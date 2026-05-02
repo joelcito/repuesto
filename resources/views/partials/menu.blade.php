@@ -31,15 +31,37 @@
                     </span>
                     <!--end:Menu link-->
                     <div class="menu-sub menu-sub-accordion">
+
                         <div class="menu-item">
-                            <a class="menu-link"
-                                href="#">
+                            <a class="menu-link {{ Route::currentRouteName() == 'usuario.listado' ? 'active' : '' }}"
+                                href="{{ route('user.listado') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title text-white">Usuarios</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {{ Route::currentRouteName() == 'rol.listado' ? 'active' : '' }}"
+                                href="{{ route('rol.listado') }}">
                                 <span class="menu-bullet">
                                     <span class="bullet bullet-dot"></span>
                                 </span>
                                 <span class="menu-title text-white">Roles</span>
                             </a>
                         </div>
+
+                        <div class="menu-item">
+                            <a class="menu-link {{ Route::currentRouteName() == 'sucursal.listado' ? 'active' : '' }}"
+                                href="{{ route('sucursal.listado') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title text-white">Sucursales</span>
+                            </a>
+                        </div>
+
+
                     </div>
                 </div>
 

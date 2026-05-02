@@ -1,0 +1,102 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Sucursal;
+use App\Utils\Respuesta;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class SucursalController extends Controller
+{
+    public function listado()
+    {
+        return view('sucursal.listado');
+    }
+
+    public function ajaxListado(Request $request)
+    {
+
+        if ($request->ajax()) {
+
+            //SACAMOS EL LISTADO
+            $sucursales = Sucursal::all();
+
+            $valores = [
+                'listado' => view('sucursal.ajaxListado')->with(compact('sucursales'))->render()
+            ];
+
+            $data = Respuesta::success($valores, "Datos Obtenidos correctamente");
+
+        } else {
+            $data = Respuesta::error(null, "Error al obtener los datos");
+        }
+        return $data;
+    }
+
+    public function guardarSucursal(Request $request)
+    {
+
+        if ($request->ajax()) {
+
+            //AL INICIO DECLARACION DE VARIABLES
+            $sucursal_id = $request->input('id');
+            $codigo_sucursal = $request->input('codigo_sucursal');
+            $nombre = $request->input('nombre');
+            $direccion = $request->input('direccion');
+            $usuario = Auth::user();
+
+            if ($sucursal_id == '0') {
+                //LA CREACION DE UN NUEVa sucursal
+                $sucursal = new Sucursal();
+                $sucursal->usuario_creador_id = $usuario->id;
+
+            } else {
+                //LA EDICION DE UN NUEVO sucursal
+                $sucursal = Sucursal::find($sucursal_id);
+                $sucursal->usuario_modificador_id = $usuario->id;
+            }
+
+            $sucursal->codigo_sucursal = $codigo_sucursal;
+            $sucursal->nombre = $nombre;
+            $sucursal->direccion = $direccion;
+            $sucursal->save();
+
+            $data = Respuesta::success(null, "Datos Obtenidos correctamente");
+
+        } else {
+            $data = Respuesta::error(null, "Error al obtener los datos");
+        }
+
+        return $data;
+
+    }
+
+    public function eliminarSucursal(Request $request)
+    {
+
+        if ($request->ajax()) {
+
+            //INICIALIZAMOS LAS VARIABLES
+            $sucursal_id = $request->input('sucursal');
+            $usuario = Auth::user();
+
+            //BUSCAMOS AL SUCURSAL
+            $sucursal = Sucursal::find($sucursal_id);
+            $sucursal->usuario_eliminador_id = $usuario->id;
+            $sucursal->save();
+
+            //AHORA ELIMINAMOS
+            Sucursal::destroy($sucursal_id);
+
+            $data = Respuesta::success(null, "Se elimino con exito");
+
+        } else {
+
+            $data = Respuesta::error(null, "Error al obtener los datos");
+        }
+
+        return $data;
+
+    }
+}
