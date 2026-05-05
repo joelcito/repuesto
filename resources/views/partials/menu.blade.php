@@ -60,6 +60,25 @@
                                 <span class="menu-title text-white">Sucursales</span>
                             </a>
                         </div>
+                        <div class="menu-item">
+                            <a class="menu-link {{ Route::currentRouteName() == 'cliente.listado' ? 'active' : '' }}"
+                                href="{{ route('cliente.listado') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title text-white">Clientes</span>
+                            </a>
+                        </div>
+
+                        <div class="menu-item">
+                            <a class="menu-link {{ Route::currentRouteName() == 'proveedor.listado' ? 'active' : '' }}"
+                                href="{{ route('proveedor.listado') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title text-white">Proveedores</span>
+                            </a>
+                        </div>
 
 
                     </div>
