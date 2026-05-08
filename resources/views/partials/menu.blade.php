@@ -80,6 +80,16 @@
                             </a>
                         </div>
 
+                        <div class="menu-item">
+                            <a class="menu-link {{ Route::currentRouteName() == 'producto.listado' ? 'active' : '' }}"
+                                href="{{ route('producto.listado') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title text-white">Producto</span>
+                            </a>
+                        </div>
+
 
                     </div>
                 </div>
