@@ -28,23 +28,15 @@
                             {{ $producto->stock_actual }}
                         </span>
                     </td>
-
                     <td>
                         {{ number_format($producto->precio_venta, 2) }}
                     </td>
-
                     <td>
-
                         @if($producto->imagen)
-
                             <img src="{{ asset('imagenes/productos/' . $producto->imagen) }}" width="60" class="img-thumbnail">
-
                         @else
-
                             <img src="{{ asset('imagenes/productos/default.jpg') }}" width="60" class="img-thumbnail">
-
                         @endif
-
                     </td>
                     <td>
                         @if($producto->estado)
@@ -53,16 +45,16 @@
                             <span class="badge bg-danger">Inactivo</span>
                         @endif
                     </td>
-
                     <td>
+                        <button class="btn btn-icon btn-sm btn-info btn-circle" title="Ver Stock"
+                            onclick="abrirStock({{ $producto->id }}, '{{ $producto->nombre }}')"><i
+                                class="fa fa-boxes"></i></button>
                         <button class="btn btn-icon btn-sm btn-warning btn-circle" title="Editar producto"
-                            onclick="editarProducto({{ json_encode($producto) }})">
-                            <i class="fa fa-edit"></i>
+                            onclick="editarProducto({{ json_encode($producto) }})"><i class="fa fa-edit"></i>
                         </button>
-
                         <button class="btn btn-icon btn-sm btn-danger btn-circle" title="Eliminar producto"
-                            onclick="eliminarProducto('{{ $producto->id }}', '{{ $producto->nombre }}')">
-                            <i class="fa fa-trash"></i>
+                            onclick="eliminarProducto('{{ $producto->id }}', '{{ $producto->nombre }}')"> <i
+                                class="fa fa-trash"></i>
                         </button>
                     </td>
 

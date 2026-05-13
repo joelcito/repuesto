@@ -23,5 +23,8 @@ class Sucursal extends Model
         'deleted_at',
     ];
 
-
+    public function movimientos()
+    {
+        return $this->hasMany(Movimiento::class, 'sucursal_id');
+    }
 }

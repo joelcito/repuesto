@@ -20,14 +20,13 @@ return new class extends Migration {
             $table->unsignedBigInteger('usuario_eliminador_id')->nullable();
 
 
-            $table->foreignId('producto_id');
+            $table->foreign('producto_id')->references('id')->on('productos');
             $table->unsignedBigInteger('producto_id')->nullable();
-            $table->foreignId('sucursal_id');
+            //foranea sucursal
+            $table->foreign('sucursal_id')->references('id')->on('sucursales');
             $table->unsignedBigInteger('sucursal_id')->nullable();
-            $table->foreignId('usuario_creador_id')->nullable();
 
-            // TIPO: INGRESO / SALIDA
-            $table->string('tipo'); // ingreso | salida
+            $table->string('tipo');
 
             $table->integer('cantidad')->default(0);
 
@@ -35,9 +34,8 @@ return new class extends Migration {
             $table->decimal('precio_compra', 10, 2)->nullable();
             $table->decimal('precio_venta', 10, 2)->nullable();
 
-            // SOLO PARA SALIDAS
             $table->string('motivo')->nullable();
-            // perdida | robo | deterioro | venta
+
             $table->dateTime('fecha')->nullable();
             $table->text('descripcion')->nullable();
 

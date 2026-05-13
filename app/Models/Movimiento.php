@@ -37,8 +37,6 @@ class Movimiento extends Model
         'deleted_at'
     ];
 
-    // RELACIONES
-
     public function producto()
     {
         return $this->belongsTo(Producto::class);
@@ -48,4 +46,6 @@ class Movimiento extends Model
     {
         return $this->belongsTo(Sucursal::class);
     }
+
+
 }

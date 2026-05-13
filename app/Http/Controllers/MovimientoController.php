@@ -24,14 +24,17 @@ class MovimientoController extends Controller
     {
         if ($request->ajax()) {
 
-            $movimientos = Movimiento::with([
-                'producto',
-                'sucursal'
-            ])->orderBy('id', 'desc')->get();
+            $productoId = $request->productoId;
+
+            $sucursales = Sucursal::with('movimientos')->get();
+
 
             $valores = [
-                'listado' => view('movimiento.ajaxListado')
-                    ->with(compact('movimientos'))
+                'stock' => view('movimiento.ajaxListado')
+                    ->with(compact(
+                        'sucursales',
+                        'productoId'
+                    ))
                     ->render()
             ];
 
@@ -48,16 +51,14 @@ class MovimientoController extends Controller
     {
 
         if ($request->ajax()) {
-
+            $producto_id = $request->idProd;
+            $sucursal_id = $request->idSuc;
             $request->validate([
 
                 'producto_id' => 'required',
                 'sucursal_id' => 'required',
-
                 'cantidad' => 'required|numeric|min:1',
-
                 'precio_compra' => 'required|numeric|min:0',
-
                 'precio_venta' => 'required|numeric|min:0',
 
             ]);
@@ -65,41 +66,28 @@ class MovimientoController extends Controller
             $usuario = Auth::user();
 
             // MOVIMIENTO
+
             $movimiento = new Movimiento();
-
             $movimiento->usuario_creador_id = $usuario->id;
-
-            $movimiento->producto_id = $request->producto_id;
-
-            $movimiento->sucursal_id = $request->sucursal_id;
-
+            $movimiento->producto_id = $producto_id;
+            $movimiento->sucursal_id = $sucursal_id;
             $movimiento->tipo = 'ingreso';
-
             $movimiento->cantidad = $request->cantidad;
-
             $movimiento->precio_compra = $request->precio_compra;
-
             $movimiento->precio_venta = $request->precio_venta;
-
             $movimiento->fecha = now();
-
             $movimiento->descripcion = $request->descripcion;
-
             $movimiento->estado = 1;
-
             $movimiento->save();
 
             // ACTUALIZAR STOCK PRODUCTO
             $producto = Producto::find($request->producto_id);
-
             $producto->stock_actual =
                 $producto->stock_actual + $request->cantidad;
 
             // ACTUALIZAR PRECIOS
             $producto->precio_compra = $request->precio_compra;
-
             $producto->precio_venta = $request->precio_venta;
-
             $producto->save();
 
             return Respuesta::success(null, "Ingreso registrado correctamente");
@@ -113,26 +101,20 @@ class MovimientoController extends Controller
      */
     public function guardarSalida(Request $request)
     {
-
         if ($request->ajax()) {
-
+            $producto_id = $request->idProds;
+            $sucursal_id = $request->idSucs;
             $request->validate([
-
                 'producto_id' => 'required',
-
                 'sucursal_id' => 'required',
-
                 'cantidad' => 'required|numeric|min:1',
-
                 'motivo' => 'required',
-
             ]);
 
             $producto = Producto::find($request->producto_id);
 
             // VALIDAR STOCK
             if ($request->cantidad > $producto->stock_actual) {
-
                 return Respuesta::error(
                     null,
                     "La salida es mayor al stock disponible"
@@ -143,32 +125,20 @@ class MovimientoController extends Controller
 
             // MOVIMIENTO
             $movimiento = new Movimiento();
-
             $movimiento->usuario_creador_id = $usuario->id;
-
-            $movimiento->producto_id = $request->producto_id;
-
-            $movimiento->sucursal_id = $request->sucursal_id;
-
+            $movimiento->producto_id = $producto_id;
+            $movimiento->sucursal_id = $sucursal_id;
             $movimiento->tipo = 'salida';
-
             $movimiento->cantidad = $request->cantidad;
-
             $movimiento->motivo = $request->motivo;
-            // perdida | robo | deterioro | venta
-
             $movimiento->fecha = now();
-
             $movimiento->descripcion = $request->descripcion;
-
             $movimiento->estado = 1;
-
             $movimiento->save();
 
             // DESCONTAR STOCK
             $producto->stock_actual =
                 $producto->stock_actual - $request->cantidad;
-
             $producto->save();
 
             return Respuesta::success(null, "Salida registrada correctamente");
@@ -186,15 +156,10 @@ class MovimientoController extends Controller
         if ($request->ajax()) {
 
             $movimiento = Movimiento::find($request->movimiento_id);
-
             $usuario = Auth::user();
-
             $movimiento->usuario_eliminador_id = $usuario->id;
-
             $movimiento->deleted_at = now();
-
             $movimiento->save();
-
             return Respuesta::success(null, "Movimiento eliminado");
         }
 
