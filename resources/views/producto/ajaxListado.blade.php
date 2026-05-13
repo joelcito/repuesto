@@ -1,5 +1,4 @@
 <div style="overflow-x: auto;">
-    <!--begin::Table-->
     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_producto">
         <thead>
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
@@ -10,6 +9,7 @@
                 <th>Marca</th>
                 <th>Stock</th>
                 <th>Precio Venta</th>
+                <th>Imagen</th>
                 <th>Estado</th>
                 <th>Actions</th>
             </tr>
@@ -21,7 +21,7 @@
                     <td>{{ $producto->codigo_barras }}</td>
                     <td>{{ $producto->codigo_interno }}</td>
                     <td>{{ $producto->nombre }}</td>
-                    <td>{{ $producto->categoria }}</td>
+                    <td>{{ $producto->categoria->nombre ?? '' }}</td>
                     <td>{{ $producto->marca }}</td>
                     <td>
                         <span class="badge bg-primary">
@@ -33,6 +33,19 @@
                         {{ number_format($producto->precio_venta, 2) }}
                     </td>
 
+                    <td>
+
+                        @if($producto->imagen)
+
+                            <img src="{{ asset('imagenes/productos/' . $producto->imagen) }}" width="60" class="img-thumbnail">
+
+                        @else
+
+                            <img src="{{ asset('imagenes/productos/default.jpg') }}" width="60" class="img-thumbnail">
+
+                        @endif
+
+                    </td>
                     <td>
                         @if($producto->estado)
                             <span class="badge bg-success">Activo</span>
@@ -63,7 +76,6 @@
             @endforelse
         </tbody>
     </table>
-    <!--end::Table-->
 </div>
 
 <script>

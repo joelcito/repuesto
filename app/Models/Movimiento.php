@@ -5,37 +5,43 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Request;
 
-class Proveedor extends Model
+class Movimiento extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'proveedores';
+    protected $table = 'movimientos';
 
     protected $fillable = [
+
         'usuario_creador_id',
         'usuario_modificador_id',
         'usuario_eliminador_id',
 
-        'nombre_completo',
-        'nit',
-        'razon_social',
-        'direccion',
-        'celular',
+        'producto_id',
+        'sucursal_id',
+
+        'tipo',
+        'cantidad',
+
+        'precio_compra',
+        'precio_venta',
+
+        'motivo',
+
+        'fecha',
+        'descripcion',
 
         'estado',
-        'deleted_at',
+        'deleted_at'
     ];
 
+    // RELACIONES
 
-    public function categoria()
+    public function producto()
     {
-        return $this->belongsTo(Categoria::class);
-    }
-
-    public function proveedor()
-    {
-        return $this->belongsTo(Proveedor::class);
+        return $this->belongsTo(Producto::class);
     }
 
     public function sucursal()

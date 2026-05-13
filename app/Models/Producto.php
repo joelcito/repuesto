@@ -17,25 +17,44 @@ class Producto extends Model
         'codigo_interno',
         'nombre',
         'descripcion',
-        'categoria',
+
+        'categoria_id',
+        'proveedor_id',
+        'sucursal_id',
+
         'marca',
         'numero_parte_vehiculo',
+
         'stock_actual',
         'stock_minimo',
         'unidad',
+
         'precio_compra',
         'precio_venta',
         'precio_mayor',
-        'ubicacion',
-        'proveedor',
+
         'observaciones',
         'imagen',
         'estado',
+
         'usuario_creador_id',
         'usuario_modificador_id',
         'usuario_eliminador_id',
-        'estado',
+
         'deleted_at',
     ];
+    public function categoria()
+    {
+        return $this->belongsTo(Categoria::class, 'categoria_id');
+    }
 
+    public function proveedor()
+    {
+        return $this->belongsTo(Proveedor::class, 'proveedor_id');
+    }
+
+    public function sucursal()
+    {
+        return $this->belongsTo(Sucursal::class, 'sucursal_id');
+    }
 }

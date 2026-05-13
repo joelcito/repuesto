@@ -60,6 +60,7 @@ class SucursalController extends Controller
             $sucursal->codigo_sucursal = $codigo_sucursal;
             $sucursal->nombre = $nombre;
             $sucursal->direccion = $direccion;
+            $sucursal->estado = 1;
             $sucursal->save();
 
             $data = Respuesta::success(null, "Datos Obtenidos correctamente");

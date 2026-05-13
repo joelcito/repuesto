@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MovimientoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProveedorController;
@@ -73,7 +75,30 @@ Route::middleware('auth')->group(function () {
         Route::post('/ajaxListado', [ProductoController::class, 'ajaxListado'])->name('producto.ajaxListado');
         Route::post('/guardarProducto', [ProductoController::class, 'guardarProducto'])->name('producto.guardarProducto');
         Route::post('/eliminarProducto', [ProductoController::class, 'eliminarProducto'])->name('producto.eliminarProducto');
+
+        Route::post('/generar-codigo', [ProductoController::class, 'generarCodigo']);
+
     });
+
+    Route::prefix('/categoria')->group(function () {
+        Route::get('/listado', [CategoriaController::class, 'listado'])->name('categoria.listado');
+        Route::post('/ajaxListado', [CategoriaController::class, 'ajaxListado'])->name('categoria.ajaxListado');
+        Route::post('/guardar', [CategoriaController::class, 'guardar'])->name('categoria.guardar');
+        Route::post('/eliminar', [CategoriaController::class, 'eliminar'])->name('categoria.eliminar');
+    });
+
+
+    // MOVIMIENTO
+    Route::prefix('/movimiento')->group(function () {
+        Route::get('/listado', [MovimientoController::class, 'listado'])->name('movimiento.listado');
+        Route::get('/ajaxListado', [MovimientoController::class, 'ajaxListado'])->name('movimiento.ajaxListado');
+        Route::post('/guardarIngreso', [MovimientoController::class, 'guardarIngreso'])->name('movimiento.guardarIngreso');
+        Route::post('/guardarSalida', [MovimientoController::class, 'guardarSalida'])->name('movimiento.guardarSalida');
+        Route::post('/sacarTipoIngreso', [MovimientoController::class, 'sacarTipoIngreso'])->name('movimiento.sacarTipoIngreso');
+
+        //Route::post('/guardarMovimiento', [MovimientoController::class, 'guardarMovimiento'])->name('movimiento.guardarMovimiento');
+    });
+
 
 });
 

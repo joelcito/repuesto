@@ -64,6 +64,7 @@ class ProveedorController extends Controller
             $proveedor->razon_social = $razon_social;
             $proveedor->direccion = $direccion;
             $proveedor->celular = $celular;
+            $proveedor->estado = 1;
             $proveedor->save();
 
             $data = Respuesta::success(null, "Datos Obtenidos correctamente");
