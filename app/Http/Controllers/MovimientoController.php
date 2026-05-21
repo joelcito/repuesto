@@ -60,6 +60,7 @@ class MovimientoController extends Controller
                 'cantidad' => 'required|numeric|min:1',
                 'precio_compra' => 'required|numeric|min:0',
                 'precio_venta' => 'required|numeric|min:0',
+                'compra_ingreso' => 'required|numeric|min:0',
 
             ]);
 
@@ -75,6 +76,7 @@ class MovimientoController extends Controller
             $movimiento->cantidad = $request->cantidad;
             $movimiento->precio_compra = $request->precio_compra;
             $movimiento->precio_venta = $request->precio_venta;
+            $movimiento->compra_ingreso = $request->compra_ingreso;
             $movimiento->fecha = now();
             $movimiento->descripcion = $request->descripcion;
             $movimiento->estado = 1;
@@ -88,6 +90,8 @@ class MovimientoController extends Controller
             // ACTUALIZAR PRECIOS
             $producto->precio_compra = $request->precio_compra;
             $producto->precio_venta = $request->precio_venta;
+            $producto->compra_ingreso = $request->compra_ingreso;
+
             $producto->save();
 
             return Respuesta::success(null, "Ingreso registrado correctamente");

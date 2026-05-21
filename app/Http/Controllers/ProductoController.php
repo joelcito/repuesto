@@ -113,6 +113,7 @@ class ProductoController extends Controller
             $producto->precio_compra = $request->input('precio_compra');
             $producto->precio_venta = $request->input('precio_venta');
             $producto->precio_mayor = $request->input('precio_mayor');
+            $producto->compra_ingreso = $request->input('compra_ingreso');
 
             $producto->sucursal_id = $request->input('sucursal_id');
 

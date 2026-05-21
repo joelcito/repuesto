@@ -210,7 +210,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header" id="kt_modal_add_user_header">
-                <h3 class="fw-bold">STOCK POR SUCUASALES <span class="text-info" id="nombreProductoModal"></span></h3>
+                <h3 class="fw-bold">STOCK POR SUCURSALES <span class="text-info" id="nombreProductoModal"></span></h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body scroll-y">
@@ -262,7 +262,7 @@
 
                     <div class="row mt-3">
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
 
                             <label class="form-label fw-bold">
                                 Cantidad
@@ -273,7 +273,7 @@
 
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
 
                             <label class="form-label fw-bold">
                                 Precio Compra
@@ -284,7 +284,7 @@
 
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
 
                             <label class="form-label fw-bold">
                                 Precio Venta
@@ -292,6 +292,17 @@
 
                             <input type="number" class="form-control form-control-sm" id="precio_venta_ingreso"
                                 name="precio_venta" min="0.01" step="0.01">
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label class="form-label fw-bold">
+                                Compra por ingreso
+                            </label>
+
+                            <input type="number" class="form-control form-control-sm" id="compra_ingreso"
+                                name="compra_ingreso" min="0.01" step="0.01">
 
                         </div>
 
@@ -561,6 +572,7 @@
             formData.append('precio_compra', $('#precio_compra').val());
             formData.append('precio_venta', $('#precio_venta').val());
             formData.append('precio_mayor', $('#precio_mayor').val());
+            formData.append('compra_ingreso', $('#compra_ingreso').val());
             formData.append('sucursal_id', $('#sucursal_id').val());
             formData.append('proveedor_id', $('#proveedor_id').val());
             formData.append('observaciones', $('#observaciones').val());
@@ -626,6 +638,7 @@
             $('#precio_compra').val(producto.precio_compra);
             $('#precio_venta').val(producto.precio_venta);
             $('#precio_mayor').val(producto.precio_mayor);
+            $('#compra_ingreso').val(producto.compra_ingreso);
             $('#observaciones').val(producto.observaciones);
 
             if (producto.imagen != null) {
@@ -690,6 +703,7 @@
             $('#cantidad_ingreso').val('')
             $('#precio_compra').val('')
             $('#codigo_compra').val('')
+            $('#compra_ingreso').val('')
             $('#id').val(0)
             $('#modalIngreso').modal('show')
         }
@@ -741,28 +755,21 @@
                             let errores = xhr.responseJSON.errors;
 
                             for (let campo in errores) {
-
                                 let mensaje = errores[campo][0];
-
                                 let input = $(`[name="${campo}"]`);
-
                                 input.addClass("is-invalid");
-
                                 input.after(`
-                                    <div class="invalid-feedback">
-                                        ${mensaje}
-                                    </div>
-                                `);
+                                                    <div class="invalid-feedback">
+                                                        ${mensaje}
+                                                    </div>
+                                                `);
                             }
-
                         } else {
-
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
                                 text: 'Ocurrió un error inesperado.'
                             });
-
                         }
                     }
                 });
@@ -879,10 +886,10 @@
                                 input.addClass("is-invalid");
 
                                 input.after(`
-                                    <div class="invalid-feedback">
-                                        ${mensaje}
-                                    </div>
-                                `);
+                                                    <div class="invalid-feedback">
+                                                        ${mensaje}
+                                                    </div>
+                                                `);
                             }
 
                         } else {

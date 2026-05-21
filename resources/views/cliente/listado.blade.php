@@ -111,16 +111,7 @@
                                 name="celular_referencia_3" maxlength="8">
                         </div>
                     </div>
-                    <div class="row mt-7">
-                        <div class="col-md-6">
-                            <label class="required fw-semibold fs-6 mb-2">Correo de ingreso al sistema</label>
-                            <input type="email" class="form-control form-control-sm" id="email" name="email" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="fw-semibold fs-6 mb-2">Contrasenia</label>
-                            <input type="password" class="form-control form-control-sm" id="password" name="password">
-                        </div>
-                    </div>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -214,7 +205,7 @@
             $('#ap_paterno').val('')
             $('#nombre').val('')
             $('#id').val(0)
-            $('#password').attr('required', true)
+            // $('#password').attr('required', true)
             $('#modalCliente').modal('show')
         }
 
@@ -295,9 +286,6 @@
             $('#nombre').val(cliente.nombres)
             $('#rol_id').val(cliente.rol_id)
             $('#id').val(cliente.id)
-
-            $('#email').val(cliente.email)
-            $('#password').attr('required', false)
             $('#modalCliente').modal('show')
         }
 

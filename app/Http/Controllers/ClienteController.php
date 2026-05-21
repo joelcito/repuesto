@@ -42,7 +42,7 @@ class ClienteController extends Controller
     {
 
 
-        if ($request->ajax()) {
+        try {
 
             // dd($request->all());
             //$rolCliente = env('ROL_CLIENTE');
@@ -63,9 +63,6 @@ class ClienteController extends Controller
             $celular_referencia_2 = $request->input('celular_referencia_2');
             $nombre_referencia_3 = $request->input('nombre_referencia_3');
             $celular_referencia_3 = $request->input('celular_referencia_3');
-            $email = $request->input('email');
-            $password = $request->input('password');
-
 
             $usuario = Auth::user();
 
@@ -73,24 +70,7 @@ class ClienteController extends Controller
                 $cliente = new User();
                 $cliente->usuario_creador_id = $usuario->id;
 
-                $request->validate([
-                    'nombre' => 'required',
-                    'ap_paterno' => 'required',
-                    'email' => 'required|email|unique:users,email',
-                    'password' => 'required',
-                ]);
-
             } else {
-
-                $request->validate([
-                    'nombre' => 'required',
-                    'ap_paterno' => 'required',
-                    'email' => [
-                        'required',
-                        'email',
-                        Rule::unique('users', 'email')->ignore($cliente_id),
-                    ],
-                ]);
 
                 $cliente = User::find($cliente_id);
                 $cliente->usuario_modificador_id = $usuario->id;
@@ -148,23 +128,15 @@ class ClienteController extends Controller
             $cliente->nombre_referencia_3 = $nombre_referencia_3;
             $cliente->celular_referencia_3 = $celular_referencia_3;
             $cliente->name = $nombre . " " . $ap_paterno . " " . $ap_materno;
-            $cliente->email = $email;
-            if ($cliente_id == '0') {
-                $cliente->password = Hash::make($password);
-            } else {
-                if ($password != null && $password != "") {
-                    $cliente->password = Hash::make($password);
-                }
-            }
+
             $cliente->rol_id = $rolCliente;
             $cliente->save();
 
-            $data = Respuesta::success(null, "Datos Obtenidos correctamente");
-        } else {
-            $data = Respuesta::error(null, "Error al obtener los datos");
-        }
+            return Respuesta::success(null, "Cliente guardado correctamente");
 
-        return $data;
+        } catch (\Exception $e) {
+            return Respuesta::error($e->getMessage(), "Error interno");
+        }
     }
 
     public function eliminarCliente(Request $request, Cliente $clientes)

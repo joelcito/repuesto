@@ -32,6 +32,7 @@ class Producto extends Model
         'precio_compra',
         'precio_venta',
         'precio_mayor',
+        'compra_ingreso',
 
         'observaciones',
         'imagen',

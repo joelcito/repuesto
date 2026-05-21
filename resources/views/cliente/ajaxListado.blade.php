@@ -13,7 +13,7 @@
                 <th>Razon Social</th>
                 <th>Direccion</th>
                 <th>Actions</th>
-                <th>Referencias</th>
+
             </tr>
         </thead>
         <tbody class="text-gray-600 fw-semibold">
@@ -34,30 +34,7 @@
                             onclick="eliminarCliente('{{ $cliente->id }}',  '{{ $cliente->razon_social }}')"><i
                                 class="fa fa-trash"></i></button>
                     </td>
-                    <td>
-                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_usuarios">
-                            <thead>
-                                <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                    <th>Nombre Completo</th>
-                                    <th>Celular</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-gray-600 fw-semibold">
-                                <tr>
-                                    <td>{{ $cliente->nombre_referencia_1 }}</td>
-                                    <td>{{ $cliente->celular_referencia_1 }}</td>
-                                </tr>
-                                <tr>
-                                    <td>{{ $cliente->nombre_referencia_2 }}</td>
-                                    <td>{{ $cliente->celular_referencia_2 }}</td>
-                                </tr>
-                                <tr>
-                                    <td>{{ $cliente->nombre_referencia_3 }}</td>
-                                    <td>{{ $cliente->celular_referencia_3 }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
+
                 </tr>
             @empty
                 <h4 class="text-danger">No hay datos</h4>
