@@ -69,7 +69,7 @@
                         <input type="file" accept="image/*" class="form-control form-control-sm" id="imagen"
                             name="imagen">
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-md-6">
                             <label class="fw-semibold fs-6 mb-2">Imagen Cedula Identidad Anverso</label>
                             <input type="file" accept="image/*" class="form-control form-control-sm"
@@ -110,7 +110,7 @@
                             <input type="text" class="form-control form-control-sm" id="celular_referencia_3"
                                 name="celular_referencia_3" maxlength="8">
                         </div>
-                    </div>
+                    </div> -->
 
                 </form>
             </div>

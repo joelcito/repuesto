@@ -99,6 +99,24 @@
                                 <span class="menu-title text-white">Producto</span>
                             </a>
                         </div>
+                        <div class="menu-item">
+                            <a class="menu-link {{ Route::currentRouteName() == 'venta.listado' ? 'active' : '' }}"
+                                href="{{ route('venta.listado') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title text-white">Venta</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {{ Route::currentRouteName() == 'caja.listado' ? 'active' : '' }}"
+                                href="{{ route('caja.listado') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title text-white">Caja</span>
+                            </a>
+                        </div>
 
 
                     </div>

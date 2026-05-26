@@ -1,45 +1,88 @@
 <div style="overflow-x: auto;">
     <!--begin::Table-->
-    <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_venta">
+    <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_caja">
         <thead>
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                 <th>ID</th>
-                <th>Fecha</th>
-                <th>Cliente</th>
-                <th>Atendido Por</th>
-                <th>Total</th>
-                <th>Método Pago</th>
+                <th>Usuario</th>
+                <th>Sucursal</th>
+                <th>Apertura</th>
+                <th>Ingresos</th>
+                <th>Egresos</th>
+                <th>Cierre</th>
                 <th>Estado</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody class="text-gray-600 fw-semibold">
-            @forelse($ventas as $venta)
+            @forelse($cajas as $caja)
 
                 <tr>
-                    <td>{{ $venta->id }}</td>
+
+                    <td>{{ $caja->id }}</td>
+
                     <td>
-                        {{ date('d/m/Y H:i', strtotime($venta->created_at)) }}
+                        {{ $caja->usuario->name ?? '' }}
                     </td>
+
                     <td>
-                        {{ $venta->cliente->nombres ?? 'SIN CLIENTE' }}
+                        {{ $caja->sucursal->nombre ?? '' }}
                     </td>
+
                     <td>
-                        {{ $venta->usuarioCreador->name ?? '' }}
+                        Bs. {{ number_format($caja->monto_apertura, 2) }}
                     </td>
+
                     <td>
-                        Bs. {{ number_format($venta->total, 2) }}
+                        Bs. {{ number_format($caja->total_ingresos, 2) }}
                     </td>
+
                     <td>
-                        {{ $venta->metodo_pago }}
+                        Bs. {{ number_format($caja->total_egresos, 2) }}
                     </td>
+
                     <td>
-                        <span class="badge bg-success">
-                            {{ $venta->estado }}
-                        </span>
+                        Bs. {{ number_format($caja->monto_cierre, 2) }}
                     </td>
+
+                    <td>
+
+                        @if($caja->estado == 'ABIERTA')
+
+                            <span class="badge bg-success">
+                                ABIERTA
+                            </span>
+
+                        @else
+
+                            <span class="badge bg-danger">
+                                CERRADA
+                            </span>
+
+                        @endif
+
+                    </td>
+
+                    <td>
+
+                        @if($caja->estado == 'ABIERTA')
+
+                            <button class="btn btn-danger btn-sm" onclick="cerrarCaja({{ $caja->id }})">
+
+                                Cerrar
+
+                            </button>
+
+                        @endif
+
+                    </td>
+
                 </tr>
+
             @empty
+
                 <h4 class="text-danger">No hay datos</h4>
+
             @endforelse
         </tbody>
     </table>
@@ -48,7 +91,7 @@
 
 <script>
     $(document).ready(function () {
-        $('#kt_table_venta').DataTable({
+        $('#kt_table_caja').DataTable({
             lengthMenu: [10, 25, 50, 100], // Opciones de longitud de página
             dom: '<"dt-head row"<"col-md-6"l><"col-md-6"f>><"clear">t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>', // Use dom for basic layout
             language: {

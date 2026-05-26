@@ -44,9 +44,6 @@ class User extends Authenticatable
         'estado',
         'deleted_at',
 
-        'pago_diario',
-        'horas_base',
-
     ];
 
     /**

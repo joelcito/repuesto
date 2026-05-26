@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\CajasController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MovimientoCajaController;
 use App\Http\Controllers\MovimientoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProfileController;
@@ -10,6 +12,7 @@ use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VentasController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -98,6 +101,28 @@ Route::middleware('auth')->group(function () {
 
         //Route::post('/guardarMovimiento', [MovimientoController::class, 'guardarMovimiento'])->name('movimiento.guardarMovimiento');
     });
+
+    //venta
+    Route::prefix('/venta')->group(function () {
+        Route::get('/listado', [VentasController::class, 'listado'])->name('venta.listado');
+        Route::post('/ajaxListado', [VentasController::class, 'ajaxListado'])->name('venta.ajaxListado');
+        Route::post('/guardarVenta', [VentasController::class, 'guardarVenta'])->name('venta.guardarVenta');
+        Route::post('/eliminar', [VentasController::class, 'eliminar'])->name('venta.eliminar');
+    });
+
+    //caja
+    Route::prefix('/caja')->group(function () {
+        Route::get('/listado', [CajasController::class, 'listado'])->name('caja.listado');
+        Route::post('/ajaxListado', [CajasController::class, 'ajaxListado'])->name('caja.ajaxListado');
+        Route::post('/guardar', [CajasController::class, 'guardar'])->name('caja.guardar');
+        Route::post('/eliminar', [CajasController::class, 'eliminar'])->name('caja.eliminar');
+
+        Route::post('/abrirCaja', [CajasController::class, 'abrirCaja'])->name('caja.abrirCaja');
+        Route::post('/cerrarCaja', [CajasController::class, 'cerrarCaja'])->name('caja.cerrarCaja');
+    });
+
+
+    Route::post('/movimiento-caja/guardar', [MovimientoCajaController::class, 'guardarMovimiento'])->name('movimientoCaja.guardar');
 
 
 });
