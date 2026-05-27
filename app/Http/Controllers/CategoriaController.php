@@ -11,14 +11,16 @@ class CategoriaController extends Controller
 {
     public function listado()
     {
-        return view('categoria.listado');
+        $categoriasPadre = Categoria::whereNull('parent_id')->get();
+
+        return view('categoria.listado', compact('categoriasPadre'));
     }
 
     public function ajaxListado(Request $request)
     {
         if ($request->ajax()) {
             //$categorias = Categoria::where('estado', 'PAGO')->get();
-            $categorias = Categoria::all();
+            $categorias = Categoria::with('parent')->get();
             $valores = [
                 'listado' => view('categoria.ajaxListado')->with(compact('categorias'))->render()
             ];
@@ -45,6 +47,7 @@ class CategoriaController extends Controller
             $nombre = $request->input('nombre');
             $tipo = $request->input('tipo');
             $descripcion = $request->input('descripcion');
+            $parent_id = $request->parent_id ?: null;
             $usuario = Auth::user();
 
             if ($id == 0) {
@@ -58,7 +61,9 @@ class CategoriaController extends Controller
             $categoria->nombre = $nombre;
             $categoria->descripcion = $descripcion;
             $categoria->tipo = $tipo;
+            $categoria->parent_id = $parent_id;
             $categoria->estado = 1;
+
             $categoria->save();
 
             $data = Respuesta::success(null, "Datos obtenidos correctamente");

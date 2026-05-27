@@ -4,8 +4,10 @@
         <thead>
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                 <th>Nombre</th>
+                <th>Subcategoria</th>
                 <th>Descripcion</th>
                 <th>Tipo</th>
+
                 <th>Actions</th>
             </tr>
         </thead>
@@ -13,6 +15,7 @@
             @forelse ($categorias as $rol)
                 <tr>
                     <td>{{ $rol->nombre }}</td>
+                    <td>{{ $rol->parent ? $rol->parent->nombre : 'Principal' }}</td>
                     <td>{{ $rol->descripcion }}</td>
                     <td>
 

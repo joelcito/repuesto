@@ -19,17 +19,8 @@ class VentasController extends Controller
     public function listado()
     {
         $clientes = User::get();
-
-        $productos = Producto::where(
-            'estado',
-            1
-        )->get();
-
-        $cajas = Caja::where(
-            'estado',
-            'ABIERTA'
-        )->get();
-
+        $productos = Producto::where('estado', 1)->get();
+        $cajas = Caja::where('estado', 'ABIERTA')->get();
         return view(
             'venta.listado',
             compact(
@@ -48,12 +39,10 @@ class VentasController extends Controller
         ])
             ->orderBy('id', 'desc')
             ->get();
-
         $listado = view(
             'venta.ajaxListado',
             compact('ventas')
         )->render();
-
         return response()->json([
             'estado' => true,
             'data' => [
@@ -71,17 +60,13 @@ class VentasController extends Controller
                 'metodo_pago' => 'required',
                 'productos' => 'required|array|min:1'
             ]);
-
             $usuario = Auth::user();
-
             $caja = Caja::where('id', $request->caja_id)
                 ->where('estado', 'ABIERTA')
                 ->first();
-
             if (!$caja) {
                 throw new \Exception('La caja no está abierta');
             }
-
             $venta = new Venta();
             $venta->usuario_cliente_id = $request->cliente_id;
             $venta->usuario_venta_id = $usuario->id;
@@ -104,12 +89,7 @@ class VentasController extends Controller
                 if ($producto->stock_actual < $item['cantidad']) {
                     throw new \Exception("Stock insuficiente de: " . $producto->nombre);
                 }
-                $precio = 0;
-                if ($item['tipo_precio'] == 'MAYOR') {
-                    $precio = $producto->precio_mayor;
-                } else {
-                    $precio = $producto->precio_venta;
-                }
+                $precio = $item['precio'];
                 $subtotal = $precio * $item['cantidad'];
                 $detalle = new VentaDetalle();
                 $detalle->venta_id = $venta->id;
@@ -128,29 +108,17 @@ class VentasController extends Controller
 
                 // MOVIMIENTO STOCK
                 Movimiento::create([
-
                     'producto_id' => $producto->id,
-
                     'sucursal_id' => $producto->sucursal_id,
-
                     'tipo' => 'VENTA',
-
                     'cantidad' => $item['cantidad'],
-
                     'precio_compra' => $producto->precio_compra,
-
                     'precio_venta' => $precio,
-
                     'compra_ingreso' => null,
-
                     'motivo' => 'VENTA',
-
                     'fecha' => now(),
-
                     'descripcion' => 'VENTA #' . $venta->id,
-
                     'estado' => 'ACTIVO',
-
                     'usuario_creador_id' => $usuario->id
                 ]);
                 $subtotalGeneral += $subtotal;

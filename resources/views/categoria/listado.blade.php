@@ -49,6 +49,22 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="fw-semibold fs-6 mb-2">Categoría Padre</label>
+                            <select class="form-select form-select-sm" name="parent_id" id="parent_id">
+                                <option value="">-- Categoría Principal --</option>
+
+                                @foreach($categoriasPadre as $cat)
+                                    <option value="{{ $cat->id }}">
+                                        {{ $cat->nombre }}
+                                    </option>
+                                @endforeach
+
+                            </select>
+                        </div>
+                    </div>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -89,13 +105,6 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
 @stop()
 
 @section('js')
@@ -113,16 +122,6 @@
         });
 
         function ajaxListado() {
-            // Mostrar SweetAlert2 antes de enviar la solicitud
-            // Swal.fire({
-            //     title: 'Generando Listado...',
-            //     text: 'Por favor espera mientras generamos el listado.',
-            //     allowOutsideClick: false, // Evitar que se cierre al hacer clic fuera
-            //     didOpen: () => {
-            //         Swal.showLoading(); // Mostrar el spinner de carga
-            //     }
-            // });
-
             let datos = {};
             $.ajax({
                 url: "{{ route('categoria.ajaxListado') }}",
@@ -135,8 +134,7 @@
                     } else {
 
                     }
-                    // Ocultar SweetAlert2 cuando la solicitud sea exitosa
-                    // Swal.close();
+
                 }
             })
         }
@@ -152,7 +150,9 @@
             $('#id').val(0)
             $('#nombre').val('')
             $('#descripcion').val('')
-            $('#tipo').val('INGRESO')
+            $('#tipo').val('AUTOMOVIL')
+            $('#parent_id').val('')
+
             $('#modalRol').modal('show')
         }
 
@@ -203,12 +203,12 @@
         function editarRol(rol) {
             limpiarErorres();
 
-            Object.keys(rol).forEach(key => {
-                let input = $(`#${key}`);
-                if (input.length) {
-                    input.val(rol[key]);
-                }
-            });
+            $('#id').val(rol.id)
+            $('#nombre').val(rol.nombre)
+            $('#descripcion').val(rol.descripcion)
+            $('#tipo').val(rol.tipo)
+            $('#parent_id').val(rol.parent_id) // 👈 CLAVE
+
             $('#modalRol').modal('show')
         }
 

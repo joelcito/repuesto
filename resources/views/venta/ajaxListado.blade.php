@@ -3,7 +3,7 @@
     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_venta">
         <thead>
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                <th>ID</th>
+
                 <th>Fecha</th>
                 <th>Cliente</th>
                 <th>Atendido Por</th>
@@ -14,24 +14,13 @@
         </thead>
         <tbody class="text-gray-600 fw-semibold">
             @forelse($ventas as $venta)
-
                 <tr>
-                    <td>{{ $venta->id }}</td>
-                    <td>
-                        {{ date('d/m/Y H:i', strtotime($venta->created_at)) }}
-                    </td>
-                    <td>
-                        {{ $venta->cliente->nombres ?? 'SIN CLIENTE' }}
-                    </td>
-                    <td>
-                        {{ $venta->usuarioCreador->name ?? '' }}
-                    </td>
-                    <td>
-                        Bs. {{ number_format($venta->total, 2) }}
-                    </td>
-                    <td>
-                        {{ $venta->metodo_pago }}
-                    </td>
+
+                    <td>{{ date('d/m/Y H:i', strtotime($venta->created_at)) }}</td>
+                    <td>{{ $venta->cliente->nombres ?? 'SIN CLIENTE' }}</td>
+                    <td>{{ $venta->usuarioCreador->name ?? '' }}</td>
+                    <td>Bs. {{ number_format($venta->total, 2) }}</td>
+                    <td>{{ $venta->metodo_pago }}</td>
                     <td>
                         <span class="badge bg-success">
                             {{ $venta->estado }}
