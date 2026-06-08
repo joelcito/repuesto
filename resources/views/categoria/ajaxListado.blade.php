@@ -7,7 +7,6 @@
                 <th>Subcategoria</th>
                 <th>Descripcion</th>
                 <th>Tipo</th>
-
                 <th>Actions</th>
             </tr>
         </thead>
@@ -18,10 +17,7 @@
                     <td>{{ $rol->parent ? $rol->parent->nombre : 'Principal' }}</td>
                     <td>{{ $rol->descripcion }}</td>
                     <td>
-
                         <span class="badge badge-success">{{ $rol->tipo }}</span>
-
-
                     </td>
                     <td>
                         <button class="btn btn-icon btn-sm btn-warning btn-circle" title="Editar rol"

@@ -22,7 +22,7 @@
                     <td>{{ $producto->codigo_interno }}</td>
                     <td>{{ $producto->nombre }}</td>
                     <td>{{ $producto->categoria->nombre ?? '' }}</td>
-                    <td>{{ $producto->marca }}</td>
+                    <td>{{ $producto->marca->nombre ?? '' }}</td>
                     <td>
                         <span class="badge bg-primary">
                             {{ $producto->stock_actual }}

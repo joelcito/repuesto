@@ -21,11 +21,19 @@ class Venta extends Model
         'usuario_venta_id',
         'caja_id',
 
+        'fecha',
+
+        'numero_factura',
+        'nit',
+        'razon_social',
         'subtotal',
         'descuento',
         'total',
+        'estado_pago',
         'metodo_pago',
         'observacion',
+        'descripcion',
+
 
         'estado',
         'deleted_at',
@@ -57,4 +65,17 @@ class Venta extends Model
         return $this->belongsTo(User::class, 'usuario_creador_id');
     }
 
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'venta_id');
+    }
+
+
+    public function vendedor()
+    {
+        return $this->belongsTo(
+            User::class,
+            'usuario_venta_id'
+        );
+    }
 }

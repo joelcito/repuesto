@@ -12,196 +12,82 @@
 @endsection
 @section('content')
 
-
 <div class="d-flex flex-column flex-column-fluid">
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxlg">
             <div class="card shadow-sm">
-                <div class="card-header bg-light-info py-4 d-flex align-items-center justify-content-between">
-                    <h3 class="card-title fw-bold">Listado de Venta</h3>
+
+
+                <div class="card-header flex-wrap bg-light-info py-4">
+                    <h3
+                        class="card-title page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
+                        LISTADO DE VENTAS</h3>
                     <div class="card-toolbar">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="modalNuevaVenta()">
-                            <i class="fa fa-plus"></i> Nueva Venta
-                        </button>
+                        <a class="btn btn-sm fw-bold btn-primary" href="{{ url('venta/formulario') }}"><i
+                                class="fa fa-plus"></i>Nueva Venta Compra Venta</a>
                     </div>
                 </div>
-                <div class="card-body py-4" id="table_listado">
-                    <!-- El listado se carga por AJAX -->
+                <div class="card-body py-4">
+                    <form id="formulario-busqueda-factura">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label class="fw-semibold fs-6 mb-2">No. Factura</label>
+                                <input type="number" class="form-control form-control-sm" name="buscar_nro_factura"
+                                    id="buscar_nro_factura">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="fw-semibold fs-6 mb-2">Nombre Cliente</label>
+                                <input type="text" class="form-control form-control-sm" name="buscar_nombre_cliente"
+                                    id="buscar_nombre_cliente">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="fw-semibold fs-6 mb-2">C.I. Persona</label>
+                                <input type="number" class="form-control form-control-sm" name="buscar_nro_cedula"
+                                    id="buscar_nro_cedula">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="fw-semibold fs-6 mb-2">NIT</label>
+                                <input type="number" class="form-control form-control-sm" name="buscar_nit"
+                                    id="buscar_nit">
+                            </div>
+                            <div class="col-md-1">
+                                <label class="fw-semibold fs-6 mb-2">Fecha Inicio</label>
+                                <input type="date" class="form-control form-control-sm" name="buscar_fecha_inicio"
+                                    id="buscar_fecha_inicio">
+                            </div>
+                            <div class="col-md-1">
+                                <label class="fw-semibold fs-6 mb-2">Fecha Fin</label>
+                                <input type="date" class="form-control form-control-sm" name="buscar_fecha_fin"
+                                    id="buscar_fecha_fin">
+                            </div>
+                            <div class="col-md-2">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <button type="button" id="botom_genera_buscar"
+                                            class="btn btn-success btn-sm w-100 mt-8 btn-icon"
+                                            onclick="ajaxListado()"><i class="fa fa-search"></i></button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" id="botom_genera_pdf"
+                                            class="btn btn-danger btn-sm w-100 btn-icon mt-8" title="Expotar en PDF"
+                                            onclick="reportePDF()"><i class="fa fa-file-pdf"></i></button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" id="botom_genera_excel"
+                                            class="btn btn-success btn-sm w-100 btn-icon mt-8" title="Expotar en Excel"
+                                            onclick="exportarExcel()"><i class="fa fa-file-excel"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="card-body py-4" id="table_listado">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
-<div class="modal fade" id="modalVenta" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-secondary text-white">
-                <h3 class="fw-bold mb-0">
-                    <i class="fa fa-shopping-cart me-2"></i>
-                    NUEVA VENTA
-                </h3>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="formularioVenta">
-                    <div class="card shadow-sm mb-3">
-
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label class="fw-semibold fs-6 mb-2">
-                                        Cliente
-                                    </label>
-                                    <select class="form-select form-select-sm" name="cliente_id">
-                                        <option value="">
-                                            Seleccione
-                                        </option>
-                                        @foreach($clientes as $cliente)
-                                            <option value="{{ $cliente->id }}">
-                                                {{ $cliente->nombres }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="fw-semibold fs-6 mb-2">
-                                        Método Pago
-                                    </label>
-                                    <select class="form-select form-select-sm" name="metodo_pago" id="metodo_pago">
-                                        <option value="EFECTIVO">
-                                            EFECTIVO
-                                        </option>
-                                        <option value="QR">
-                                            QR
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="fw-semibold fs-6 mb-2">
-                                        Caja
-                                    </label>
-                                    <select class="form-select form-select-sm" name="caja_id">
-                                        @foreach($cajas as $caja)
-                                            <option value="{{ $caja->id }}">
-                                                CAJA #{{ $caja->id }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card shadow-sm mb-4">
-
-                        <div class="card-body">
-                            <div class="row g-3 align-items-end">
-                                <div class="col-md-3">
-                                    <label class="fw-semibold fs-6 mb-2">
-                                        Producto
-                                    </label>
-                                    <select class="form-select form-select-sm" id="producto_id">
-                                        @foreach($productos as $producto)
-                                            <option value="{{ $producto->id }}" data-normal="{{ $producto->precio_venta }}"
-                                                data-mayor="{{ $producto->precio_mayor }}">
-                                                {{ $producto->nombre }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="fw-semibold fs-6 mb-2">
-                                        Cantidad
-                                    </label>
-                                    <input type="number" id="cantidad" class="form-control form-control-sm" min="1"
-                                        value="1">
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="fw-semibold fs-6 mb-2">
-                                        Tipo Precio
-                                    </label>
-                                    <select class="form-select form-select-sm" id="tipo_precio">
-                                        <option value="NORMAL">
-                                            NORMAL
-                                        </option>
-                                        <option value="MAYOR">
-                                            MAYOR
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="fw-semibold fs-6 mb-2">
-                                        Precio Venta
-                                    </label>
-
-                                    <input type="number" step="0.01" id="precio_venta"
-                                        class="form-control form-control-sm">
-                                </div>
-
-                                <div class="col-md-3">
-                                    <button type="button" class="btn btn-success btn-sm w-100"
-                                        onclick="agregarProducto()">
-                                        <i class="fa fa-plus me-1"></i>
-                                        Agregar Producto
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DETALLE -->
-                    <div class="card shadow-sm">
-
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-bordered align-middle">
-                                    <thead class="table-light">
-                                        <tr class="fw-bold text-center">
-                                            <th>Producto</th>
-                                            <th width="120">Cantidad</th>
-                                            <th width="140">Precio</th>
-                                            <th width="140">Subtotal</th>
-                                            <th width="80">Acción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="detalle_venta">
-                                        <tr>
-                                            <td colspan="5" class="text-center text-muted py-5">
-                                                No hay productos agregados
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!-- TOTAL -->
-                            <div class="d-flex justify-content-end mt-4">
-                                <div class="bg-light-primary px-5 py-3 rounded">
-                                    <h2 class="fw-bold mb-0">
-                                        TOTAL:
-                                        <span class="text-primary">
-                                            Bs. <span id="total_general">0.00</span>
-                                        </span>
-                                    </h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <!-- FOOTER -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                    Cancelar
-                </button>
-                <button class="btn btn-primary" onclick="guardarVenta()">
-                    <i class="fa fa-save me-1"></i>
-                    Guardar Venta
-                </button>
-            </div>
-        </div>
-    </div>
 </div>
 
 @stop()
@@ -212,161 +98,332 @@
     <script>
 
         $.ajaxSetup({
-            // definimos cabecera donde estarra el token y poder hacer nuestras operaciones de put,post...
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         })
         $(document).ready(function () {
+            console.log('dddd');
             ajaxListado();
         });
 
-        $('#producto_id').change(function () {
-            actualizarPrecio();
-        });
-
-        $('#tipo_precio').change(function () {
-            actualizarPrecio();
-        });
-
         function ajaxListado() {
-            $.ajax({
-                url: "{{ route('venta.ajaxListado') }}",
-                method: "POST",
-                success: function (resultado) {
-                    if (resultado.estado) {
-                        $('#table_listado')
-                            .html(resultado.data.listado);
-                    }
+            console.log('ENTRO AJAX');
+            Swal.fire({
+                title: 'Generando Listado...',
+                text: 'Por favor espera mientras generamos el listado.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
             });
-        }
 
-
-        function modalNuevaVenta() {
-            productosVenta = [];
-            $('#detalle_venta').html('');
-            $('#total_general').text('0.00');
-            $('#cantidad').val(1);
-            $('#cliente_id').val('').trigger('change');
-            $('#producto_id').prop('selectedIndex', 0);
-            $('#tipo_precio').val('NORMAL');
-            $('#metodo_pago').val('EFECTIVO');
-            actualizarPrecio();
-            $('#modalVenta').modal('show');
-        }
-
-        let productosVenta = [];
-
-
-        function agregarProducto() {
-            let select = $('#producto_id option:selected');
-            let producto_id = select.val();
-            let nombre = select.text();
-            let cantidad = parseFloat($('#cantidad').val());
-            let tipo_precio = $('#tipo_precio').val();
-            let precio = parseFloat($('#precio_venta').val());
-            let subtotal = cantidad * precio;
-            productosVenta.push({
-                producto_id: producto_id,
-                cantidad: cantidad,
-                tipo_precio: tipo_precio,
-                precio: precio
-            });
-            $('#detalle_venta').append(`
-                    <tr>
-                        <td>${nombre}</td>
-                        <td>${cantidad}</td>
-                        <td>${precio.toFixed(2)}</td>
-                        <td>${subtotal.toFixed(2)}</td>
-                        <td>
-                        <button
-                            type="button"
-                            class="btn btn-danger btn-sm"
-                            onclick="eliminarFila(this, ${producto_id})">
-                            X
-                        </button>
-                    </td>
-                    </tr>
-                `);
-            calcularTotal();
-        }
-
-        function calcularTotal() {
-            let total = 0;
-            $('#detalle_venta tr').each(function () {
-                let subtotal = parseFloat(
-                    $(this).find('td:eq(3)').text()
-                ) || 0;
-                total += subtotal;
-            });
-            $('#total_general').text(
-                total.toFixed(2)
-            );
-        }
-
-        function eliminarFila(boton, producto_id) {
-            productosVenta = productosVenta.filter(item =>
-                item.producto_id != producto_id
-            );
-            $(boton).closest('tr').remove();
-            calcularTotal();
-        }
-
-        function guardarVenta() {
-            if (productosVenta.length == 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Agregue productos'
-                });
-                return;
-            }
-            let datos = {
-                cliente_id:
-                    $('[name="cliente_id"]').val(),
-                metodo_pago:
-                    $('[name="metodo_pago"]').val(),
-                caja_id:
-                    $('[name="caja_id"]').val(),
-                productos:
-                    productosVenta
-            };
+            let datos = $('#formulario-busqueda-factura').serializeArray();
 
             $.ajax({
-                url: "{{ route('venta.guardarVenta') }}",
+                url: "{{ url('venta/ajaxListado') }}",
                 method: "POST",
                 data: datos,
-                success: function (resultado) {
-                    if (resultado.estado) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: resultado.mensaje,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        $('#modalVenta').modal('hide');
-                        ajaxListado();
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: resultado.mensaje
-                        });
+                success: function (data) {
+
+                    if (data.estado) {
+                        $('#table_listado').html(data.data.listado)
                     }
+
+                    Swal.close();
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+
+                    Swal.close();
+
+                    Swal.fire(
+                        'Error',
+                        xhr.responseText,
+                        'error'
+                    );
+                }
+            })
+        }
+
+
+
+        function reportePDF() {
+
+            let datos = $('#formulario-busqueda-factura').serializeArray();
+            Swal.fire({
+                title: 'Generando PDF...',
+                text: 'Por favor espera mientras generamos el archivo.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: "{{ url('factura/reportePDF') }}",
+                method: "POST",
+                data: datos,
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function (data, status, xhr) {
+                    Swal.close();
+                    var blob = new Blob([data], {
+                        type: 'application/pdf'
+                    });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = "reporte_facturas.pdf";
+                    link.click();
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'No se pudo generar el PDF. Inténtalo de nuevo.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    console.error("Error al generar el PDF: ", error);
+                }
+            });
+
+        }
+
+        function exportarExcel() {
+            let datos = $('#formulario-busqueda-factura').serializeArray();
+
+            Swal.fire({
+                title: 'Generando Excel...',
+                text: 'Por favor espera mientras generamos el archivo.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: "{{ url('factura/reporteExcel') }}",
+                method: "POST",
+                data: datos,
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function (data, status, xhr) {
+                    Swal.close();
+                    var blob = new Blob([data], {
+                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'reporte_facturas.xlsx';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+                error: function (xhr, status, error) {
+
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'No se pudo generar el PDF. Inténtalo de nuevo.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    console.error("Error al generar el PDF: ", error);
                 }
             });
         }
 
 
-        function actualizarPrecio() {
-            let producto = $('#producto_id option:selected');
-            let tipo_precio = $('#tipo_precio').val();
-            let precio = 0;
-            if (tipo_precio == 'MAYOR') {
-                precio = producto.data('mayor');
-            } else {
-                precio = producto.data('normal');
-            }
-            $('#precio_venta').val(parseFloat(precio).toFixed(2));
+        function limpiarErorres() {
+            $('.error-message').html('');
+            $('.is-invalid').removeClass('is-invalid');
         }
+
+        function cambiaEstadoVenta(factura, estado) {
+            let estados = [];
+            if (estado == 'RECEPCIONADO') {
+                estados = {
+                    'TRABAJANDO': 'TRABAJANDO',
+                    'TERMINADO': 'TERMINADO'
+                }
+            } else if (estado == 'TRABAJANDO') {
+                estados = {
+                    'TERMINADO': 'TERMINADO'
+                }
+            } else if (estado == 'TERMINADO') {
+                estados = {
+                    'ENTREGADO': 'ENTREGADO'
+                }
+            }
+
+            Swal.fire({
+                title: "SELECCIONE UN ESTADO",
+                input: "select",
+                inputOptions: estados,
+                inputPlaceholder: 'Selecciona',
+                showCancelButton: true,
+                confirmButtonText: "Buscar",
+                showLoaderOnConfirm: true,
+                icon: 'question',
+                preConfirm: async (login) => {
+
+                    let datos = {
+                        estado: login,
+                        factura: factura
+                    }
+
+                    $.ajax({
+                        url: "{{ url('factura/cambioEstadoVenta') }}",
+                        method: "POST",
+                        data: datos,
+                        success: function (data) {
+
+                            if (data.estado) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: "EXITO!",
+                                    text: "SE CAMBIO DE ESTADO CON EXITO",
+                                })
+                                ajaxListado();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: data.mensaje.descripcion.codigoDescripcion,
+                                    text: JSON.stringify(data.mensaje.descripcion
+                                        .mensajesList),
+                                })
+                            }
+                        }
+                    })
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+
+            });
+
+
+        }
+
+        function imprimeREcibo(recibo) {
+            href = "{{ url('factura/recibo') }}/" + recibo;
+            window.open(href, '_blank');
+        }
+
+
+        function anularRecibo(recibo, numero) {
+            Swal.fire({
+                title: "Esta seguro de Anular el numero de recibo " + numero + "?",
+                text: "Esta accion no se podra revertir!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Si, estoy seguro!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('factura/anularRecibo') }}",
+                        method: "POST",
+                        data: { recibo: recibo },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.estado) {
+                                ajaxListado();
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: "EXITO",
+                                    text: JSON.stringify(data.msg),
+                                    showConfirmButton: false, // No mostrar botón de confirmación
+                                    timerProgressBar: true
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    text: JSON.stringify(data.msg),
+                                    title: "ERROR",
+                                    showConfirmButton: false, // No mostrar botón de confirmación
+                                    timerProgressBar: true
+                                });
+                            }
+                        }, error: function (xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Ocurrió un error inesperado.' + xhr,
+                            });
+                        }
+                    })
+                }
+            });
+        }
+
+
+        function imprimirRecibo(venta_id) {
+
+            let url = "{{ url('venta/recibo') }}/" + venta_id;
+
+            window.open(url, '_blank');
+        }
+
+        function anularVenta(venta_id) {
+
+            Swal.fire({
+                title: '¿Anular venta?',
+                text: 'Esta acción devolverá el stock',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, anular'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    $.ajax({
+
+                        url: "{{ url('venta/anularVenta') }}",
+
+                        method: "POST",
+
+                        data: {
+                            venta_id: venta_id
+                        },
+
+                        success: function (data) {
+
+                            if (data.estado) {
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: data.mensaje
+                                });
+
+                                ajaxListado();
+
+                            } else {
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: data.mensaje
+                                });
+
+                            }
+
+                        },
+
+                        error: function (xhr) {
+
+                            console.log(xhr.responseText);
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+
     </script>
 @endsection

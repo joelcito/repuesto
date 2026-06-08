@@ -11,7 +11,7 @@ class Devolucion extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'movimientos';
+    protected $table = 'devoluciones';
 
     protected $fillable = [
 
@@ -21,7 +21,7 @@ class Devolucion extends Model
 
         'venta_id',
         'caja_id',
-        'cliente_id',
+        'usuario_cliente_id',
         'tipo',
         'total',
         'motivo',
@@ -30,6 +30,20 @@ class Devolucion extends Model
         'usuario_creador_id'
     ];
 
+
+    public function venta()
+    {
+        return $this->belongsTo('App\Models\Venta', 'venta_id');
+    }
+    public function caja()
+    {
+        return $this->belongsTo('App\Models\Caja', 'caja_id');
+    }
+    public function cliente()
+    {
+        return $this->belongsTo('App\Models\User', 'usuario_cliente_id');
+
+    }
 
 
 }

@@ -28,6 +28,9 @@
                     <td>{{ $cliente->razon_social }}</td>
                     <td>{{ $cliente->direccion}}</td>
                     <td>
+                        <button class="btn btn-icon btn-sm btn-success btn-circle" title="Agregar Vehículo"
+                            onclick="agregarVehiculo({{ $cliente->id }})"> <i class="fa fa-car"></i>
+                        </button>
                         <button class="btn btn-icon btn-sm btn-warning btn-circle" title="Editar cliente"
                             onclick="editarCliente({{ json_encode($cliente) }})"><i class="fa fa-edit"></i></button>
                         <button class="btn btn-icon btn-sm btn-danger btn-circle" title="Eliminar cliente"

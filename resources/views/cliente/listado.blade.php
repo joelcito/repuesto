@@ -69,48 +69,6 @@
                         <input type="file" accept="image/*" class="form-control form-control-sm" id="imagen"
                             name="imagen">
                     </div>
-                    <!-- <div class="row">
-                        <div class="col-md-6">
-                            <label class="fw-semibold fs-6 mb-2">Imagen Cedula Identidad Anverso</label>
-                            <input type="file" accept="image/*" class="form-control form-control-sm"
-                                id="imagen_CI_anverso" name="imagen_CI_anverso">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="fw-semibold fs-6 mb-2">Imagen Cedula Identidad Reverso</label>
-                            <input type="file" accept="image/*" class="form-control form-control-sm"
-                                id="imagen_CI_reverso" name="imagen_CI_reverso">
-                        </div>
-                    </div>
-                    <div class="row mb-7 mt-7">
-                        <label class="fw-semibold fs-6 mb-2">REFERENCIAS:</label>
-                        <div class="col-md-4">
-                            <label class="fw-semibold fs-6 mb-2">Nombre Completo</label>
-                            <input type="text" class="form-control form-control-sm" id="nombre_referencia_1"
-                                name="nombre_referencia_1">
-
-                            <label class="fw-semibold fs-6 mb-2">Celular</label>
-                            <input type="text" class="form-control form-control-sm" id="celular_referencia_1"
-                                name="celular_referencia_1" maxlength="8">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="fw-semibold fs-6 mb-2">Nombre Completo</label>
-                            <input type="text" class="form-control form-control-sm" id="nombre_referencia_2"
-                                name="nombre_referencia_2">
-
-                            <label class="fw-semibold fs-6 mb-2">Celular</label>
-                            <input type="text" class="form-control form-control-sm" id="celular_referencia_2"
-                                name="celular_referencia_2" maxlength="8">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="fw-semibold fs-6 mb-2">Nombre Completo</label>
-                            <input type="text" class="form-control form-control-sm" id="nombre_referencia_3"
-                                name="nombre_referencia_3">
-
-                            <label class="fw-semibold fs-6 mb-2">Celular</label>
-                            <input type="text" class="form-control form-control-sm" id="celular_referencia_3"
-                                name="celular_referencia_3" maxlength="8">
-                        </div>
-                    </div> -->
 
                 </form>
             </div>
@@ -128,6 +86,79 @@
 </div>
 <!--end::Modal - Add task-->
 
+
+
+
+<div class="modal fade" id="modalListadoVehiculos" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h3>Vehículos del Cliente</h3>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <form id="formularioVehiculo">
+
+                    <input type="hidden" id="vehiculo_id" name="vehiculo_id" value="0">
+
+                    <input type="hidden" id="usuario_cliente_id" name="usuario_cliente_id">
+
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <label>Vehículo</label>
+
+                            <input type="text" class="form-control" id="nombre_vehiculo" name="nombre_vehiculo">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Modelo</label>
+
+                            <input type="text" class="form-control" id="modelo" name="modelo">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Placa</label>
+
+                            <input type="text" class="form-control" id="placa" name="placa">
+                        </div>
+
+                    </div>
+
+                    <div class="mt-5">
+
+                        <button type="button" class="btn btn-success" onclick="guardarVehiculo()">
+
+                            Guardar Vehículo
+
+                        </button>
+
+                        <button type="button" class="btn btn-secondary" onclick="limpiarFormularioVehiculo()">
+
+                            Nuevo
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+                <hr>
+
+                <div id="contenedorVehiculos">
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <div class="d-flex flex-column flex-column-fluid">
     <div id="kt_app_content" class="app-content flex-column-fluid">
@@ -343,5 +374,120 @@
                 }
             });
         }
+
+
+        function agregarVehiculo(cliente_id) {
+
+            clienteSeleccionado = cliente_id;
+
+            $('#usuario_cliente_id').val(cliente_id);
+
+            limpiarFormularioVehiculo();
+
+            listarVehiculos(cliente_id);
+
+            $('#modalListadoVehiculos').modal('show');
+        }
+
+        function limpiarFormularioVehiculo() {
+
+            $('#vehiculo_id').val(0);
+
+            $('#nombre_vehiculo').val('');
+
+            $('#modelo').val('');
+
+            $('#placa').val('');
+        }
+
+        function guardarVehiculo() {
+            let datos = $('#formularioVehiculo').serialize();
+            $.ajax({
+                url: "{{ route('cliente.guardarVehiculo') }}",
+                method: "POST",
+                data: datos,
+                success: function (resultado) {
+                    if (resultado.estado) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Correcto',
+                            text: resultado.mensaje
+                        });
+                        limpiarFormularioVehiculo();
+                        listarVehiculos(clienteSeleccionado);
+
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un error'
+                    });
+                }
+            });
+        }
+
+        let clienteSeleccionado = 0;
+        function listarVehiculos(cliente_id) {
+            clienteSeleccionado = cliente_id;
+            $.ajax({
+                url: "{{ route('cliente.ajaxListadoVehiculos') }}",
+                method: "POST",
+                data: {
+                    cliente_id: cliente_id
+                },
+                success: function (resultado) {
+                    $('#contenedorVehiculos').html(resultado.data.listado);
+                    $('#modalListadoVehiculos').modal('show');
+                }
+            });
+        }
+
+        function editarVehiculo(vehiculo) {
+
+            $('#vehiculo_id').val(vehiculo.id);
+
+            $('#usuario_cliente_id')
+                .val(vehiculo.usuario_cliente_id);
+
+            $('#nombre_vehiculo')
+                .val(vehiculo.nombre_vehiculo);
+
+            $('#modelo')
+                .val(vehiculo.modelo);
+
+            $('#placa')
+                .val(vehiculo.placa);
+        }
+        function eliminarVehiculo(vehiculo_id) {
+            Swal.fire({
+                title: '¿Eliminar vehículo?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí eliminar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('cliente.eliminarVehiculo') }}",
+                        method: "POST",
+                        data: {
+                            vehiculo_id: vehiculo_id
+                        },
+                        success: function (resultado) {
+                            if (resultado.estado) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Correcto',
+                                    text: resultado.mensaje
+                                });
+                                listarVehiculos(clienteSeleccionado);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
     </script>
 @endsection

@@ -3,14 +3,21 @@
 use App\Http\Controllers\CajasController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ClienteVehiculoController;
+use App\Http\Controllers\DevolucionController;
+use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\IncorporacionController;
+use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\MovimientoCajaController;
 use App\Http\Controllers\MovimientoController;
+use App\Http\Controllers\PagoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VentasController;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +66,21 @@ Route::middleware('auth')->group(function () {
     });
 
 
+    Route::prefix('/unidad')->group(function () {
+        Route::get('/listado', [UnidadController::class, 'listado'])->name('unidad.listado');
+        Route::post('/ajaxListado', [UnidadController::class, 'ajaxListado'])->name('unidad.ajaxListado');
+        Route::post('/guardarUnidad', [UnidadController::class, 'guardarUnidad'])->name('unidad.guardarUnidad');
+        Route::post('/eliminarUnidad', [UnidadController::class, 'eliminarUnidad'])->name('unidad.eliminarUnidad');
+    });
+
+    Route::prefix('/marca')->group(function () {
+        Route::get('/listado', [MarcaController::class, 'listado'])->name('marca.listado');
+        Route::post('/ajaxListado', [MarcaController::class, 'ajaxListado'])->name('marca.ajaxListado');
+        Route::post('/guardarMarca', [MarcaController::class, 'guardarMarca'])->name('marca.guardarMarca');
+        Route::post('/eliminarMarca', [MarcaController::class, 'eliminarMarca'])->name('marca.eliminarMarca');
+    });
+
+
     Route::prefix('/proveedor')->group(function () {
         Route::get('/listado', [ProveedorController::class, 'listado'])->name('proveedor.listado');
         Route::post('/ajaxListado', [ProveedorController::class, 'ajaxListado'])->name('proveedor.ajaxListado');
@@ -103,12 +125,12 @@ Route::middleware('auth')->group(function () {
     });
 
     //venta
-    Route::prefix('/venta')->group(function () {
-        Route::get('/listado', [VentasController::class, 'listado'])->name('venta.listado');
-        Route::post('/ajaxListado', [VentasController::class, 'ajaxListado'])->name('venta.ajaxListado');
-        Route::post('/guardarVenta', [VentasController::class, 'guardarVenta'])->name('venta.guardarVenta');
-        Route::post('/eliminar', [VentasController::class, 'eliminar'])->name('venta.eliminar');
-    });
+    // Route::prefix('/venta')->group(function () {
+    //     Route::get('/listado', [VentasController::class, 'listado'])->name('venta.listado');
+    //     Route::post('/ajaxListado', [VentasController::class, 'ajaxListado'])->name('venta.ajaxListado');
+    //     Route::post('/guardarVenta', [VentasController::class, 'guardarVenta'])->name('venta.guardarVenta');
+    //     Route::post('/eliminar', [VentasController::class, 'eliminar'])->name('venta.eliminar');
+    // });
 
     //caja
     Route::prefix('/caja')->group(function () {
@@ -123,6 +145,62 @@ Route::middleware('auth')->group(function () {
 
 
     Route::post('/movimiento-caja/guardar', [MovimientoCajaController::class, 'guardarMovimiento'])->name('movimientoCaja.guardar');
+
+
+    Route::prefix('/devolucion')->group(function () {
+        Route::get('/listado', [DevolucionController::class, 'listado'])->name('devolucion.listado');
+        Route::post('/ajaxListado', [DevolucionController::class, 'ajaxListado'])->name('devolucion.ajaxListado');
+        Route::post('/guardarDevolucion', [DevolucionController::class, 'guardarDevolucion'])->name('devolucion.guardarDevolucion');
+        Route::post('/eliminarDevolucion', [DevolucionController::class, 'eliminarDevolucion'])->name('devolucion.eliminarDevolucion');
+        Route::post('/obtenerDetalleVenta', [DevolucionController::class, 'obtenerDetalleVenta'])->name('devolucion.obtenerDetalleVenta');
+    });
+
+    Route::prefix('/incorporacion')->group(function () {
+        Route::get('/listado', [IncorporacionController::class, 'listado'])->name('incorporacion.listado');
+        Route::post('/ajaxListado', [IncorporacionController::class, 'ajaxListado'])->name('incorporacion.ajaxListado');
+        Route::post('/guardarIncorporacion', [IncorporacionController::class, 'guardarIncorporacion'])->name('incorporacion.guardarIncorporacion');
+        Route::post('/eliminarIncorporacion', [IncorporacionController::class, 'eliminarIncorporacion'])->name('incorporacion.eliminarIncorporacion');
+
+    });
+
+    Route::post('/guardarVehiculo', [ClienteVehiculoController::class, 'guardarVehiculo'])->name('cliente.guardarVehiculo');
+    Route::post('/ajaxListadoVehiculos', [ClienteVehiculoController::class, 'ajaxListadoVehiculos'])->name('cliente.ajaxListadoVehiculos');
+    Route::post('/eliminarVehiculo', [ClienteVehiculoController::class, 'eliminarVehiculo'])->name('cliente.eliminarVehiculo');
+
+
+    // FACTURA
+    Route::prefix('/venta')->group(function () {
+        Route::get('/formulario', [VentasController::class, 'formulario'])->name('venta.formulario');
+        Route::post('/recepcionar', [VentasController::class, 'recepcionar'])->name('venta.recepcionar');
+        Route::get('/listado', [VentasController::class, 'listado'])->name('venta.listado');
+        Route::get('/recibo/{venta_id}', [VentasController::class, 'recibo'])->name('venta.recibo');
+        Route::get('/detalle/{venta_id}', [VentasController::class, 'detalle'])->name('venta.detalle');
+        Route::post('/anularRecibo', [VentasController::class, 'anularRecibo']);
+        Route::post('/agregarNuevoOrdenTrabajo', [VentasController::class, 'agregarNuevoOrdenTrabajo']);
+        Route::get('/ventas-estado-null', [VentasController::class, 'getVentaNull'])->name('venta.estadoNull');
+        Route::get('/ots', [VentasController::class, 'getOTs'])->name('venta.obtenerOTs');
+        Route::post('/obtenerProductosAprobados', [VentasController::class, 'obtenerProductosAprobados'])->name('venta.obtenerProductosAprobados');
+        Route::post('/enviarArchivar', [VentasController::class, 'enviarArchivar'])->name('venta.enviarArchivar');
+        Route::post('/guardarVenta', [VentasController::class, 'guardarVenta'])->name('venta.guardarVenta');
+        Route::post('/ajaxListado', [VentasController::class, 'ajaxListado'])->name('venta.ajaxListado');
+        Route::post('/ajaxListadoDetalleVenta', [VentasController::class, 'ajaxListadoDetalleVenta'])->name('venta.ajaxListadoDetalleVenta');
+    });
+
+    //PAGO
+    Route::prefix('/pago')->group(function () {
+        Route::post('/guardarTipoIngresoSalida', [PagoController::class, 'guardarTipoIngresoSalida']);
+        Route::get('/listado', [PagoController::class, 'listado'])->name('pago.listado');
+        Route::post('/ajaxListado', [PagoController::class, 'ajaxListado'])->name('pago.ajaxListado');
+        Route::get('/listadoDeuda', [PagoController::class, 'listadoDeuda'])->name('pago.listadoDeuda');
+        Route::post('/ajaxListadoDeuda', [PagoController::class, 'ajaxListadoDeuda'])->name('pago.ajaxListadoDeuda');
+        Route::post('/ajaxFormPagoDeuda', [PagoController::class, 'ajaxFormPagoDeuda'])->name('pago.ajaxFormPagoDeuda');
+        Route::post('/guardarPagoDeuda', [PagoController::class, 'guardarPagoDeuda'])->name('pago.guardarPagoDeuda');
+        Route::post('/ajaxDescargarReportePago', [PagoController::class, 'ajaxDescargarReportePago'])->name('pago.ajaxDescargarReportePago');
+        Route::post('/formularioDecuentoAdicional', [PagoController::class, 'formularioDecuentoAdicional'])->name('pago.formularioDecuentoAdicional');
+        Route::post('/guardarDescuentoAdicional', [PagoController::class, 'guardarDescuentoAdicional'])->name('pago.guardarDescuentoAdicional');
+        Route::get('/comprobantePago/{pago_id}', [PagoController::class, 'comprobantePago'])->name('pago.comprobantePago');
+        Route::post('/generaExcelPago', [PagoController::class, 'generaExcelPago'])->name('pago.generaExcelPago');
+    });
 
 
 });

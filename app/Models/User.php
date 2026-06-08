@@ -80,4 +80,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Models\Rol', 'rol_id');
     }
+
+    public function vehiculos()
+    {
+        return $this->hasMany(ClienteVehiculo::class);
+    }
+
 }

@@ -11,7 +11,7 @@ class Incorporacion extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'movimientos';
+    protected $table = 'incorporaciones';
 
     protected $fillable = [
         'usuario_creador_id',

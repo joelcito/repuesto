@@ -40,5 +40,9 @@ class Cliente extends Model
         'deleted_at',
     ];
 
+    public function vehiculos()
+    {
+        return $this->hasMany(ClienteVehiculo::class);
+    }
 
 }
