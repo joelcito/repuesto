@@ -23,7 +23,7 @@
                     <td>{{ $user->ap_paterno }}</td>
                     <td>{{ $user->ap_materno }}</td>
                     <td>
-                        <span class="badge badge-success">{{ $user->rol->nombre }}</span>
+                        <span class="badge badge-success">{{ $user->rol?->nombre }}</span>
                     </td>
                     <td>{{ $user->cedula }}</td>
                     <td>{{ $user->celular }}</td>
