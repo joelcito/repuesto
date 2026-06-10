@@ -149,7 +149,7 @@ class VentasController extends Controller
                 $detalle->tipo_precio = $item['tipo_precio'];
                 $detalle->subtotal = $subtotal;
                 $detalle->descripcion = $item['descripcion'] ?? null;
-                $detalle->estado = 'ACTIVO';
+                $detalle->estado = 'INGRESO';
                 $detalle->usuario_creador_id = $usuario->id;
                 $detalle->save();
                 // DESCONTAR STOCK
