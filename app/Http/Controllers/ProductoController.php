@@ -17,7 +17,12 @@ class ProductoController extends Controller
 {
     public function listado()
     {
-        $categorias = Categoria::where('estado', 1)->get();
+        $categorias = Categoria::where('estado', 1)
+            ->whereIn('tipo', ['AUTOMOVIL', 'MOTOCICLETA'])
+            ->doesntHave('children')
+            ->get();
+
+
         $proveedores = Proveedor::where('estado', 1)->get();
         $sucursales = Sucursal::where('estado', 1)->get();
         $marcas = Marca::where('estado', 1)->get();

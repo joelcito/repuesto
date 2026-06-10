@@ -349,52 +349,37 @@
 <div class="modal fade" id="modalTransferencia" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-
             <div class="modal-header">
                 <h3 class="fw-bold">
                     TRANSFERENCIA DE PRODUCTO
                 </h3>
-
                 <button type="button" class="btn-close" data-bs-dismiss="modal">
                 </button>
             </div>
-
             <div class="modal-body">
-
                 <form id="formularioTransferencia">
-
                     @csrf
-
                     <input type="hidden" id="producto_transferencia_id" name="producto_id">
                     <input type="hidden" id="sucursal_origen_id" name="sucursal_origen_id">
-
                     <div class="mb-4">
                         <label class="form-label">
                             Sucursal Origen
                         </label>
-
                         <input type="text" id="sucursal_origen_nombre" class="form-control" readonly>
                     </div>
-
                     <div class="mb-4">
                         <label class="form-label">
                             Sucursal Destino
                         </label>
-
                         <select class="form-select" name="sucursal_destino_id" id="sucursal_destino_id" required>
-
                             <option value="">
                                 Seleccione una sucursal
                             </option>
-
                             @foreach ($sucursales as $sucursal)
-
                                 <option value="{{ $sucursal->id }}">
                                     {{ $sucursal->nombre }}
                                 </option>
-
                             @endforeach
-
                         </select>
                     </div>
 
@@ -420,26 +405,16 @@
             </div>
 
             <div class="modal-footer">
-
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-
                     Cancelar
                 </button>
-
                 <button type="button" class="btn btn-warning" onclick="guardarTransferencia()">
-
                     Transferir
                 </button>
-
             </div>
-
         </div>
     </div>
 </div>
-
-
-
-
 
 <div class="d-flex flex-column flex-column-fluid">
     <div id="kt_app_content" class="app-content flex-column-fluid">
@@ -680,10 +655,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                        <div class="invalid-feedback">
-                                                                            ${mensaje}
-                                                                        </div>
-                                                                    `);
+                                                <div class="invalid-feedback">
+                                                    ${mensaje}
+                                                </div>
+                                            `);
                             }
                         } else {
                             Swal.fire({
@@ -782,10 +757,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                        <div class="invalid-feedback">
-                                                                            ${mensaje}
-                                                                        </div>
-                                                                    `);
+                                                                            <div class="invalid-feedback">
+                                                                                ${mensaje}
+                                                                            </div>
+                                                                        `);
                             }
 
                         } else {

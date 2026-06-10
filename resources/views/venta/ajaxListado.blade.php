@@ -73,7 +73,7 @@
                         <span class="badge badge-success">
                             {{ $venta->estado }}
                         </span>
-                    </td>ndif
+                    </td>
                     </td>
                     <td>
                         {{ $venta->usuarioCreador?->nombres }}

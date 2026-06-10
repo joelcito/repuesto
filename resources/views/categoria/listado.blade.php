@@ -36,8 +36,8 @@
                                 <select class="form-select form-select-sm" name="tipo" id="tipo">
                                     <option value="AUTOMOVIL">AUTOMOVIL</option>
                                     <option value="MOTOCICLETA">MOTOCICLETA</option>
-                                    <option value="MOTOCICLETA">INGRESO</option>
-                                    <option value="MOTOCICLETA">SALIDA</option>
+                                    <option value="INGRESO">INGRESO</option>
+                                    <option value="SALIDA">SALIDA</option>
                                 </select>
                             </div>
                         </div>
@@ -209,7 +209,7 @@
             $('#nombre').val(rol.nombre)
             $('#descripcion').val(rol.descripcion)
             $('#tipo').val(rol.tipo)
-            $('#parent_id').val(rol.parent_id) // 👈 CLAVE
+            $('#parent_id').val(rol.parent_id)
 
             $('#modalRol').modal('show')
         }
