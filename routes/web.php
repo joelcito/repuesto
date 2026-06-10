@@ -120,6 +120,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/guardarIngreso', [MovimientoController::class, 'guardarIngreso'])->name('movimiento.guardarIngreso');
         Route::post('/guardarSalida', [MovimientoController::class, 'guardarSalida'])->name('movimiento.guardarSalida');
         Route::post('/sacarTipoIngreso', [MovimientoController::class, 'sacarTipoIngreso'])->name('movimiento.sacarTipoIngreso');
+        Route::post('/guardar-transferencia', [MovimientoController::class, 'guardarTransferencia'])->name('movimiento.guardarTransferencia');
 
         //Route::post('/guardarMovimiento', [MovimientoController::class, 'guardarMovimiento'])->name('movimiento.guardarMovimiento');
     });

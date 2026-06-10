@@ -22,10 +22,7 @@ class ClienteController extends Controller
     public function ajaxListado(Request $request)
     {
         if ($request->ajax()) {
-            //sacamos el listado
-            //$rolCliente = env('ROL_CLIENTE');
             $rolCliente = 3;
-
             $clientes = User::where('rol_id', 3)->get();
             $valores = [
                 'listado' => view('cliente.ajaxListado')->with(compact('clientes'))->render()
@@ -40,14 +37,9 @@ class ClienteController extends Controller
 
     public function guardarCliente(Request $request)
     {
-
-
         try {
 
-            // dd($request->all());
-            //$rolCliente = env('ROL_CLIENTE');
             $rolCliente = 3;
-
             $cliente_id = $request->input('id');
             $nombre = $request->input('nombre');
             $ap_paterno = $request->input('ap_paterno');
@@ -57,59 +49,45 @@ class ClienteController extends Controller
             $nit = $request->input('nit');
             $razon_social = $request->input('razon_social');
             $direccion = $request->input('direccion');
+            $tipo_cliente = $request->input('tipo_cliente');
             $nombre_referencia_1 = $request->input('nombre_referencia_1');
             $celular_referencia_1 = $request->input('celular_referencia_1');
             $nombre_referencia_2 = $request->input('nombre_referencia_2');
             $celular_referencia_2 = $request->input('celular_referencia_2');
             $nombre_referencia_3 = $request->input('nombre_referencia_3');
             $celular_referencia_3 = $request->input('celular_referencia_3');
-
             $usuario = Auth::user();
-
             if ($cliente_id == '0') {
                 $cliente = new User();
                 $cliente->usuario_creador_id = $usuario->id;
-
             } else {
-
                 $cliente = User::find($cliente_id);
                 $cliente->usuario_modificador_id = $usuario->id;
             }
-
             $imagen = null;
             $imagen_CI_anverso = null;
             $imagen_CI_reverso = null;
-
-            // IMAGEN
             if ($request->hasFile('imagen')) {
                 $file = $request->file('imagen');
-
                 if ($file && $file->isValid()) {
                     $imagen = time() . '_' . Str::uuid() . '.' . $file->getClientOriginalExtension();
                     $file->storeAs('imagenesClientes', $imagen, 'public');
                 }
             }
-
-            // CI ANVERSO
             if ($request->hasFile('imagen_CI_anverso')) {
                 $file = $request->file('imagen_CI_anverso');
-
                 if ($file && $file->isValid()) {
                     $imagen_CI_anverso = time() . '_' . Str::uuid() . '.' . $file->getClientOriginalExtension();
                     $file->storeAs('imagenesClientes', $imagen_CI_anverso, 'public');
                 }
             }
-
-            // CI REVERSO
             if ($request->hasFile('imagen_CI_reverso')) {
                 $file = $request->file('imagen_CI_reverso');
-
                 if ($file && $file->isValid()) {
                     $imagen_CI_reverso = time() . '_' . Str::uuid() . '.' . $file->getClientOriginalExtension();
                     $file->storeAs('imagenesClientes', $imagen_CI_reverso, 'public');
                 }
             }
-
             $cliente->nombres = $nombre;
             $cliente->ap_paterno = $ap_paterno;
             $cliente->ap_materno = $ap_materno;
@@ -118,6 +96,7 @@ class ClienteController extends Controller
             $cliente->nit = $nit;
             $cliente->razon_social = $razon_social;
             $cliente->direccion = $direccion;
+            $cliente->tipo_cliente = $tipo_cliente;
             $cliente->imagen = $imagen;
             $cliente->imagen_CI_anverso = $imagen_CI_anverso;
             $cliente->imagen_CI_reverso = $imagen_CI_reverso;
@@ -128,12 +107,9 @@ class ClienteController extends Controller
             $cliente->nombre_referencia_3 = $nombre_referencia_3;
             $cliente->celular_referencia_3 = $celular_referencia_3;
             $cliente->name = $nombre . " " . $ap_paterno . " " . $ap_materno;
-
             $cliente->rol_id = $rolCliente;
             $cliente->save();
-
             return Respuesta::success(null, "Cliente guardado correctamente");
-
         } catch (\Exception $e) {
             return Respuesta::error($e->getMessage(), "Error interno");
         }
@@ -141,13 +117,9 @@ class ClienteController extends Controller
 
     public function eliminarCliente(Request $request, Cliente $clientes)
     {
-
         if ($request->ajax()) {
-
-            //INICIALIZAMOS LAS VARIABLES
             $cliente_id = $request->input('cliente');
             $usuario = Auth::user();
-
             if ($clientes->imagen && $clientes->imagen_CI_anverso && $clientes->imagen_CI_reverso) {
                 Storage::disk('public')->delete($clientes->imagen);
                 Storage::disk('public')->delete($clientes->imagen_CI_anverso);
@@ -155,23 +127,14 @@ class ClienteController extends Controller
             } else {
                 $data = Respuesta::error(null, "Error al obtener los datos");
             }
-
-            //BUSCAMOS AL CLIENTE
             $cliente = Cliente::find($cliente_id);
             $cliente->usuario_eliminador_id = $usuario->id;
             $cliente->save();
-
-            //AHORA ELIMINAMOS
             Cliente::destroy($cliente_id);
-
             $data = Respuesta::success(null, "Se elimino con exito");
-
         } else {
-
             $data = Respuesta::error(null, "Error al obtener los datos");
         }
-
         return $data;
-
     }
 }

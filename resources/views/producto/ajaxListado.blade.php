@@ -7,7 +7,7 @@
                 <th>Nombre</th>
                 <th>Categoría</th>
                 <th>Marca</th>
-                <th>Stock</th>
+                <!-- <th>Stock</th> -->
                 <th>Precio Venta</th>
                 <th>Imagen</th>
                 <th>Estado</th>
@@ -23,11 +23,11 @@
                     <td>{{ $producto->nombre }}</td>
                     <td>{{ $producto->categoria->nombre ?? '' }}</td>
                     <td>{{ $producto->marca->nombre ?? '' }}</td>
-                    <td>
-                        <span class="badge bg-primary">
-                            {{ $producto->stock_actual }}
-                        </span>
-                    </td>
+                    <!-- <td>
+                            <span class="badge bg-primary">
+                                {{ $producto->stock_actual }}
+                            </span>
+                        </td> -->
                     <td>
                         {{ number_format($producto->precio_venta, 2) }}
                     </td>

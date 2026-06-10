@@ -26,6 +26,7 @@ class Cliente extends Model
         'nit',
         'razon_social',
         'direccion',
+        'tipo_cliente',
         'imagen',
         'imagen_CI_anverso',
         'imagen_CI_reverso',

@@ -14,31 +14,25 @@
                     <td>{{ $sucursal->nombre }}</td>
                     @php
 
-                        $ingresos = $sucursal->movimientos
-                            ->where('producto_id', $productoId)
-                            ->where('tipo', 'ingreso')
-                            ->sum('cantidad');
-
-                        $salidas = $sucursal->movimientos
-                            ->where('producto_id', $productoId)
-                            ->where('tipo', 'salida')
-                            ->sum('cantidad');
-
-                        $stock = $ingresos - $salidas;
+                        $stock = app(\App\Http\Controllers\MovimientoController::class)
+                            ->obtenerStock($productoId, $sucursal->id);
 
                     @endphp
 
                     <td>{{ $stock }}</td>
                     <td>
-                        {{-- <button class="btn btn-icon btn-sm btn-success btn-circle" title="Ingreso producto"
-                            onclick="modalIngreso({{ $productoId }}, {{ $movimiento->sucursal_id }},{{ json_encode($movimiento->sucursal_nombre) }})">+</button>
-                        <button class="btn btn-icon btn-sm btn-danger btn-circle" title="Salida producto"
-                            onclick="modalSalida({{ $productoId }}, {{ $movimiento->sucursal_id }},{{ json_encode($movimiento->sucursal_nombre) }})">-</button>
-                        --}}
                         <button class="btn btn-icon btn-sm btn-success btn-circle" title="Ingreso producto"
                             onclick="modalIngreso({{ $productoId }}, {{ $sucursal->id }},{{ json_encode($sucursal->nombre) }})">+</button>
                         <button class="btn btn-icon btn-sm btn-danger btn-circle" title="Salida producto"
                             onclick="modalSalida({{ $productoId }}, {{ $sucursal->id }},{{ json_encode($sucursal->nombre) }})">-</button>
+                        <button class="btn btn-icon btn-sm btn-warning btn-circle" title="Transferir producto" onclick="modalTransferencia(
+                        {{ $productoId }},
+                        {{ $sucursal->id }},
+                        {{ json_encode($sucursal->nombre) }}
+                    )">
+                            ⇄
+                        </button>
+
                     </td>
                 </tr>
             @empty

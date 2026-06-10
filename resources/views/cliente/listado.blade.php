@@ -24,19 +24,32 @@
                 <form id="formularioCliente" enctype="multipart/form-data">
                     <input type="hidden" name="id" id="id" value="0">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="required fw-semibold fs-6 mb-2">Nombres</label>
                             <input type="text" class="form-control form-control-sm" id="nombre" name="nombre" required>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="required fw-semibold fs-6 mb-2">Apellido paterno</label>
                             <input type="text" class="form-control form-control-sm" id="ap_paterno" name="ap_paterno"
                                 required>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="fw-semibold fs-6 mb-2">Apellido materno</label>
                             <input type="text" class="form-control form-control-sm" id="ap_materno" name="ap_materno">
                         </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label required">
+                                Tipo Cliente
+                            </label>
+                            <select name="tipo_cliente" id="tipo_cliente" class="form-select">
+                                <option value="">Seleccione</option>
+                                <option value="PERSONA">Persona</option>
+                                <option value="TALLER">Taller</option>
+                                <option value="TIENDA">Tienda</option>
+                            </select>
+                        </div>
+
                     </div>
                     <div class="row mt-5">
                         <div class="col-md-3">
@@ -50,7 +63,6 @@
                                 maxlength="10">
                         </div>
                         <div class="col-md-3">
-
                             <label class="fw-semibold fs-6 mb-2">NIT</label>
                             <input type="text" class="form-control form-control-sm" id="nit" name="nit">
                         </div>
@@ -92,70 +104,43 @@
 <div class="modal fade" id="modalListadoVehiculos" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-
             <div class="modal-header">
                 <h3>Vehículos del Cliente</h3>
-
                 <button type="button" class="btn-close" data-bs-dismiss="modal">
                 </button>
             </div>
-
             <div class="modal-body">
-
                 <form id="formularioVehiculo">
-
                     <input type="hidden" id="vehiculo_id" name="vehiculo_id" value="0">
-
                     <input type="hidden" id="usuario_cliente_id" name="usuario_cliente_id">
-
                     <div class="row">
-
                         <div class="col-md-4">
                             <label>Vehículo</label>
-
                             <input type="text" class="form-control" id="nombre_vehiculo" name="nombre_vehiculo">
                         </div>
-
                         <div class="col-md-4">
                             <label>Modelo</label>
-
                             <input type="text" class="form-control" id="modelo" name="modelo">
                         </div>
-
                         <div class="col-md-4">
                             <label>Placa</label>
-
                             <input type="text" class="form-control" id="placa" name="placa">
                         </div>
-
                     </div>
 
                     <div class="mt-5">
-
                         <button type="button" class="btn btn-success" onclick="guardarVehiculo()">
-
                             Guardar Vehículo
-
                         </button>
-
                         <button type="button" class="btn btn-secondary" onclick="limpiarFormularioVehiculo()">
-
                             Nuevo
-
                         </button>
-
                     </div>
-
                 </form>
-
                 <hr>
-
                 <div id="contenedorVehiculos">
-
                 </div>
-
             </div>
-
         </div>
     </div>
 </div>
@@ -208,14 +193,10 @@
                 method: "POST",
                 data: datos,
                 success: function (resultado) {
-
                     if (resultado.estado) {
                         $('#table_listado').html(resultado.data.listado)
                     } else {
-
                     }
-                    // Ocultar SweetAlert2 cuando la solicitud sea exitosa
-                    // Swal.close();
                 }
             })
         }
@@ -228,6 +209,7 @@
             $('#celular_referencia_1').val('')
             $('#nombre_referencia_1').val('')
             $('#direccion').val('')
+            $('tipo_cliente').val('')
             $('#razon_social').val('')
             $('#nit').val('')
             $('#cedula').val('')
@@ -244,20 +226,20 @@
 
             if ($("#formularioCliente")[0].checkValidity()) {
                 let form = document.getElementById('formularioCliente');
-                let datos = new FormData(form);  // <-- Importante
+                let datos = new FormData(form);
 
                 $.ajax({
                     url: "{{ route('cliente.guardarCliente') }}",
                     method: "POST",
                     data: datos,
-                    processData: false, // <-- Obligatorio para FormData
-                    contentType: false, // <-- Obligatorio para FormData
+                    processData: false,
+                    contentType: false,
                     success: function (resultado) {
                         if (resultado.estado) {
                             Swal.fire({
                                 title: "EL REGISTRO FUE EXITOSO.",
                                 icon: "success",
-                                timer: 3000, // Se cierra en 3 segundos
+                                timer: 3000,
                                 showConfirmButton: false
                             });
                             ajaxListado();
@@ -267,24 +249,14 @@
                         }
                     },
                     error: function (xhr) {
-                        // limpiarErorres();
-
                         if (xhr.status === 422) {
                             let errores = xhr.responseJSON.errors;
-
                             for (let campo in errores) {
                                 let mensaje = errores[campo][0];
-
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`<div class="invalid-feedback">${mensaje}</div>`);
                             }
-
-                            // Swal.fire({
-                            //     icon: 'error',
-                            //     title: 'Error',
-                            //     text: JSON.strify(xhr.responseJSON),
-                            // });
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -308,6 +280,7 @@
             $('#celular_referencia_1').val(cliente.celular_referencia_1)
             $('#nombre_referencia_1').val(cliente.nombre_referencia_1)
             $('#direccion').val(cliente.direccion)
+            $('#tipo_cliente').val(cliente.tipo_cliente)
             $('#razon_social').val(cliente.razon_social)
             $('#nit').val(cliente.nit)
             $('#cedula').val(cliente.cedula)
@@ -341,7 +314,7 @@
                         },
                         success: function (resultado) {
                             if (resultado.estado) {
-                                ajaxListado(); // recarga el listado
+                                ajaxListado();
                                 Swal.fire(
                                     'Eliminado!',
                                     'El usuario ha sido eliminado correctamente.',
@@ -363,8 +336,6 @@
                             });
                         }
                     });
-
-
                 } else if (result.dismiss === Swal.DismissReason.cancel) {
                     Swal.fire(
                         'Cancelado',
@@ -377,26 +348,17 @@
 
 
         function agregarVehiculo(cliente_id) {
-
             clienteSeleccionado = cliente_id;
-
             $('#usuario_cliente_id').val(cliente_id);
-
             limpiarFormularioVehiculo();
-
             listarVehiculos(cliente_id);
-
             $('#modalListadoVehiculos').modal('show');
         }
 
         function limpiarFormularioVehiculo() {
-
             $('#vehiculo_id').val(0);
-
             $('#nombre_vehiculo').val('');
-
             $('#modelo').val('');
-
             $('#placa').val('');
         }
 
@@ -415,7 +377,6 @@
                         });
                         limpiarFormularioVehiculo();
                         listarVehiculos(clienteSeleccionado);
-
                     }
                 },
                 error: function () {
@@ -445,20 +406,11 @@
         }
 
         function editarVehiculo(vehiculo) {
-
             $('#vehiculo_id').val(vehiculo.id);
-
-            $('#usuario_cliente_id')
-                .val(vehiculo.usuario_cliente_id);
-
-            $('#nombre_vehiculo')
-                .val(vehiculo.nombre_vehiculo);
-
-            $('#modelo')
-                .val(vehiculo.modelo);
-
-            $('#placa')
-                .val(vehiculo.placa);
+            $('#usuario_cliente_id').val(vehiculo.usuario_cliente_id);
+            $('#nombre_vehiculo').val(vehiculo.nombre_vehiculo);
+            $('#modelo').val(vehiculo.modelo);
+            $('#placa').val(vehiculo.placa);
         }
         function eliminarVehiculo(vehiculo_id) {
             Swal.fire({

@@ -42,12 +42,6 @@
                             <label class="form-label fw-bold">Nombre</label>
                             <input type="text" class="form-control form-control-sm" name="nombre" id="nombre">
                         </div>
-
-                        <!-- VEHICULO -->
-                        <!-- <div class="col-md-4">
-                            <label class="form-label fw-bold">Vehículo</label>
-                            <input type="text" class="form-control form-control-sm" name="vehiculo" id="vehiculo">
-                        </div> -->
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Descripción</label>
                             <input class="form-control form-control-sm" name="descripcion" id="descripcion">
@@ -166,13 +160,7 @@
                             <img id="preview_imagen" src="{{ asset('imagenes/productos/default.jpg') }}" width="120"
                                 class="img-thumbnail">
                         </div>
-                        <!-- <div class="col-md-4">
-                            <label class="form-label fw-bold">Estado</label>
-                            <select class="form-select form-select-sm" name="estado" id="estado">
-                                <option value="1">Activo</option>
-                                <option value="0">Inactivo</option>
-                            </select>
-                        </div> -->
+
                     </div>
                 </form>
             </div>
@@ -319,16 +307,16 @@
                             </label>
                             <select class="form-select form-select-sm" id="motivo" name="motivo" required>
                                 <option value="">Seleccione</option>
-                                <option value="perdida">
+                                <option value="PERDIDA">
                                     Pérdida
                                 </option>
-                                <option value="robo">
+                                <option value="ROBO">
                                     Robo
                                 </option>
-                                <option value="deterioro">
+                                <option value="DETERIORO">
                                     Deterioro
                                 </option>
-                                <option value="venta">
+                                <option value="VENTA">
                                     Venta
                                 </option>
                             </select>
@@ -355,6 +343,104 @@
         </div>
     </div>
 </div>
+
+
+
+<div class="modal fade" id="modalTransferencia" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h3 class="fw-bold">
+                    TRANSFERENCIA DE PRODUCTO
+                </h3>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <form id="formularioTransferencia">
+
+                    @csrf
+
+                    <input type="hidden" id="producto_transferencia_id" name="producto_id">
+                    <input type="hidden" id="sucursal_origen_id" name="sucursal_origen_id">
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            Sucursal Origen
+                        </label>
+
+                        <input type="text" id="sucursal_origen_nombre" class="form-control" readonly>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            Sucursal Destino
+                        </label>
+
+                        <select class="form-select" name="sucursal_destino_id" id="sucursal_destino_id" required>
+
+                            <option value="">
+                                Seleccione una sucursal
+                            </option>
+
+                            @foreach ($sucursales as $sucursal)
+
+                                <option value="{{ $sucursal->id }}">
+                                    {{ $sucursal->nombre }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            Cantidad
+                        </label>
+
+                        <input type="number" class="form-control" name="cantidad" id="cantidad_transferencia" min="1"
+                            required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            Descripción
+                        </label>
+
+                        <textarea class="form-control" name="descripcion" id="descripcion_transferencia"></textarea>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+
+                    Cancelar
+                </button>
+
+                <button type="button" class="btn btn-warning" onclick="guardarTransferencia()">
+
+                    Transferir
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
 <div class="d-flex flex-column flex-column-fluid">
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxlg">
@@ -551,7 +637,7 @@
             $('#descripcion').val('')
             $('#cantidad_ingreso').val('')
             $('#precio_compra').val('')
-            $('#codigo_compra').val('')
+            $('#compra_ingreso').val('')
             $('#compra_ingreso').val('')
             $('#id').val(0)
             $('#modalIngreso').modal('show')
@@ -594,10 +680,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                                            <div class="invalid-feedback">
-                                                                                                ${mensaje}
-                                                                                            </div>
-                                                                                        `);
+                                                                        <div class="invalid-feedback">
+                                                                            ${mensaje}
+                                                                        </div>
+                                                                    `);
                             }
                         } else {
                             Swal.fire({
@@ -633,7 +719,7 @@
                             $select.append(
                                 $('<option>', {
                                     value: element.id,
-                                    text: element.codigo_compra
+                                    text: 'Compra: ' + element.compra_ingreso + ' | Cantidad: ' + element.cantidad
                                 })
                             );
                         });
@@ -696,10 +782,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                                            <div class="invalid-feedback">
-                                                                                                ${mensaje}
-                                                                                            </div>
-                                                                                        `);
+                                                                        <div class="invalid-feedback">
+                                                                            ${mensaje}
+                                                                        </div>
+                                                                    `);
                             }
 
                         } else {
@@ -738,6 +824,63 @@
                     });
                 }
             });
+        }
+
+
+        function modalTransferencia(
+            productoId,
+            sucursalId,
+            nombreSucursal
+        ) {
+
+            $('#producto_transferencia_id').val(productoId);
+            $('#sucursal_origen_id').val(sucursalId);
+            $('#sucursal_origen_nombre').val(nombreSucursal);
+            $('#cantidad_transferencia').val('');
+            $('#descripcion_transferencia').val('');
+            $('#sucursal_destino_id').val('');
+            $('#modalTransferencia').modal('show');
+        }
+        function guardarTransferencia() {
+
+            if ($("#formularioTransferencia")[0].checkValidity()) {
+                let datos =
+                    $('#formularioTransferencia').serializeArray();
+                $.ajax({
+                    url: "{{ route('movimiento.guardarTransferencia') }}",
+                    method: "POST",
+                    data: datos,
+                    success: function (resultado) {
+                        if (resultado.estado) {
+                            Swal.fire({
+                                title: "TRANSFERENCIA REALIZADA",
+                                icon: "success",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            $('#modalTransferencia').modal('hide');
+                            ajaxListado();
+                        } else {
+                            Swal.fire({
+                                title: resultado.mensaje,
+                                icon: "error"
+                            });
+                        }
+                    },
+
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ocurrió un error inesperado.'
+                        });
+                    }
+                });
+            } else {
+
+                $("#formularioTransferencia")[0]
+                    .reportValidity();
+            }
         }
     </script>
 @endsection
