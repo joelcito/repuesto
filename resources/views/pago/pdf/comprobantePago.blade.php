@@ -103,7 +103,7 @@
                 <td>{{ $pago->descripcion }}</td>
                 <td>{{ $pago->tipo_pago }}</td>
                 <td>{{ number_format($pago->monto, 2) }}</td>
-                <td>{{ number_format(($pago->venta->total - $pago->venta->pagos->sum('monto')), 2) }}</td>
+                <td>{{ number_format(($pago->venta?->total - $pago->venta?->pagos->sum('monto')), 2) }}</td>
             </tr>
         </tbody>
     </table>

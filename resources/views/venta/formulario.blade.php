@@ -73,7 +73,7 @@
                                         <label class="fs-6 fw-semibold form-label mb-2 required">Fecha de
                                             Recepcion</label>
                                         <input type="date" class="form-control fw-bold form-control-solid"
-                                            name="fecha_recepcion_cliente" id="fecha_recepcion_cliente" required>
+                                            name="fecha_recepcion_cliente" id="fecha_recepcion_cliente" required value="{{date('Y-m-d')}}">
                                     </div>
                                     <div class="col-md-12">
                                         <label class="fs-6 fw-semibold form-label mb-2">Recibido por</label>
@@ -408,8 +408,8 @@
 
 
         function validarCamposRecibo() {
-            let realizoPago =
-                $('#realizo_pago_recibo').is(':checked');
+
+            let realizoPago = $('#realizo_pago_recibo').is(':checked');
             if (realizoPago) {
                 $('#monto_pagado_recibo')
                     .prop('readonly', false);
