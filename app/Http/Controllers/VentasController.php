@@ -487,5 +487,33 @@ class VentasController extends Controller
         ]);
     }
 
+
+
+    public function buscarProductos(Request $request)
+    {
+        $buscar = $request->buscar;
+
+        $productos = Producto::with('marca')
+            ->where('estado', 1)
+            ->where(function ($query) use ($buscar) {
+
+                $query->where('nombre', 'LIKE', "%{$buscar}%")
+                    ->orWhere('codigo_barras', 'LIKE', "%{$buscar}%")
+                    ->orWhere('codigo_interno', 'LIKE', "%{$buscar}%")
+                    ->orWhere('descripcion', 'LIKE', "%{$buscar}%")
+                    ->orWhere('vehiculos_compatibles', 'LIKE', "%{$buscar}%")
+                    ->orWhere('numero_parte_vehiculo', 'LIKE', "%{$buscar}%")
+
+                    ->orWhereHas('marca', function ($q) use ($buscar) {
+                        $q->where('nombre', 'LIKE', "%{$buscar}%");
+                    });
+
+            })
+            ->limit(30)
+            ->get();
+
+        return response()->json($productos);
+    }
+
 }
 

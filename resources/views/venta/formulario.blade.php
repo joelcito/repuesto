@@ -93,7 +93,7 @@
                     <div id="tabla_ventas">
                         <form id="formulario_venta">
                             <div class="row">
-                                <div class="col-md-3">
+                                <!-- <div class="col-md-3">
                                     <label class="fw-semibold fs-6 mb-2">
                                         Producto
                                     </label>
@@ -105,7 +105,37 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                </div> -->
+                                <div class="col-md-6 position-relative">
+
+                                    <label class="fw-semibold fs-6 mb-2">
+                                        Buscar Producto
+                                    </label>
+
+                                    <input type="text" id="buscar_producto" class="form-control form-control-lg"
+                                        placeholder="
+                                        Buscar por:
+                                        Nombre,
+                                        Marca,
+                                        Código,
+                                        Nro Parte,
+                                        Vehículo...
+                                        ">
+
+                                    <div id="resultado_productos" class="shadow bg-white border rounded mt-1" style="
+                                    max-height:400px;
+                                    overflow-y:auto;
+                                    display:none;
+                                    position:absolute;
+                                    z-index:9999;
+                                    width:100%;
+                                ">
+                                    </div>
+
+                                    <input type="hidden" id="producto_id" name="producto_id">
+
                                 </div>
+
                                 <div class="col-md-2">
                                     <label class="fw-semibold fs-6 mb-2">
                                         Cantidad
@@ -269,6 +299,9 @@
             }
         })
         let productosVenta = [];
+
+        let tabla = null;
+
         $(document).ready(function () {
             tabla = $('#tabla_detalle').DataTable({
                 responsive: true,
@@ -278,6 +311,7 @@
             });
             actualizarPrecio();
         });
+
         $('#producto_id').change(function () {
             actualizarPrecio();
         });
@@ -287,6 +321,8 @@
         $('#realizo_pago_recibo').change(function () {
             validarCamposRecibo();
         });
+
+
         function actualizarPrecio() {
             let producto =
                 $('#producto_id option:selected');
@@ -307,11 +343,9 @@
 
             $('#tabla_detalles').show();
 
-            let producto = $('#producto_id option:selected');
+            let producto_id = $('#producto_id').val();
 
-            let producto_id = producto.val();
-
-            let nombre = producto.text();
+            let nombre = $('#buscar_producto').val();
 
             let cantidad = parseFloat($('#cantidad').val());
 
@@ -321,7 +355,17 @@
 
             let subtotal = cantidad * precio;
 
-            if (cantidad <= 0) {
+            if (producto_id == '') {
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Seleccione un producto'
+                });
+
+                return;
+            }
+
+            if (cantidad <= 0 || isNaN(cantidad)) {
 
                 Swal.fire({
                     icon: 'warning',
@@ -367,6 +411,13 @@
             recargarTabla();
 
             calcularTotal();
+
+            // limpiar campos
+            $('#producto_id').val('');
+            $('#buscar_producto').val('');
+            $('#cantidad').val(1);
+            $('#precio_venta').val('');
+            $('#subtotal').val('');
         }
 
         function recargarTabla() {
@@ -377,10 +428,10 @@
 
                 let botonEliminar =
                     `<button
-                            class="btn btn-danger btn-sm"
-                            onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
-                            X
-                        </button>`;
+                                            class="btn btn-danger btn-sm"
+                                            onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
+                                            X
+                                        </button>`;
 
                 tabla.row.add([
                     item.nombre,
@@ -563,5 +614,137 @@
                 }
             });
         }
+
+        $('#buscar_producto').keyup(function () {
+
+            let buscar = $(this).val();
+
+            if (buscar.length < 2) {
+                $('#resultado_productos').hide();
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('venta.buscarProductos') }}",
+                method: "POST",
+                data: {
+                    buscar: buscar
+                },
+                success: function (productos) {
+
+                    let html = '';
+
+                    if (productos.length == 0) {
+
+                        html = `
+                            <div class="p-3 text-center text-danger">
+                                No se encontraron productos
+                            </div>
+                        `;
+
+                    } else {
+
+                        productos.forEach(producto => {
+
+                            html += `
+                                <div class="producto-item p-3 border-bottom"
+                                    style="
+                                        cursor:pointer;
+                                        transition:0.2s;
+                                    "
+
+                                    data-id="${producto.id}"
+                                    data-nombre="${producto.nombre}"
+                                    data-precio="${producto.precio_venta}"
+                                    data-precio-mayor="${producto.precio_mayor}">
+
+                                    <div class="row">
+
+                                        <div class="col-md-8">
+
+                                            <h6 class="mb-1 fw-bold text-primary">
+                                                ${producto.nombre}
+                                            </h6>
+
+                                            <div class="small text-muted">
+
+                                                Marca:
+                                                <b>
+                                                    ${producto.marca ?
+                                    producto.marca.nombre :
+                                    'SIN MARCA'}
+                                                </b>
+
+                                            </div>
+
+                                            <div class="small">
+                                                Cod Interno:
+                                                ${producto.codigo_interno ?? '-'}
+                                            </div>
+
+                                            <div class="small">
+                                                Nro Parte:
+                                                ${producto.numero_parte_vehiculo ?? '-'}
+                                            </div>
+
+                                            <div class="small">
+                                                Vehículo:
+                                                ${producto.vehiculos_compatibles ?? '-'}
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-md-4 text-end">
+
+                                            <span class="badge badge-success mb-2">
+                                                Stock:
+                                                ${producto.stock_actual}
+                                            </span>
+
+                                            <h5 class="text-success">
+                                                Bs.
+                                                ${producto.precio_venta}
+                                            </h5>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            `;
+                        });
+
+                    }
+
+                    $('#resultado_productos').html(html);
+                    $('#resultado_productos').show();
+
+                }
+            });
+
+        });
+
+
+        $(document).on('click', '.producto-item', function () {
+
+            let id = $(this).data('id');
+            let nombre = $(this).data('nombre');
+            let precio = $(this).data('precio');
+
+            $('#producto_id').val(id);
+
+            $('#buscar_producto').val(nombre);
+
+            $('#precio_venta').val(precio);
+
+            $('#resultado_productos').hide();
+
+        });
     </script>
+
+    <style>
+        .producto-item:hover {
+            background: #f5f8fa;
+        }
+    </style>
 @endsection

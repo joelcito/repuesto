@@ -185,6 +185,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/guardarVenta', [VentasController::class, 'guardarVenta'])->name('venta.guardarVenta');
         Route::post('/ajaxListado', [VentasController::class, 'ajaxListado'])->name('venta.ajaxListado');
         Route::post('/ajaxListadoDetalleVenta', [VentasController::class, 'ajaxListadoDetalleVenta'])->name('venta.ajaxListadoDetalleVenta');
+        Route::post('/buscar-productos', [VentasController::class, 'buscarProductos'])->name('venta.buscarProductos');
+
     });
 
     //PAGO
