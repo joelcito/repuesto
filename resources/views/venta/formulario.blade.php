@@ -47,7 +47,7 @@
                                                     id="cliente_seleccionado_id">
                                             </div>
                                             <div class="col-md-12">
-                                                <label class="fs-6 fw-semibold form-label mb-2">Entregado Por</label>
+                                                <label class="fs-6 fw-semibold form-label mb-2">Entregado por</label>
                                                 <input type="text" class="form-control fw-bold form-control-solid"
                                                     name="entregado_por" id="entregado_por">
                                             </div>
@@ -73,10 +73,11 @@
                                         <label class="fs-6 fw-semibold form-label mb-2 required">Fecha de
                                             Recepcion</label>
                                         <input type="date" class="form-control fw-bold form-control-solid"
-                                            name="fecha_recepcion_cliente" id="fecha_recepcion_cliente" required value="{{date('Y-m-d')}}">
+                                            name="fecha_recepcion_cliente" id="fecha_recepcion_cliente" required
+                                            value="{{date('Y-m-d')}}">
                                     </div>
                                     <div class="col-md-12">
-                                        <label class="fs-6 fw-semibold form-label mb-2">Recibido por</label>
+                                        <label class="fs-6 fw-semibold form-label mb-2">Vendido por</label>
                                         <input type="text" class="form-control fw-bold form-control-solid"
                                             name="recibido_por" id="recibido_por"
                                             value="{{ $usuario->nombres . ' ' . $usuario->ap_paterno . ' ' . $usuario->ap_materno }}"
@@ -376,10 +377,10 @@
 
                 let botonEliminar =
                     `<button
-                        class="btn btn-danger btn-sm"
-                        onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
-                        X
-                    </button>`;
+                            class="btn btn-danger btn-sm"
+                            onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
+                            X
+                        </button>`;
 
                 tabla.row.add([
                     item.nombre,
