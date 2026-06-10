@@ -70,15 +70,10 @@
                         @endif
                     </td>
                     <td>
-                        @if ($venta->estado == 'ANULADO')
-                            <span class="badge badge-danger">
-                                ANULADO
-                            </span>
-                        @else
-                            <span class="badge badge-success">
-                                ACTIVO
-                            </span>
-                        @endif
+                        <span class="badge badge-success">
+                            {{ $venta->estado }}
+                        </span>
+                    </td>ndif
                     </td>
                     <td>
                         {{ $venta->usuarioCreador?->nombres }}

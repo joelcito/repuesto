@@ -169,7 +169,7 @@ class VentasController extends Controller
                     'motivo' => 'VENTA',
                     'fecha' => now(),
                     'descripcion' => 'VENTA #' . $venta->id,
-                    'estado' => 'ACTIVO',
+                    'estado' => 'INGRESO',
                     'usuario_creador_id' => $usuario->id
                 ]);
                 $subtotalGeneral += $subtotal;
@@ -207,7 +207,7 @@ class VentasController extends Controller
                     'fecha' => now(),
                     'descripcion' => 'PAGO VENTA #' . $venta->numero_factura,
                     'tipo_pago' => $venta->metodo_pago,
-                    'estado' => 'ACTIVO'
+                    'estado' => 'INGRESO'
                 ]);
                 // MOVIMIENTO CAJA 
                 MovimientoCaja::create([
@@ -218,7 +218,7 @@ class VentasController extends Controller
                     'monto' => $montoReal,
                     'descripcion' => 'VENTA #' . $venta->id,
                     'fecha' => now(),
-                    'estado' => 'ACTIVO',
+                    'estado' => 'INGRESO',
                     'usuario_creador_id' => $usuario->id
                 ]);
                 // ACTUALIZAR CAJA 
@@ -329,7 +329,7 @@ class VentasController extends Controller
             if (!$caja) {
                 throw new \Exception('Caja no disponible');
             }
-            $totalPagado = $venta->pagos()->where('estado', 'ACTIVO')->sum('monto');
+            $totalPagado = $venta->pagos()->where('estado', 'INGRESO')->sum('monto');
             $saldoPendiente = $venta->total - $totalPagado;
             if ($request->monto > $saldoPendiente) {
                 throw new \Exception('El monto excede la deuda');
@@ -344,7 +344,7 @@ class VentasController extends Controller
                 'fecha' => now(),
                 'descripcion' => 'ABONO VENTA #' . $venta->numero_factura,
                 'tipo_pago' => $request->tipo_pago,
-                'estado' => 'ACTIVO'
+                'estado' => 'INGRESO'
             ]);
             // MOVIMIENTO CAJA 
             MovimientoCaja::create([
@@ -355,14 +355,14 @@ class VentasController extends Controller
                 'monto' => $request->monto,
                 'descripcion' => 'ABONO VENTA #' . $venta->numero_factura,
                 'fecha' => now(),
-                'estado' => 'ACTIVO',
+                'estado' => 'INGRESO',
                 'usuario_creador_id' => $usuario->id
             ]);
             // ACTUALIZAR CAJA
             $caja->total_ingresos += $request->monto;
             $caja->save();
             // NUEVO TOTAL PAGADO 
-            $nuevoTotalPagado = $venta->pagos()->where('estado', 'ACTIVO')->sum('monto');
+            $nuevoTotalPagado = $venta->pagos()->where('estado', 'INGRESO')->sum('monto');
             // ACTUALIZAR ESTADO 
             if ($nuevoTotalPagado >= $venta->total) {
                 $venta->estado_pago = 'PAGADO';
