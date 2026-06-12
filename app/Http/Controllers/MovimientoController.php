@@ -39,8 +39,10 @@ class MovimientoController extends Controller
     public function guardarIngreso(Request $request)
     {
         if ($request->ajax()) {
+
             $producto_id = $request->idProd;
             $sucursal_id = $request->idSuc;
+
             $request->validate([
                 'idProd' => 'required',
                 'idSuc' => 'required',
@@ -48,38 +50,47 @@ class MovimientoController extends Controller
                 'precio_compra' => 'required|numeric|min:0',
                 'precio_venta' => 'required|numeric|min:0',
                 'compra_ingreso' => 'required|numeric|min:0',
-
             ]);
+
             $usuario = Auth::user();
-            $movimiento = new Movimiento();
-            $movimiento->usuario_creador_id = $usuario->id;
-            $movimiento->producto_id = $producto_id;
-            $movimiento->sucursal_id = $sucursal_id;
-            $movimiento->tipo = 'INGRESO';
-            $movimiento->cantidad = $request->cantidad;
-            $movimiento->precio_compra = $request->precio_compra;
-            $movimiento->precio_venta = $request->precio_venta;
-            $movimiento->compra_ingreso = $request->compra_ingreso;
-            $movimiento->fecha = now();
-            $movimiento->descripcion = $request->descripcion;
-            $movimiento->estado = 1;
-            $movimiento->save();
+
+            Movimiento::create([
+                'usuario_creador_id' => $usuario->id,
+                'producto_id' => $producto_id,
+                'sucursal_id' => $sucursal_id,
+                'tipo' => 'INGRESO',
+                'cantidad' => $request->cantidad,
+                'precio_compra' => $request->precio_compra,
+                'precio_venta' => $request->precio_venta,
+                'compra_ingreso' => $request->compra_ingreso,
+                'fecha' => now(),
+                'descripcion' => $request->descripcion,
+                'estado' => 'INGRESO'
+            ]);
+
             $producto = Producto::find($producto_id);
+
             $producto->precio_compra = $request->precio_compra;
             $producto->precio_venta = $request->precio_venta;
             $producto->compra_ingreso = $request->compra_ingreso;
-
             $producto->save();
-            return Respuesta::success(null, "Ingreso registrado correctamente");
+
+            return Respuesta::success(
+                null,
+                "Ingreso registrado correctamente"
+            );
         }
+
         return Respuesta::error(null, "Error");
     }
 
     public function guardarSalida(Request $request)
     {
         if ($request->ajax()) {
+
             $producto_id = $request->idProds;
             $sucursal_id = $request->idSucs;
+
             $request->validate([
                 'idProds' => 'required',
                 'idSucs' => 'required',
@@ -87,32 +98,59 @@ class MovimientoController extends Controller
                 'motivo' => 'required',
             ]);
 
-            $producto = Producto::find($producto_id);
-            $stockActual = $this->obtenerStock(
-                $producto_id,
-                $sucursal_id
-            );
-            if ($request->cantidad > $stockActual) {
+            DB::beginTransaction();
+
+            try {
+
+                $producto = Producto::find($producto_id);
+
+                if (!$producto) {
+                    throw new \Exception("Producto no encontrado");
+                }
+
+                $stock = $this->obtenerStock(
+                    $producto_id,
+                    $sucursal_id
+                );
+
+                if ($stock < $request->cantidad) {
+                    throw new \Exception(
+                        "La salida es mayor al stock disponible"
+                    );
+                }
+
+                $usuario = Auth::user();
+
+                Movimiento::create([
+                    'usuario_creador_id' => $usuario->id,
+                    'producto_id' => $producto_id,
+                    'sucursal_id' => $sucursal_id,
+                    'tipo' => 'SALIDA',
+                    'cantidad' => $request->cantidad,
+                    'motivo' => $request->motivo,
+                    'fecha' => now(),
+                    'descripcion' => $request->descripcion,
+                    'estado' => 'SALIDA'
+                ]);
+
+                DB::commit();
+
+                return Respuesta::success(
+                    null,
+                    "Salida registrada correctamente"
+                );
+
+            } catch (\Exception $e) {
+
+                DB::rollBack();
+
                 return Respuesta::error(
                     null,
-                    "La salida es mayor al stock disponible"
+                    $e->getMessage()
                 );
             }
-            $usuario = Auth::user();
-            $movimiento = new Movimiento();
-            $movimiento->usuario_creador_id = $usuario->id;
-            $movimiento->producto_id = $producto_id;
-            $movimiento->sucursal_id = $sucursal_id;
-            $movimiento->tipo = 'SALIDA';
-            $movimiento->cantidad = $request->cantidad;
-            $movimiento->motivo = $request->motivo;
-            $movimiento->fecha = now();
-            $movimiento->descripcion = $request->descripcion;
-            $movimiento->estado = 1;
-            $movimiento->save();
-            $producto->save();
-            return Respuesta::success(null, "Salida registrada correctamente");
         }
+
         return Respuesta::error(null, "Error");
     }
 
@@ -160,6 +198,80 @@ class MovimientoController extends Controller
     }
 
 
+    public function guardarTransferencia(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            $request->validate([
+                'producto_id' => 'required',
+                'sucursal_origen_id' => 'required',
+                'sucursal_destino_id' => 'required',
+                'cantidad' => 'required|numeric|min:1',
+            ]);
+
+            $producto = Producto::find($request->producto_id);
+
+            if (!$producto) {
+                throw new \Exception('Producto no encontrado');
+            }
+
+            $stock = $this->obtenerStock(
+                $request->producto_id,
+                $request->sucursal_origen_id
+            );
+
+            if ($stock < $request->cantidad) {
+                throw new \Exception('Stock insuficiente');
+            }
+
+            $usuario = Auth::user();
+
+            Movimiento::create([
+                'usuario_creador_id' => $usuario->id,
+                'producto_id' => $request->producto_id,
+                'sucursal_id' => $request->sucursal_origen_id,
+                'tipo' => 'TRANSFERENCIA_SALIDA',
+                'cantidad' => $request->cantidad,
+                'fecha' => now(),
+                'descripcion' =>
+                    'Transferencia a sucursal ' .
+                    $request->sucursal_destino_id,
+                'estado' => 'SALIDA'
+            ]);
+
+            Movimiento::create([
+                'usuario_creador_id' => $usuario->id,
+                'producto_id' => $request->producto_id,
+                'sucursal_id' => $request->sucursal_destino_id,
+                'tipo' => 'TRANSFERENCIA_INGRESO',
+                'cantidad' => $request->cantidad,
+                'fecha' => now(),
+                'descripcion' =>
+                    'Transferencia desde sucursal ' .
+                    $request->sucursal_origen_id,
+                'estado' => 'INGRESO'
+            ]);
+
+            DB::commit();
+
+            return Respuesta::success(
+                null,
+                'Transferencia realizada'
+            );
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return Respuesta::error(
+                null,
+                $e->getMessage()
+            );
+        }
+    }
+
     public function obtenerStock($productoId, $sucursalId)
     {
         $ingresos = Movimiento::where('producto_id', $productoId)
@@ -167,7 +279,8 @@ class MovimientoController extends Controller
             ->whereIn('tipo', [
                 'INGRESO',
                 'DEVOLUCION',
-                'TRANSFERENCIA_INGRESO'
+                'TRANSFERENCIA_INGRESO',
+                'ANULACION_VENTA'
             ])
             ->sum('cantidad');
 
@@ -182,63 +295,5 @@ class MovimientoController extends Controller
 
         return $ingresos - $salidas;
     }
-
-    public function guardarTransferencia(Request $request)
-    {
-        $request->validate([
-            'producto_id' => 'required',
-            'sucursal_origen_id' => 'required',
-            'sucursal_destino_id' => 'required',
-            'cantidad' => 'required|numeric|min:1',
-        ]);
-
-        $stock = $this->obtenerStock(
-            $request->producto_id,
-            $request->sucursal_origen_id
-        );
-
-        if ($request->cantidad > $stock) {
-
-            return Respuesta::error(
-                null,
-                'Stock insuficiente'
-            );
-        }
-
-        $usuario = Auth::user();
-        Movimiento::create([
-            'usuario_creador_id' => $usuario->id,
-            'producto_id' => $request->producto_id,
-            'sucursal_id' => $request->sucursal_origen_id,
-            'tipo' => 'TRANSFERENCIA_SALIDA',
-            'cantidad' => $request->cantidad,
-            'fecha' => now(),
-            'descripcion' =>
-                'Transferencia a sucursal ' .
-                $request->sucursal_destino_id,
-            'estado' => 1
-        ]);
-
-        Movimiento::create([
-            'usuario_creador_id' => $usuario->id,
-            'producto_id' => $request->producto_id,
-            'sucursal_id' => $request->sucursal_destino_id,
-            'tipo' => 'TRANSFERENCIA_INGRESO',
-            'cantidad' => $request->cantidad,
-            'fecha' => now(),
-            'descripcion' =>
-                'Transferencia desde sucursal ' .
-                $request->sucursal_origen_id,
-
-            'estado' => 1
-        ]);
-
-        return Respuesta::success(
-            null,
-            'Transferencia realizada'
-        );
-    }
-
-
 
 }

@@ -77,7 +77,7 @@ class ProductoController extends Controller
                 'categoria_id' => 'required',
                 'marca_id' => 'required',
                 'unidad_id' => 'required',
-                'stock_actual' => 'required|numeric',
+
                 'precio_venta' => 'required|numeric',
                 'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             ]);
@@ -101,7 +101,7 @@ class ProductoController extends Controller
             $producto->marca_id = $request->input('marca_id');
             //$producto->vehiculo = $request->input('vehiculo');
             $producto->numero_parte_vehiculo = $request->input('numero_parte_vehiculo');
-            $producto->stock_actual = $request->input('stock_actual');
+
             $producto->stock_minimo = $request->input('stock_minimo');
             $producto->unidad_id = $request->input('unidad_id');
             $producto->precio_compra = $request->input('precio_compra');

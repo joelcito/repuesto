@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Caja;
 use App\Models\Cliente;
 use App\Models\Devolucion;
 use App\Models\Movimiento;
@@ -116,7 +117,7 @@ class DevolucionController extends Controller
             $devolucion->tipo = $request->tipo;
             $devolucion->motivo = $request->motivo;
             $devolucion->total = $totalGeneral;
-            $devolucion->estado = 'ACTIVO';
+            $devolucion->estado = 'INGRESO';
             $devolucion->usuario_creador_id = $usuario->id;
             $devolucion->save();
             foreach ($request->productos as $item) {
@@ -141,18 +142,22 @@ class DevolucionController extends Controller
                     $request->tipo == 'DINERO' ||
                     $request->tipo == 'PRODUCTO'
                 ) {
-                    $producto->stock_actual =
-                        $producto->stock_actual +
-                        $item['cantidad'];
-                    $producto->save();
+
+                    $ventaDetalle->cantidad_devuelta =
+                        ($ventaDetalle->cantidad_devuelta ?? 0)
+                        + $item['cantidad'];
+
+                    $ventaDetalle->save();
                 }
+
+
 
                 $ventaDetalle->cantidad_devuelta = ($ventaDetalle->cantidad_devuelta ?? 0) + $item['cantidad'];
                 $ventaDetalle->save();
 
                 Movimiento::create([
                     'producto_id' => $producto->id,
-                    'sucursal_id' => $producto->sucursal_id,
+                    'sucursal_id' => $venta->caja->sucursal_id,
                     'tipo' => 'DEVOLUCION',
                     'cantidad' => $item['cantidad'],
                     'precio_compra' => $producto->precio_compra,
@@ -160,7 +165,7 @@ class DevolucionController extends Controller
                     'motivo' => 'DEVOLUCION',
                     'fecha' => now(),
                     'descripcion' => 'DEVOLUCION #' . $devolucion->id,
-                    'estado' => 'ACTIVO',
+                    'estado' => 'INGRESO',
                     'usuario_creador_id' => $usuario->id
                 ]);
 
@@ -174,7 +179,7 @@ class DevolucionController extends Controller
                         'monto' => $subtotal,
                         'descripcion' => 'DEVOLUCION #' . $devolucion->id,
                         'fecha' => now(),
-                        'estado' => 'ACTIVO',
+                        'estado' => 'SALIDA',
                         'usuario_creador_id' => $usuario->id
                     ]);
 
@@ -189,6 +194,13 @@ class DevolucionController extends Controller
                         'tipo_pago' => $venta->metodo_pago,
                         'estado' => 'SALIDA'
                     ]);
+                    $caja = Caja::find($venta->caja_id);
+
+                    $caja->total_egresos =
+                        $caja->total_egresos + $subtotal;
+
+                    $caja->save();
+
                 }
             }
 
@@ -202,8 +214,11 @@ class DevolucionController extends Controller
                 ->count();
             if ($detallesPendientes == 0) {
                 $venta->estado = 'DEVUELTO';
-                $venta->save();
+            } else {
+                $venta->estado = 'DEVOLUCION_PARCIAL';
             }
+
+            $venta->save();
 
             DB::commit();
             return response()->json([

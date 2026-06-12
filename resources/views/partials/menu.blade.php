@@ -188,7 +188,7 @@
                                 <span class="menu-bullet">
                                     <span class="bullet bullet-dot"></span>
                                 </span>
-                                <span class="menu-title text-white">Recepcion</span>
+                                <span class="menu-title text-white">VENTA</span>
                             </a>
                         </div>
                     </div>
