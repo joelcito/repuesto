@@ -34,95 +34,30 @@
 
                         <div class="col-md-6">
                             <label class="fw-semibold fs-6 mb-2">
-                                Producto
+                                Nombre Producto
                             </label>
 
-                            <select class="form-select form-select-sm" name="producto_id">
+                            <input type="text" class="form-control form-control-sm" name="nombre_producto">
 
-                                <option value="">
-                                    Seleccione
-                                </option>
 
-                                @foreach($productos as $producto)
-
-                                    <option value="{{ $producto->id }}">
-                                        {{ $producto->nombre }}
-                                    </option>
-
-                                @endforeach
-
-                            </select>
                         </div>
 
-                        <div class="col-md-3">
-                            <label class="fw-semibold fs-6 mb-2">
-                                Cantidad
-                            </label>
 
-                            <input type="number" min="1" class="form-control form-control-sm" name="cantidad">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="fw-semibold fs-6 mb-2">
-                                Motivo
-                            </label>
-
-                            <select class="form-select form-select-sm" name="motivo">
-
-                                <option value="COMPRA">
-                                    COMPRA
-                                </option>
-
-                                <option value="AJUSTE">
-                                    AJUSTE
-                                </option>
-
-                                <option value="DEVOLUCION">
-                                    DEVOLUCIÓN
-                                </option>
-
-                                <option value="OTRO">
-                                    OTRO
-                                </option>
-
-                            </select>
-                        </div>
 
                     </div>
 
-                    <div class="row mt-4">
 
-                        <div class="col-md-6">
 
-                            <label class="fw-semibold fs-6 mb-2">
-                                Precio Compra
-                            </label>
-
-                            <input type="number" step="0.01" class="form-control form-control-sm" name="precio_compra">
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <label class="fw-semibold fs-6 mb-2">
-                                Precio Venta
-                            </label>
-
-                            <input type="number" step="0.01" class="form-control form-control-sm" name="precio_venta">
-
-                        </div>
-
-                    </div>
-
-                    <div class="row mt-4">
+                    <div class="row mt-3">
 
                         <div class="col-md-12">
 
                             <label class="fw-semibold fs-6 mb-2">
-                                Descripción
+                                Descripción Producto
                             </label>
 
-                            <textarea class="form-control form-control-sm" rows="3" name="descripcion"></textarea>
+                            <textarea class="form-control form-control-sm" rows="3"
+                                name="descripcion_producto"></textarea>
 
                         </div>
 

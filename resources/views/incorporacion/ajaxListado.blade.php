@@ -6,10 +6,8 @@
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                 <th>ID</th>
                 <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio Compra</th>
-                <th>Precio Venta</th>
-                <th>Motivo</th>
+                <th>Descripcion</th>
+
                 <th>Fecha</th>
                 <th>Actions</th>
 
@@ -19,11 +17,23 @@
             @forelse($incorporaciones as $incorporacion)
                 <tr>
                     <td>{{ $incorporacion->id }}</td>
-                    <td> {{ $incorporacion->producto->nombre }} </td>
-                    <td> {{ $incorporacion->cantidad }} </td>
-                    <td> Bs. {{ number_format($incorporacion->precio_compra, 2) }} </td>
-                    <td> Bs. {{ number_format($incorporacion->precio_venta, 2) }} </td>
-                    <td> {{ $incorporacion->motivo }} </td>
+                    <td>
+
+                        @if($incorporacion->producto)
+
+                            {{ $incorporacion->producto->nombre }}
+
+                        @else
+
+                            {{ $incorporacion->nombre_producto }}
+
+                        @endif
+
+                    </td>
+                    <td>
+                        {{ $incorporacion->descripcion_producto }}
+                    </td>
+
                     <td> {{ $incorporacion->created_at }} </td>
                     <td> <button class="btn btn-icon btn-sm btn-danger btn-circle"
                             onclick="eliminarIncorporacion({{ $incorporacion->id }})">

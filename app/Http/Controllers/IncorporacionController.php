@@ -38,54 +38,44 @@ class IncorporacionController extends Controller
     public function guardarIncorporacion(Request $request)
     {
         DB::beginTransaction();
-        try {
-            $request->validate([
-                'producto_id' => 'required',
-                'cantidad' => 'required|numeric|min:1',
-                'precio_compra' => 'required|numeric|min:0',
-                'precio_venta' => 'required|numeric|min:0',
-            ]);
-            $usuario = Auth::user();
-            $producto = Producto::find($request->producto_id);
 
-            if (!$producto) {
-                throw new \Exception('Producto no encontrado');
-            }
-            $incorporacion = new Incorporacion();
-            $incorporacion->producto_id = $producto->id;
-            $incorporacion->sucursal_id = $producto->sucursal_id;
-            $incorporacion->cantidad = $request->cantidad;
-            $incorporacion->precio_compra = $request->precio_compra;
-            $incorporacion->precio_venta = $request->precio_venta;
-            $incorporacion->motivo = $request->motivo;
-            $incorporacion->descripcion = $request->descripcion;
-            $incorporacion->estado = 'ACTIVO';
-            $incorporacion->usuario_creador_id = $usuario->id;
-            $incorporacion->save();
-            // AUMENTAR STOCK 
-            $producto->stock_actual = $producto->stock_actual + $request->cantidad;
-            $producto->precio_compra = $request->precio_compra;
-            $producto->precio_venta = $request->precio_venta;
-            $producto->save();
-            // MOVIMIENTO 
-            Movimiento::create([
-                'producto_id' => $producto->id,
-                'sucursal_id' => $producto->sucursal_id,
-                'tipo' => 'INCORPORACION',
-                'cantidad' => $request->cantidad,
-                'precio_compra' => $request->precio_compra,
-                'precio_venta' => $request->precio_venta,
-                'motivo' => 'INCORPORACION',
-                'fecha' => now(),
-                'descripcion' =>
-                    'INCORPORACION #' . $incorporacion->id,
-                'estado' => 'ACTIVO',
-                'usuario_creador_id' => $usuario->id
+        try {
+
+            $request->validate([
+                'nombre_producto' => 'required|string|max:255',
+                'descripcion_producto' => 'nullable|string',
             ]);
+
+            $usuario = Auth::user();
+
+            $incorporacion = new Incorporacion();
+
+            $incorporacion->producto_id = null;
+
+            $incorporacion->nombre_producto =
+                strtoupper($request->nombre_producto);
+
+            $incorporacion->descripcion_producto =
+                $request->descripcion_producto;
+
+            $incorporacion->estado = 'ACTIVO';
+
+            $incorporacion->usuario_creador_id =
+                $usuario->id;
+
+            $incorporacion->save();
+
             DB::commit();
-            return response()->json(['estado' => true, 'mensaje' => 'Incorporación registrada correctamente']);
+
+            return response()->json([
+                'estado' => true,
+                'mensaje' => 'Incorporación registrada correctamente'
+            ]);
+
         } catch (\Exception $e) {
+
             DB::rollBack();
+
             return response()->json([
                 'estado' => false,
                 'mensaje' => $e->getMessage()
