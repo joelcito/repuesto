@@ -415,7 +415,12 @@ class PagoController extends Controller
     public function comprobantePago(Request $request, $pago_id)
     {
 
-        $pago = Pago::find($pago_id);
+        $pago = Pago::with([
+            'usuario',
+            'sucursal',
+            'venta.pagos',
+            'categoria.parent'
+        ])->findOrFail($pago_id);
 
         $html = View::make('pago.pdf.comprobantePago', compact(['pago']))->render();
         $dompdf = new Dompdf();

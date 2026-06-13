@@ -83,8 +83,8 @@
         <thead>
             <tr>
                 <th>SUCURSAL</th>
-                <th>CATEGORIA</th>
-                <th>SUB CATEGORIA</th>
+                <!-- <th>CATEGORIA</th>
+                <th>SUB CATEGORIA</th> -->
                 <th>FAC/OR REC.</th>
                 <th>FECHA</th>
                 <th>DESCRIPCION</th>
@@ -96,8 +96,8 @@
         <tbody>
             <tr>
                 <td>{{ $pago?->sucursal?->nombre }}</td>
-                <td>{{ $pago->subCategoria?->Categoria?->nombre }}</td>
-                <td>{{ $pago->subCategoria?->nombre }}</td>
+                <!-- <td>{{ $pago->categoria?->parent?->nombre }}</td>
+                <td>{{ $pago->categoria?->nombre }}</td> -->
                 <td>{{ $pago->venta?->numero_factura }}</td>
                 <td>{{ $pago->fecha }}</td>
                 <td>{{ $pago->descripcion }}</td>

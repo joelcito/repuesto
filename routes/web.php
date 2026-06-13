@@ -154,6 +154,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/guardarDevolucion', [DevolucionController::class, 'guardarDevolucion'])->name('devolucion.guardarDevolucion');
         Route::post('/eliminarDevolucion', [DevolucionController::class, 'eliminarDevolucion'])->name('devolucion.eliminarDevolucion');
         Route::post('/obtenerDetalleVenta', [DevolucionController::class, 'obtenerDetalleVenta'])->name('devolucion.obtenerDetalleVenta');
+        Route::get('/detalledevolucion/{devolucion_id}', [DevolucionController::class, 'detalledevolucion'])->name('devolucion.detalledevolucion');
     });
 
     Route::prefix('/incorporacion')->group(function () {

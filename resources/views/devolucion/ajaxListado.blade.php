@@ -24,7 +24,10 @@
                     <td> Bs. {{ number_format($devolucion->total, 2) }} </td>
                     <td> {{ $devolucion->motivo }} </td>
                     <td> {{ $devolucion->created_at }} </td>
-                    <td>
+                    <td> <a href="{{ route('devolucion.detalledevolucion', $devolucion->id) }}" target="_blank"
+                            class="btn btn-info btn-sm btn-icon" title="Ver detalle">
+                            <i class="fa fa-eye"></i>
+                        </a>
                         <button class="btn btn-icon btn-sm btn-danger btn-circle"
                             onclick="eliminarDevolucion({{ $devolucion->id }})">
                             <i class="fa fa-trash"></i>

@@ -53,6 +53,14 @@ class Pago extends Model
         return $this->belongsTo(Caja::class, 'caja_id');
     }
 
+    public function categoria()
+    {
+        return $this->belongsTo(
+            Categoria::class,
+            'sub_categoria_id'
+        );
+    }
+
 
 
 

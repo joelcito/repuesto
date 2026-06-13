@@ -140,11 +140,11 @@
                     let html = ''; resultado.data.forEach(item => {
                         let devuelto = item.cantidad_devuelta ?? 0;
                         let disponible = item.cantidad - devuelto; html += ` <tr> <td> 
-                            ${item.producto.nombre} </td> <td class="text-center"> ${item.cantidad} 
-                            </td> <td class="text-center text-danger fw-bold"> ${devuelto} </td> <td class="text-center"> Bs. 
-                            ${parseFloat(item.precio_unitario).toFixed(2)} </td> <td> <input type="number" min="0" max="${disponible}" 
-                            value="0" class="form-control form-control-sm cantidad_devolucion" data-precio="${item.precio_unitario}" 
-                            data-producto="${item.producto_id}"> <small class="text-danger"> Disponible: ${disponible} </small> </td> </tr> `;
+                                    ${item.producto.nombre} </td> <td class="text-center"> ${item.cantidad} 
+                                    </td> <td class="text-center text-danger fw-bold"> ${devuelto} </td> <td class="text-center"> Bs. 
+                                    ${parseFloat(item.precio_unitario).toFixed(2)} </td> <td> <input type="number" min="0" max="${disponible}" 
+                                    value="0" class="form-control form-control-sm cantidad_devolucion" data-precio="${item.precio_unitario}" 
+                                    data-producto="${item.producto_id}"> <small class="text-danger"> Disponible: ${disponible} </small> </td> </tr> `;
                     });
                     $('#detalle_devolucion').html(html); calcularMonto();
                 }
@@ -184,6 +184,61 @@
                     } else { Swal.fire({ icon: 'error', title: resultado.mensaje }); }
                 }, error: function () {
                     Swal.fire({ icon: 'error', title: 'Ocurrió un error inesperado' });
+                }
+            });
+        }
+
+
+        function eliminarDevolucion(id) {
+            Swal.fire({
+                title: '¿Eliminar devolución?',
+                text: 'Esta acción no se puede revertir',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('devolucion.eliminarDevolucion') }}",
+                        method: "POST",
+                        data: {
+                            id: id
+                        },
+
+                        success: function (resultado) {
+
+                            if (resultado.estado) {
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: resultado.mensaje,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+
+                                ajaxListado();
+
+                            } else {
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: resultado.mensaje
+                                });
+                            }
+                        },
+
+                        error: function (xhr) {
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Ocurrió un error al eliminar'
+                            });
+
+                            console.log(xhr.responseText);
+                        }
+                    });
                 }
             });
         }

@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
+use PDF;
+
 class DevolucionController extends Controller
 {
     public function listado()
@@ -47,6 +49,7 @@ class DevolucionController extends Controller
     {
         if ($request->ajax()) {
             $devoluciones = Devolucion::with('venta')
+                ->whereNull('deleted_at')
                 ->orderBy('id', 'desc')
                 ->get();
             $valores = [
@@ -150,11 +153,6 @@ class DevolucionController extends Controller
                     $ventaDetalle->save();
                 }
 
-
-
-                $ventaDetalle->cantidad_devuelta = ($ventaDetalle->cantidad_devuelta ?? 0) + $item['cantidad'];
-                $ventaDetalle->save();
-
                 Movimiento::create([
                     'producto_id' => $producto->id,
                     'sucursal_id' => $venta->caja->sucursal_id,
@@ -235,14 +233,167 @@ class DevolucionController extends Controller
         }
     }
 
-    public function eliminar(Request $request)
+    public function eliminarDevolucion(Request $request)
     {
-        $devolucion = Devolucion::find($request->id);
-        $devolucion->delete();
-        return response()->json([
-            'estado' => true,
-            'mensaje' => 'Registro eliminado'
-        ]);
+        DB::beginTransaction();
+        try {
+            $devolucion = Devolucion::findOrFail($request->id);
+            if ($devolucion->estado == 'ANULADO') {
+                throw new \Exception(
+                    'La devolución ya fue anulada'
+                );
+            }
+            $venta = Venta::findOrFail(
+                $devolucion->venta_id
+            );
+            $usuario = Auth::user();
+            $movimientos = Movimiento::where(
+                'descripcion',
+                'DEVOLUCION #' . $devolucion->id
+            )->get();
+            foreach ($movimientos as $movimiento) {
+                $ventaDetalle = VentaDetalle::where(
+                    'venta_id',
+                    $venta->id
+                )
+                    ->where(
+                        'producto_id',
+                        $movimiento->producto_id
+                    )
+                    ->first();
+
+                if ($ventaDetalle) {
+                    $ventaDetalle->cantidad_devuelta =
+                        $ventaDetalle->cantidad_devuelta
+                        - $movimiento->cantidad;
+                    if (
+                        $ventaDetalle->cantidad_devuelta < 0
+                    ) {
+                        $ventaDetalle->cantidad_devuelta = 0;
+                    }
+                    $ventaDetalle->save();
+                }
+                Movimiento::create([
+                    'producto_id' => $movimiento->producto_id,
+                    'sucursal_id' => $movimiento->sucursal_id,
+                    'tipo' => 'ANULACION_DEVOLUCION',
+                    'cantidad' => $movimiento->cantidad,
+                    'precio_compra' => $movimiento->precio_compra,
+                    'precio_venta' => $movimiento->precio_venta,
+                    'motivo' => 'ANULACION DEVOLUCION',
+                    'fecha' => now(),
+                    'descripcion' => 'ANULACION DEVOLUCION #' . $devolucion->id,
+                    'estado' => 'SALIDA',
+                    'usuario_creador_id' => $usuario->id
+                ]);
+            }
+
+            if ($devolucion->tipo == 'DINERO') {
+                MovimientoCaja::create([
+                    'caja_id' => $venta->caja_id,
+                    'venta_id' => $venta->id,
+                    'tipo' => 'INGRESO',
+                    'metodo_pago' => $venta->metodo_pago,
+                    'monto' => $devolucion->total,
+                    'descripcion' =>
+                        'ANULACION DEVOLUCION #' .
+                        $devolucion->id,
+                    'fecha' => now(),
+                    'estado' => 'INGRESO',
+                    'usuario_creador_id' => $usuario->id
+                ]);
+
+                Pago::create([
+                    'usuario_creador_id' => $usuario->id,
+                    'venta_id' => $venta->id,
+                    'sucursal_id' => $venta->caja->sucursal_id,
+                    'monto' => $devolucion->total,
+                    'cambio' => 0,
+                    'fecha' => now(),
+                    'descripcion' =>
+                        'ANULACION DEVOLUCION',
+                    'tipo_pago' => $venta->metodo_pago,
+                    'estado' => 'INGRESO'
+                ]);
+
+                $caja = Caja::find($venta->caja_id);
+                $caja->total_egresos = $caja->total_egresos - $devolucion->total;
+                if ($caja->total_egresos < 0) {
+                    $caja->total_egresos = 0;
+                }
+                $caja->save();
+            }
+            $devolucion->estado = 'ANULADO';
+            $devolucion->usuario_eliminador_id = $usuario->id;
+            $devolucion->save();
+            $devolucion->delete();
+            $detallesPendientes =
+                VentaDetalle::where(
+                    'venta_id',
+                    $venta->id
+                )
+                    ->whereRaw(
+                        'cantidad > COALESCE(cantidad_devuelta,0)'
+                    )
+                    ->count();
+
+            if ($detallesPendientes == 0) {
+                $venta->estado = 'DEVUELTO';
+            } else {
+                $venta->estado =
+                    'DEVOLUCION_PARCIAL';
+            }
+            $venta->save();
+            DB::commit();
+            return response()->json([
+                'estado' => true,
+                'mensaje' =>
+                    'Devolución anulada correctamente'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'estado' => false,
+                'mensaje' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function detalledevolucion($devolucion_id)
+    {
+        $usuario = Auth::user();
+
+        $devolucion = Devolucion::with([
+            'venta.cliente',
+            'venta.detalles.producto',
+            'caja'
+        ])->find($devolucion_id);
+
+        if (!$devolucion) {
+
+            return redirect()
+                ->back()
+                ->with(
+                    'error',
+                    'Devolución no encontrada'
+                );
+        }
+
+        $data = [
+            'usuario' => $usuario,
+            'devolucion' => $devolucion
+        ];
+
+        $pdf = Pdf::loadView(
+            'devolucion.pdf.detalledevolucion',
+            $data
+        )->setPaper('a5', 'landscape');
+
+        return $pdf->stream(
+            'devolucion_' .
+            $devolucion->id .
+            '.pdf'
+        );
     }
 }
 
