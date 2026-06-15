@@ -15,6 +15,7 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProveedorController;
+use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\UnidadController;
@@ -206,6 +207,24 @@ Route::middleware('auth')->group(function () {
         Route::post('/generaExcelPago', [PagoController::class, 'generaExcelPago'])->name('pago.generaExcelPago');
     });
 
+    // REPORTE
+    Route::prefix('/reporte')->group(function () {
+        Route::get('/cajas', [ReporteController::class, 'cajas'])->name('reporte.cajas');
+        Route::get('/historial', [ReporteController::class, 'historial'])->name('reporte.historial_precios');
+        Route::get('/ingresosalida', [ReporteController::class, 'ingresosalida'])->name('reporte.ingreso_salida');
+        Route::get('/inventarios', [ReporteController::class, 'inventarios'])->name('reporte.inventarios');
+        Route::get('/pagos', [ReporteController::class, 'pagos'])->name('reporte.pagos');
+        Route::get('/utilidades', [ReporteController::class, 'utilidades'])->name('reporte.utilidades');
+        Route::get('/ventas', [ReporteController::class, 'ventas'])->name('reporte.ventas');
+
+
+        Route::post('/inventarios/pdf', [ReporteController::class, 'inventariosPdf'])->name('reporte.inventarios.pdf');
+        Route::post('/ventas/pdf', [ReporteController::class, 'ventasPdf'])->name('reporte.ventas.pdf');
+        Route::post('/cajas/pdf', [ReporteController::class, 'cajasPdf'])->name('reporte.cajas.pdf');
+        Route::post('/utilidades/pdf', [ReporteController::class, 'utilidadesPdf'])->name('reporte.utilidades.pdf');
+        Route::post('/ingreso-salida/pdf', [ReporteController::class, 'ingresoSalidaPdf'])->name('reporte.ingreso_salida.pdf');
+        Route::post('/historial/pdf', [ReporteController::class, 'historialPdf'])->name('reporte.historial.pdf');
+    });
 
 });
 

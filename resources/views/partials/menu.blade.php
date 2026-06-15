@@ -231,31 +231,65 @@
                     <!--end:Menu link-->
                     <div class="menu-sub menu-sub-accordion">
                         <div class="menu-item">
-                            <a class="menu-link" href="">
+                            <a class="menu-link {{ Route::currentRouteName() == 'reporte.inventarios' ? 'active' : '' }}"
+                                href="{{ route('reporte.inventarios') }}">
                                 <span class="menu-bullet">
                                     <span class="bullet bullet-dot"></span>
                                 </span>
-                                <span class="menu-title text-white">Reporte Cuentas Cliente</span>
+                                <span class="menu-title text-white">Reporte de inventarios</span>
                             </a>
                         </div>
 
                         <!-- NUEVO: Stock Histórico -->
                         <div class="menu-item">
-                            <a class="menu-link" href="">
+                            <a class="menu-link {{ Route::currentRouteName() == 'reporte.ventas' ? 'active' : '' }}"
+                                href="{{ route('reporte.ventas') }}">
                                 <span class="menu-bullet">
                                     <span class="bullet bullet-dot"></span>
                                 </span>
-                                <span class="menu-title text-white">Stock Histórico</span>
+                                <span class="menu-title text-white">Reporte de ventas</span>
                             </a>
                         </div>
 
 
                         <div class="menu-item">
-                            <a class="menu-link" href="">
+                            <a class="menu-link {{ Route::currentRouteName() == 'reporte.cajas' ? 'active' : '' }}"
+                                href="{{ route('reporte.cajas') }}">
                                 <span class="menu-bullet">
                                     <span class="bullet bullet-dot"></span>
                                 </span>
-                                <span class="menu-title text-white">Estructura de costos</span>
+                                <span class="menu-title text-white">Reporte de cajas</span>
+                            </a>
+                        </div>
+
+                        <div class="menu-item">
+                            <a class="menu-link {{ Route::currentRouteName() == 'reporte.utilidades' ? 'active' : '' }}"
+                                href="{{ route('reporte.utilidades') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title text-white">Reporte de utilidades</span>
+                            </a>
+                        </div>
+
+                        <div class="menu-item">
+                            <a class="menu-link {{ Route::currentRouteName() == 'reporte.ingresosalida' ? 'active' : '' }}"
+                                href="{{ route('reporte.ingreso_salida') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title text-white">Reporte de ingresos y salidas</span>
+                            </a>
+
+                        </div>
+
+                        <div class="menu-item">
+                            <a class="menu-link {{ Route::currentRouteName() == 'reporte.historial_precios' ? 'active' : '' }}"
+                                href="{{ route('reporte.historial_precios') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title text-white">Historial de precios</span>
                             </a>
                         </div>
 
