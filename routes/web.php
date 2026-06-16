@@ -48,7 +48,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/eliminarRol', [RolController::class, 'eliminarRol'])->name('rol.eliminarRol');
     });
 
-
     Route::prefix('/user')->group(function () {
         Route::get('/listado', [UserController::class, 'listado'])->name('user.listado');
         Route::post('/ajaxListado', [UserController::class, 'ajaxListado'])->name('user.ajaxListado');
@@ -224,6 +223,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/utilidades/pdf', [ReporteController::class, 'utilidadesPdf'])->name('reporte.utilidades.pdf');
         Route::post('/ingreso-salida/pdf', [ReporteController::class, 'ingresoSalidaPdf'])->name('reporte.ingreso_salida.pdf');
         Route::post('/historial/pdf', [ReporteController::class, 'historialPdf'])->name('reporte.historial.pdf');
+        Route::post('/pagos/pdf', [ReporteController::class, 'pagosPdf'])->name('reporte.pagos.pdf');
     });
 
 });

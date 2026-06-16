@@ -1,269 +1,468 @@
+```blade
 @extends('layouts.app')
-@section('css')
 
+@section('css')
 @endsection
 
 @section('content')
-<!--begin::Row-->
-<div class="row g-5 gx-xl-10 mb-5 mb-xl-10">
 
-    <div class="col-xxl-12">
-        <div class="card card-flush h-md-100">
-            <div class="card-body d-flex flex-column justify-content-between mt-9 bgi-no-repeat bgi-size-cover bgi-position-x-center pb-0"
-                style="background-position: 100% 50%; background-image:url('assets/media/stock/900x600/42.png')">
-                <div class="mb-10">
-                    <div class="fs-2hx fw-bold text-gray-800 text-center mb-13">
-                        <span class="me-2">Sistema de Repuestos
-                            <br />
+{{-- ========================================================= --}}
+{{-- DASHBOARD ADMINISTRADOR --}}
+{{-- ========================================================= --}}
+@if(auth()->user()->esAdministrador())
+
+    <div class="row g-5 gx-xl-10 mb-5">
+
+        {{-- PRODUCTOS --}}
+        <div class="col-md-3">
+            <div class="card card-flush" style="background-color:#F1416C;">
+                <div class="card-body text-center py-10">
+
+                    <i class="fa fa-box fs-2x text-white mb-5"></i>
+
+                    <div class="fs-2hx fw-bold text-white">
+                        {{ $totalProductos ?? 0 }}
                     </div>
-                </div>
 
-                <!--begin::Content-->
-                <div id="kt_app_content" class="app-content flex-column-fluid">
-                    <!--begin::Content container-->
-                    <div id="kt_app_content_container" class="app-container container-fluid">
-                        <!--begin::Row-->
-                        <div class="row">
-                            <!--begin::Col-->
-                            <div class="col-md-3">
-                                <!--begin::Card widget 20-->
-                                <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end"
-                                    style="background-color: #F1416C;background-image:url('assets/media/patterns/vector-1.png');">
-                                    <!--begin::Header-->
-                                    <div class="card-header pt-5">
-                                        <!--begin::Title-->
-                                        <div class="card-title d-flex flex-column">
-                                            <!--begin::Amount-->
-                                            <span class="fs-2hx fw-bold text-white me-2 lh-1 ls-n2"></span>
-                                            <!--end::Amount-->
-                                            <!--begin::Subtitle-->
-                                            <span class="text-white opacity-75 pt-1 fw-semibold fs-6">Productos</span>
-                                            <!--end::Subtitle-->
-                                        </div>
-                                        <!--end::Title-->
-                                    </div>
-                                    <!--end::Header-->
-                                    <!--begin::Card body-->
-                                    <div class="card-body d-flex align-items-end pt-0">
-                                        <!--begin::Progress-->
-                                        <div class="d-flex align-items-center flex-column mt-3 w-100">
-                                            <div
-                                                class="d-flex justify-content-between fw-bold fs-6 text-white opacity-75 w-100 mt-auto mb-2">
-                                                {{-- <span>43 Pending</span>
-                                                <span>72%</span> --}}
-                                            </div>
-                                            <div class="h-8px mx-3 w-100 bg-white bg-opacity-50 rounded">
-                                                <div class="bg-white rounded h-8px" role="progressbar"
-                                                    style="width: 72%;" aria-valuenow="50" aria-valuemin="0"
-                                                    aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <!--end::Progress-->
-                                    </div>
-                                    <!--end::Card body-->
-                                </div>
-                                <!--end::Card widget 20-->
-                            </div>
-                            <!--end::Col-->
-
-                            <!--begin::Col-->
-                            <div class="col-md-3">
-                                <!--begin::Card widget 20-->
-                                <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end"
-                                    style="background-color: #4d41f1;background-image:url('assets/media/patterns/vector-1.png');">
-                                    <!--begin::Header-->
-                                    <div class="card-header pt-5">
-                                        <!--begin::Title-->
-                                        <div class="card-title d-flex flex-column">
-                                            <!--begin::Amount-->
-                                            <span class="fs-2hx fw-bold text-white me-2 lh-1 ls-n2"></span>
-                                            <!--end::Amount-->
-                                            <!--begin::Subtitle-->
-                                            <span class="text-white opacity-75 pt-1 fw-semibold fs-6">Proveedores</span>
-                                            <!--end::Subtitle-->
-                                        </div>
-                                        <!--end::Title-->
-                                    </div>
-                                    <!--end::Header-->
-                                    <!--begin::Card body-->
-                                    <div class="card-body d-flex align-items-end pt-0">
-                                        <!--begin::Progress-->
-                                        <div class="d-flex align-items-center flex-column mt-3 w-100">
-                                            <div
-                                                class="d-flex justify-content-between fw-bold fs-6 text-white opacity-75 w-100 mt-auto mb-2">
-                                                {{-- <span>43 Pending</span>
-                                                <span>72%</span> --}}
-                                            </div>
-                                            <div class="h-8px mx-3 w-100 bg-white bg-opacity-50 rounded">
-                                                <div class="bg-white rounded h-8px" role="progressbar"
-                                                    style="width: 41%;" aria-valuenow="50" aria-valuemin="0"
-                                                    aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <!--end::Progress-->
-                                    </div>
-                                    <!--end::Card body-->
-                                </div>
-                                <!--end::Card widget 20-->
-                            </div>
-                            <!--end::Col-->
-
-                            <!--begin::Col-->
-                            <div class="col-md-3">
-                                <!--begin::Card widget 20-->
-                                <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end"
-                                    style="background-color: #f18241;background-image:url('assets/media/patterns/vector-1.png');">
-                                    <!--begin::Header-->
-                                    <div class="card-header pt-5">
-                                        <!--begin::Title-->
-                                        <div class="card-title d-flex flex-column">
-                                            <!--begin::Amount-->
-                                            <span class="fs-2hx fw-bold text-white me-2 lh-1 ls-n2"></span>
-                                            <!--end::Amount-->
-                                            <!--begin::Subtitle-->
-                                            <span class="text-white opacity-75 pt-1 fw-semibold fs-6">Precios</span>
-                                            <!--end::Subtitle-->
-                                        </div>
-                                        <!--end::Title-->
-                                    </div>
-                                    <!--end::Header-->
-                                    <!--begin::Card body-->
-                                    <div class="card-body d-flex align-items-end pt-0">
-                                        <!--begin::Progress-->
-                                        <div class="d-flex align-items-center flex-column mt-3 w-100">
-                                            <div
-                                                class="d-flex justify-content-between fw-bold fs-6 text-white opacity-75 w-100 mt-auto mb-2">
-                                                {{-- <span>43 Pending</span>
-                                                <span>72%</span> --}}
-                                            </div>
-                                            <div class="h-8px mx-3 w-100 bg-white bg-opacity-50 rounded">
-                                                <div class="bg-white rounded h-8px" role="progressbar"
-                                                    style="width: 20%;" aria-valuenow="50" aria-valuemin="0"
-                                                    aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <!--end::Progress-->
-                                    </div>
-                                    <!--end::Card body-->
-                                </div>
-                                <!--end::Card widget 20-->
-                            </div>
-                            <!--end::Col-->
-
-
-                            <!--begin::Col-->
-                            <div class="col-md-3">
-                                <!--begin::Card widget 20-->
-                                <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end"
-                                    style="background-color: #3e7213;background-image:url('assets/media/patterns/vector-1.png');">
-                                    <!--begin::Header-->
-                                    <div class="card-header pt-5">
-                                        <!--begin::Title-->
-                                        <div class="card-title d-flex flex-column">
-                                            <!--begin::Amount-->
-                                            <span class="fs-2hx fw-bold text-white me-2 lh-1 ls-n2"></span>
-                                            <!--end::Amount-->
-                                            <!--begin::Subtitle-->
-                                            <span class="text-white opacity-75 pt-1 fw-semibold fs-6">Cantidad de
-                                                Usuarios Registrados</span>
-                                            <!--end::Subtitle-->
-                                        </div>
-                                        <!--end::Title-->
-                                    </div>
-                                    <!--begin::Card body-->
-                                    <div class="card-body d-flex align-items-end pt-0">
-                                        <!--begin::Progress-->
-                                        <div class="d-flex align-items-center flex-column mt-3 w-100">
-                                            <div
-                                                class="d-flex justify-content-between fw-bold fs-6 text-white opacity-75 w-100 mt-auto mb-2">
-                                                {{-- <span>43 Pending</span>
-                                                <span>72%</span> --}}
-                                            </div>
-                                            <div class="h-8px mx-3 w-100 bg-white bg-opacity-50 rounded">
-                                                <div class="bg-white rounded h-8px" role="progressbar"
-                                                    style="width: 80%;" aria-valuenow="50" aria-valuemin="0"
-                                                    aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <!--end::Progress-->
-                                    </div>
-                                    <!--end::Card body-->
-                                </div>
-                                <!--end::Card widget 20-->
-                            </div>
-                            <!--end::Col-->
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="fw-bold text-gray-800 text-center mb-3" style="font-size: 20px">
-                                    <span class="me-2">Productos </span>
-                                </div>
-                                <!-- <div style="overflow-x: auto;">
-                                    <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_users">
-                                        <thead>
-                                            <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                                <th>Sucursal</th>
-                                                <th>Producto</th>
-                                                <th>Minimo en Stock</th>
-                                                <th>Cantidad en Stock</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="text-gray-600 fw-semibold">
-
-                                        </tbody>
-                                    </table>
-                                </div> -->
-                            </div>
-                            <div class="col-md-6">
-                                <div class="fw-bold text-gray-800 text-center mb-3" style="font-size: 20px">
-                                    <span class="me-2">Devoluciones</span>
-                                </div>
-                                <!-- <div style="overflow-x: auto;">
-                                    <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_users">
-                                        <thead>
-                                            <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                                <th>Sucursal</th>
-                                                <th>Producto</th>
-                                                <th>Minimo en Stock</th>
-                                                <th>Cantidad en Stock</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="text-gray-600 fw-semibold">
-
-                                        </tbody>
-                                    </table>
-                                </div> -->
-                            </div>
-                            <div class="col-md-4">
-                                <div id="chartFacturaRecibo" style="width:100%; height:400px;"></div>
-                            </div>
-                        </div>
+                    <div class="text-white fw-semibold">
+                        Productos
                     </div>
-                    <!--end::Content container-->
+
                 </div>
-                <!--end::Content-->
             </div>
         </div>
+
+        {{-- VENTAS HOY --}}
+        <div class="col-md-3">
+            <div class="card card-flush" style="background-color:#4d41f1;">
+                <div class="card-body text-center py-10">
+
+                    <i class="fa fa-shopping-cart fs-2x text-white mb-5"></i>
+
+                    <div class="fs-2hx fw-bold text-white">
+                        Bs {{ number_format($ventasHoy ?? 0, 2) }}
+                    </div>
+
+                    <div class="text-white fw-semibold">
+                        Ventas Hoy
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {{-- UTILIDADES --}}
+        <div class="col-md-3">
+            <div class="card card-flush" style="background-color:#f18241;">
+                <div class="card-body text-center py-10">
+
+                    <i class="fa fa-chart-line fs-2x text-white mb-5"></i>
+
+                    <div class="fs-2hx fw-bold text-white">
+                        Bs {{ number_format($utilidades ?? 0, 2) }}
+                    </div>
+
+                    <div class="text-white fw-semibold">
+                        Utilidades
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {{-- USUARIOS --}}
+        <div class="col-md-3">
+            <div class="card card-flush" style="background-color:#3e7213;">
+                <div class="card-body text-center py-10">
+
+                    <i class="fa fa-users fs-2x text-white mb-5"></i>
+
+                    <div class="fs-2hx fw-bold text-white">
+                        {{ $totalUsuarios ?? 0 }}
+                    </div>
+
+                    <div class="text-white fw-semibold">
+                        Usuarios
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
-</div>
+
+
+    <div class="row mb-5">
+
+        {{-- STOCK BAJO --}}
+        <div class="col-md-4">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Productos con Stock Bajo
+                    </h3>
+                </div>
+
+                <div class="card-body">
+
+                    @forelse($stockBajo ?? [] as $producto)
+
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span>
+                                {{ $producto->nombre }}
+                            </span>
+
+                            <span class="badge badge-danger">
+                                {{ $producto->stock_actual }}
+                            </span>
+
+                        </div>
+
+                    @empty
+
+                        <div class="alert alert-success">
+                            Sin productos críticos
+                        </div>
+
+                    @endforelse
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{-- ULTIMAS VENTAS --}}
+        <div class="col-md-8">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Últimas Ventas
+                    </h3>
+                </div>
+
+                <div class="card-body table-responsive">
+
+                    <table class="table table-row-bordered">
+
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Cliente</th>
+                                <th>Total</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @forelse($ultimasVentas ?? [] as $venta)
+
+                                <tr>
+
+                                    <td>
+                                        {{ $venta->id }}
+                                    </td>
+
+                                    <td>
+                                        {{ $venta->razon_social }}
+                                    </td>
+
+                                    <td>
+                                        Bs {{ number_format($venta->total, 2) }}
+                                    </td>
+
+                                    <td>
+                                        {{ $venta->fecha }}
+                                    </td>
+
+                                </tr>
+
+                            @empty
+
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        Sin registros
+                                    </td>
+                                </tr>
+
+                            @endforelse
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {{-- GRAFICO --}}
+    <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Ventas Mensuales
+                    </h3>
+                </div>
+
+                <div class="card-body">
+
+                    <div id="graficoVentas" style="width:100%; height:400px;">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+@endif
+
+
+
+{{-- ========================================================= --}}
+{{-- DASHBOARD OPERADOR / VENTAS / ALMACEN --}}
+{{-- ========================================================= --}}
+@if(
+        auth()->user()->esOperador()
+        || auth()->user()->esVentas()
+        || auth()->user()->esAlmacen()
+    )
+
+    <div class="row g-5 gx-xl-10 mb-5">
+
+        {{-- PRODUCTOS --}}
+        <div class="col-md-4">
+
+            <div class="card card-flush" style="background-color:#F1416C;">
+
+                <div class="card-body text-center py-10">
+
+                    <i class="fa fa-box fs-2x text-white mb-5"></i>
+
+                    <div class="fs-2hx fw-bold text-white">
+                        {{ $totalProductos ?? 0 }}
+                    </div>
+
+                    <div class="text-white fw-semibold">
+                        Productos
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{-- VENTAS HOY --}}
+        @if(
+                auth()->user()->esOperador()
+                || auth()->user()->esVentas()
+            )
+
+            <div class="col-md-4">
+
+                <div class="card card-flush" style="background-color:#4d41f1;">
+
+                    <div class="card-body text-center py-10">
+
+                        <i class="fa fa-shopping-cart fs-2x text-white mb-5"></i>
+
+                        <div class="fs-2hx fw-bold text-white">
+                            Bs {{ number_format($ventasHoy ?? 0, 2) }}
+                        </div>
+
+                        <div class="text-white fw-semibold">
+                            Ventas Hoy
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        @endif
+
+        {{-- STOCK BAJO --}}
+        <div class="col-md-4">
+
+            <div class="card card-flush" style="background-color:#f18241;">
+
+                <div class="card-body text-center py-10">
+
+                    <i class="fa fa-exclamation-triangle fs-2x text-white mb-5"></i>
+
+                    <div class="fs-2hx fw-bold text-white">
+                        {{ $productosStockBajo ?? 0 }}
+                    </div>
+
+                    <div class="text-white fw-semibold">
+                        Stock Bajo
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="row">
+
+        {{-- ULTIMOS PRODUCTOS --}}
+        <div class="col-md-6">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Últimos Productos
+                    </h3>
+                </div>
+
+                <div class="card-body">
+
+                    @forelse($ultimosProductos ?? [] as $producto)
+
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span>
+                                {{ $producto->nombre }}
+                            </span>
+
+                            <span class="badge badge-primary">
+                                {{ $producto->stock_actual }}
+                            </span>
+
+                        </div>
+
+                    @empty
+
+                        <div class="alert alert-warning">
+                            Sin productos
+                        </div>
+
+                    @endforelse
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{-- ULTIMAS VENTAS --}}
+        @if(
+                auth()->user()->esOperador()
+                || auth()->user()->esVentas()
+            )
+
+            <!-- <div class="col-md-6">
+
+                        <div class="card">
+
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    Últimas Ventas
+                                </h3>
+                            </div>
+
+                            <div class="card-body">
+
+                                @forelse($ultimasVentas ?? [] as $venta)
+
+                                    <div class="d-flex justify-content-between mb-3">
+
+                                        <span>
+                                            {{ $venta->nombre }}
+                                        </span>
+
+                                        <span class="badge badge-success">
+                                            Bs {{ number_format($venta->total, 2) }}
+                                        </span>
+
+                                    </div>
+
+                                @empty
+
+                                    <div class="alert alert-warning">
+                                        Sin ventas
+                                    </div>
+
+                                @endforelse
+
+                            </div>
+
+                        </div>
+
+                    </div> -->
+
+        @endif
+
+    </div>
+
+@endif
+
 @stop
+
+
 @section('js')
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
+    </script>
+
     <script>
 
-        $(document).ready(function () {
-
-            google.charts.load('current', { packages: ['corechart'] });
-            google.charts.setOnLoadCallback(dibujarGraficos);
-
-            $(window).resize(function () {
-                dibujarGraficos();
-            });
+        google.charts.load('current', {
+            packages: ['corechart']
         });
 
+        google.charts.setOnLoadCallback(drawChart);
 
-        let chartFacturaRecibo;
+        function drawChart() {
+
+            var data = google.visualization.arrayToDataTable([
+                ['Mes', 'Ventas'],
+
+                @foreach($ventasMensuales ?? [] as $venta)
+                    ['{{ $venta->mes }}', {{ $venta->total }}],
+                @endforeach
+
+                    ]);
+
+            var options = {
+                title: 'Ventas Mensuales',
+                curveType: 'function',
+                legend: {
+                    position: 'bottom'
+                }
+            };
+
+            var chart = new google.visualization.LineChart(
+                document.getElementById('graficoVentas')
+            );
+
+            chart.draw(data, options);
+        }
 
     </script>
+
 @endsection
+```

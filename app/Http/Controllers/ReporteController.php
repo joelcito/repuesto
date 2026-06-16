@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Caja;
 use App\Models\Cliente;
 use App\Models\Movimiento;
+use App\Models\Pago;
 use App\Models\Producto;
 use App\Models\Sucursal;
 use App\Models\User;
@@ -23,59 +24,43 @@ class ReporteController extends Controller
     {
         $clientes = User::where('rol_id', 3)->get();
         return view('reporte.cajas')->with(compact('clientes'));
-
     }
-
 
     public function historial(Request $request)
     {
-
         $clientes = User::where('rol_id', 3)->get();
         return view('reporte.historial_precios')->with(compact('clientes'));
-
     }
 
     public function ingresosalida(Request $request)
     {
-
         $clientes = User::where('rol_id', 3)->get();
         return view('reporte.ingreso_salida')->with(compact('clientes'));
-
     }
 
     public function inventarios(Request $request)
     {
-
         $clientes = User::where('rol_id', 3)->get();
         return view('reporte.inventarios')->with(compact('clientes'));
-
     }
 
     public function pagos(Request $request)
     {
         $clientes = User::where('rol_id', 3)->get();
         return view('reporte.pagos')->with(compact('clientes'));
-
     }
-
 
     public function utilidades(Request $request)
     {
         $clientes = User::where('rol_id', 3)->get();
         return view('reporte.utilidades')->with(compact('clientes'));
-
     }
-
 
     public function ventas(Request $request)
     {
-
         $clientes = User::where('rol_id', 3)->get();
         return view('reporte.ventas')->with(compact('clientes'));
-
     }
-
-
 
     public function inventariosPdf(Request $request)
     {
@@ -91,7 +76,6 @@ class ReporteController extends Controller
             'reporte.pdf.inventarios_pdf',
             compact('productos')
         );
-
         return $pdf->stream('inventarios.pdf');
     }
 
@@ -108,12 +92,10 @@ class ReporteController extends Controller
                 $request->fecha_fin
             ])
             ->get();
-
         $pdf = Pdf::loadView(
             'reporte.pdf.ventas_pdf',
             compact('ventas')
         );
-
         return $pdf->stream('ventas.pdf');
     }
 
@@ -133,7 +115,6 @@ class ReporteController extends Controller
             'reporte.pdf.cajas_pdf',
             compact('cajas')
         );
-
         return $pdf->stream('cajas.pdf');
     }
 
@@ -158,7 +139,6 @@ class ReporteController extends Controller
             'reporte.pdf.utilidades_pdf',
             compact('detalles')
         );
-
         return $pdf->stream('utilidades.pdf');
     }
 
@@ -179,7 +159,6 @@ class ReporteController extends Controller
             'reporte.pdf.ingreso_salida_pdf',
             compact('movimientos')
         );
-
         return $pdf->stream('ingresos_salidas.pdf');
     }
 
@@ -197,9 +176,30 @@ class ReporteController extends Controller
             'reporte.pdf.historial_precios_pdf',
             compact('movimientos')
         );
-
         return $pdf->stream('historial_precios.pdf');
     }
 
+    public function pagosPdf(Request $request)
+    {
+        $pagos = Pago::with([
+            'usuario',
+            'venta',
+            'caja',
+            'sucursal',
+            'categoria'
+        ])
+            ->whereBetween('fecha', [
+                $request->fecha_inicio,
+                $request->fecha_fin
+            ])
+            ->get();
+
+        $pdf = Pdf::loadView(
+            'reporte.pdf.pagos_pdf',
+            compact('pagos')
+        );
+
+        return $pdf->stream('pagos.pdf');
+    }
 
 }

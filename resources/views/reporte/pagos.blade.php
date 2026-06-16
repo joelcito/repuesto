@@ -16,24 +16,25 @@
                     <div class="card-header bg-light-info py-4">
                         <h3 class="card-title fw-bold">REPORTE DE PAGOS</h3>
                     </div>
-
                     <div class="card-body">
-
                         <form action="{{ route('reporte.pagos.pdf') }}" method="POST" target="_blank">
                             @csrf
                             <div class="row">
                                 <div class="col-md-5">
-                                    <label>Fecha Inicio</label>
+                                    <label class="fw-semibold mb-2">
+                                        Fecha Inicio
+                                    </label>
                                     <input type="date" name="fecha_inicio" class="form-control" required>
                                 </div>
-
                                 <div class="col-md-5">
-                                    <label>Fecha Fin</label>
+                                    <label class="fw-semibold mb-2">
+                                        Fecha Fin
+                                    </label>
                                     <input type="date" name="fecha_fin" class="form-control" required>
                                 </div>
-
                                 <div class="col-md-2 d-flex align-items-end">
                                     <button class="btn btn-danger w-100">
+                                        <i class="fa fa-file-pdf"></i>
                                         PDF
                                     </button>
                                 </div>

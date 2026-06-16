@@ -86,4 +86,26 @@ class User extends Authenticatable
         return $this->hasMany(ClienteVehiculo::class);
     }
 
+
+
+    public function esAdministrador()
+    {
+        return $this->rol_id == 1;
+    }
+
+    public function esOperador()
+    {
+        return $this->rol_id == 2;
+    }
+
+    public function esVentas()
+    {
+        return $this->rol_id == 3;
+    }
+
+    public function esAlmacen()
+    {
+        return $this->rol_id == 4;
+    }
+
 }
