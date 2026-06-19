@@ -43,13 +43,18 @@ class MovimientoController extends Controller
             $producto_id = $request->idProd;
             $sucursal_id = $request->idSuc;
 
+            $ultimo = Movimiento::where('tipo', 'INGRESO')
+                ->max('compra_ingreso');
+
+            $compra_ingreso = $ultimo ? $ultimo + 1 : 1;
+
             $request->validate([
                 'idProd' => 'required',
                 'idSuc' => 'required',
                 'cantidad' => 'required|numeric|min:1',
                 'precio_compra' => 'required|numeric|min:0',
                 'precio_venta' => 'required|numeric|min:0',
-                'compra_ingreso' => 'required|numeric|min:0',
+
             ]);
 
             $usuario = Auth::user();
@@ -62,7 +67,7 @@ class MovimientoController extends Controller
                 'cantidad' => $request->cantidad,
                 'precio_compra' => $request->precio_compra,
                 'precio_venta' => $request->precio_venta,
-                'compra_ingreso' => $request->compra_ingreso,
+                'compra_ingreso' => $compra_ingreso,
                 'fecha' => now(),
                 'descripcion' => $request->descripcion,
                 'estado' => 'INGRESO'

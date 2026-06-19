@@ -162,6 +162,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/ajaxListado', [IncorporacionController::class, 'ajaxListado'])->name('incorporacion.ajaxListado');
         Route::post('/guardarIncorporacion', [IncorporacionController::class, 'guardarIncorporacion'])->name('incorporacion.guardarIncorporacion');
         Route::post('/eliminarIncorporacion', [IncorporacionController::class, 'eliminarIncorporacion'])->name('incorporacion.eliminarIncorporacion');
+        Route::post('/convertirProducto', [IncorporacionController::class, 'convertirProducto'])->name('incorporacion.convertirProducto');
+        Route::get('/obtener', [IncorporacionController::class, 'obtener'])
+            ->name('incorporacion.obtener');
 
     });
 
@@ -187,6 +190,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/ajaxListado', [VentasController::class, 'ajaxListado'])->name('venta.ajaxListado');
         Route::post('/ajaxListadoDetalleVenta', [VentasController::class, 'ajaxListadoDetalleVenta'])->name('venta.ajaxListadoDetalleVenta');
         Route::post('/buscar-productos', [VentasController::class, 'buscarProductos'])->name('venta.buscarProductos');
+        Route::post('/anularVenta', [VentasController::class, 'anularVenta'])->name('venta.anularVenta');
 
     });
 

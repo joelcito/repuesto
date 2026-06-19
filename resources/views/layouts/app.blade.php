@@ -112,12 +112,12 @@
                         <!--begin::Logo image-->
                         <a href="{{ url('home') }}">
                             <div class="row mt-4">
-                                <div class="col-md-4">
+                                <div class="col-md-12">
                                     <img alt="Logo" src="{{ asset('assets/img/logo.jpeg') }}" width="100%" />
                                 </div>
-                                <div class="col-md-8">
+                                <!-- <div class="col-md-8">
                                     <h2 class="text-white mt-6">REPUESTOS</h2>
-                                </div>
+                                </div> -->
                             </div>
                         </a>
                         <!--end::Logo image-->

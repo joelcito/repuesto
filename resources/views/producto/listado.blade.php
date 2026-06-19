@@ -200,59 +200,59 @@
             </div>
             <div class="modal-body scroll-y">
                 <form id="formularioIngreso">
-                    <<input type="hidden" id="idProd" name="idProd">
-                        <input type="hidden" id="idSuc" name="idSuc">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Sucursal</label>
-                                <input type="text" class="form-control form-control-sm" id="sucursal" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Fecha</label>
-                                <input type="text" class="form-control form-control-sm" value="{{ date('Y-m-d') }}"
-                                    readonly>
-                            </div>
+                    <input type="hidden" id="idProd" name="idProd">
+                    <input type="hidden" id="idSuc" name="idSuc">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Sucursal</label>
+                            <input type="text" class="form-control form-control-sm" id="sucursal" readonly>
                         </div>
-                        <div class="row mt-3">
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">
-                                    Cantidad
-                                </label>
-                                <input type="number" class="form-control form-control-sm" id="cantidad_ingreso"
-                                    name="cantidad" min="1" required>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">
-                                    Precio Compra
-                                </label>
-                                <input type="number" class="form-control form-control-sm" id="precio_compra"
-                                    name="precio_compra" min="0.01" step="0.01">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">
-                                    Precio Venta
-                                </label>
-                                <input type="number" class="form-control form-control-sm" id="precio_venta_ingreso"
-                                    name="precio_venta" min="0.01" step="0.01">
-                            </div>
-                            <div class="col-md-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Fecha</label>
+                            <input type="text" class="form-control form-control-sm" value="{{ date('Y-m-d') }}"
+                                readonly>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">
+                                Cantidad
+                            </label>
+                            <input type="number" class="form-control form-control-sm" id="cantidad_ingreso"
+                                name="cantidad" min="1" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">
+                                Precio Compra
+                            </label>
+                            <input type="number" class="form-control form-control-sm" id="precio_compra"
+                                name="precio_compra" min="0.01" step="0.01">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">
+                                Precio Venta
+                            </label>
+                            <input type="number" class="form-control form-control-sm" id="precio_venta_ingreso"
+                                name="precio_venta" min="0.01" step="0.01">
+                        </div>
+                        <!-- <div class="col-md-3">
                                 <label class="form-label fw-bold">
                                     Compra por ingreso
                                 </label>
                                 <input type="number" class="form-control form-control-sm" id="compra_ingreso"
                                     name="compra_ingreso" min="0.01" step="0.01">
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">
-                                    Descripción
-                                </label>
+                            </div> -->
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">
+                                Descripción
+                            </label>
 
-                                <textarea class="form-control form-control-sm" id="descripcion_ingreso"
-                                    name="descripcion"></textarea>
-                            </div>
+                            <textarea class="form-control form-control-sm" id="descripcion_ingreso"
+                                name="descripcion"></textarea>
                         </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -509,7 +509,7 @@
             formData.append('precio_compra', $('#precio_compra').val());
             formData.append('precio_venta', $('#precio_venta').val());
             formData.append('precio_mayor', $('#precio_mayor').val());
-            formData.append('compra_ingreso', $('#compra_ingreso').val());
+            //formData.append('compra_ingreso', $('#compra_ingreso').val());
             formData.append('sucursal_id', $('#sucursal_id').val());
             formData.append('proveedor_id', $('#proveedor_id').val());
             formData.append('observaciones', $('#observaciones').val());
@@ -561,7 +561,7 @@
             $('#precio_compra').val(producto.precio_compra);
             $('#precio_venta').val(producto.precio_venta);
             $('#precio_mayor').val(producto.precio_mayor);
-            $('#compra_ingreso').val(producto.compra_ingreso);
+            //$('#compra_ingreso').val(producto.compra_ingreso);
             $('#observaciones').val(producto.observaciones);
 
             if (producto.imagen != null) {
@@ -657,10 +657,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                            <div class="invalid-feedback">
-                                                                ${mensaje}
-                                                            </div>
-                                                        `);
+                                                                        <div class="invalid-feedback">
+                                                                            ${mensaje}
+                                                                        </div>
+                                                                    `);
                             }
                         } else {
                             Swal.fire({
@@ -759,10 +759,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                                        <div class="invalid-feedback">
-                                                                                            ${mensaje}
-                                                                                        </div>
-                                                                                    `);
+                                                                                                    <div class="invalid-feedback">
+                                                                                                        ${mensaje}
+                                                                                                    </div>
+                                                                                                `);
                             }
 
                         } else {

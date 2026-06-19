@@ -22,8 +22,8 @@ class ClienteController extends Controller
     public function ajaxListado(Request $request)
     {
         if ($request->ajax()) {
-            $rolCliente = 3;
-            $clientes = User::where('rol_id', 3)->get();
+            $rolCliente = 5;
+            $clientes = User::where('rol_id', 5)->get();
             $valores = [
                 'listado' => view('cliente.ajaxListado')->with(compact('clientes'))->render()
             ];
@@ -39,7 +39,7 @@ class ClienteController extends Controller
     {
         try {
 
-            $rolCliente = 3;
+            $rolCliente = 5;
             $cliente_id = $request->input('id');
             $nombre = $request->input('nombre');
             $ap_paterno = $request->input('ap_paterno');

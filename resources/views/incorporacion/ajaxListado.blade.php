@@ -35,10 +35,18 @@
                     </td>
 
                     <td> {{ $incorporacion->created_at }} </td>
-                    <td> <button class="btn btn-icon btn-sm btn-danger btn-circle"
+                    <td>
+
+                        <button class="btn btn-icon btn-sm btn-success btn-circle"
+                            onclick="convertirAProducto({{ $incorporacion->id }})">
+                            <i class="fa fa-box"></i>
+                        </button>
+                        <button class="btn btn-icon btn-sm btn-danger btn-circle"
                             onclick="eliminarIncorporacion({{ $incorporacion->id }})">
                             <i class="fa fa-trash"></i>
                         </button>
+
+
                     </td>
             </tr> @empty
                 <h4 class="text-danger">No hay datos</h4>

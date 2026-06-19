@@ -479,7 +479,7 @@ class VentasController extends Controller
 
     public function formulario()
     {
-        $rolCliente = 3;
+        $rolCliente = 5;
         $clientes = User::where('rol_id', $rolCliente)->get();
         $productos = Producto::where('estado', 1)->get();
         $cajas = Caja::where('estado', 'ABIERTA')->get();
