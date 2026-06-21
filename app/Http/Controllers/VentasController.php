@@ -143,6 +143,12 @@ class VentasController extends Controller
                     $caja->sucursal_id
                 );
 
+                dd(
+                    ($stockActual < $item['cantidad']),
+                    $stockActual,
+                    $item['cantidad']
+                );
+
                 if ($stockActual < $item['cantidad']) {
 
                     throw new \Exception(
