@@ -143,13 +143,13 @@ class VentasController extends Controller
                     $caja->sucursal_id
                 );
 
-                dd(
-                    ($stockActual < $item['cantidad']),
-                    $stockActual,
-                    $item['cantidad'],
-                    $producto->id,
-                    $caja->sucursal_id
-                );
+                // dd(
+                //     ($stockActual < $item['cantidad']),
+                //     $stockActual,
+                //     $item['cantidad'],
+                //     $producto->id,
+                //     $caja->sucursal_id
+                // );
 
                 if ($stockActual < $item['cantidad']) {
 
