@@ -563,13 +563,11 @@
             $('#precio_mayor').val(producto.precio_mayor);
             //$('#compra_ingreso').val(producto.compra_ingreso);
             $('#observaciones').val(producto.observaciones);
-
             if (producto.imagen != null) {
                 $('#preview_imagen').attr(
                     'src',
                     '/imagenes/productos/' + producto.imagen
                 );
-
             } else {
                 $('#preview_imagen').attr(
                     'src',
@@ -592,7 +590,6 @@
                     nombre: nombre
                 },
                 success: function (res) {
-
                     if (res.estado) {
                         $('#tabla_stock').html(res.data
                             .stock); // Donde 'stock' es el HTML renderizado por AJAX
@@ -657,10 +654,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                        <div class="invalid-feedback">
-                                                                            ${mensaje}
-                                                                        </div>
-                                                                    `);
+                                                <div class="invalid-feedback">
+                                                    ${mensaje}
+                                                </div>
+                                            `);
                             }
                         } else {
                             Swal.fire({
@@ -759,10 +756,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                                                    <div class="invalid-feedback">
-                                                                                                        ${mensaje}
-                                                                                                    </div>
-                                                                                                `);
+                                                <div class="invalid-feedback">
+                                                    ${mensaje}
+                                                </div>
+                                            `);
                             }
 
                         } else {

@@ -115,26 +115,34 @@ class ClienteController extends Controller
         }
     }
 
-    public function eliminarCliente(Request $request, Cliente $clientes)
+    public function eliminarCliente(Request $request)
     {
-        if ($request->ajax()) {
+        if (!$request->ajax()) {
+            return Respuesta::error(null, "Error al obtener los datos");
+        }
+        try {
             $cliente_id = $request->input('cliente');
             $usuario = Auth::user();
-            if ($clientes->imagen && $clientes->imagen_CI_anverso && $clientes->imagen_CI_reverso) {
-                Storage::disk('public')->delete($clientes->imagen);
-                Storage::disk('public')->delete($clientes->imagen_CI_anverso);
-                Storage::disk('public')->delete($clientes->imagen_CI_reverso);
-            } else {
-                $data = Respuesta::error(null, "Error al obtener los datos");
+            $cliente = User::find($cliente_id);
+            if (!$cliente) {
+                return Respuesta::error(null, "Cliente no encontrado");
             }
-            $cliente = Cliente::find($cliente_id);
+            if ($cliente->imagen) {
+                Storage::disk('public')->delete('imagenesClientes/' . $cliente->imagen);
+            }
+            if ($cliente->imagen_CI_anverso) {
+                Storage::disk('public')->delete('imagenesClientes/' . $cliente->imagen_CI_anverso);
+            }
+            if ($cliente->imagen_CI_reverso) {
+                Storage::disk('public')->delete('imagenesClientes/' . $cliente->imagen_CI_reverso);
+            }
             $cliente->usuario_eliminador_id = $usuario->id;
             $cliente->save();
-            Cliente::destroy($cliente_id);
-            $data = Respuesta::success(null, "Se elimino con exito");
-        } else {
-            $data = Respuesta::error(null, "Error al obtener los datos");
+            $cliente->delete();
+            return Respuesta::success(null, "Se eliminó con éxito");
+        } catch (\Exception $e) {
+            return Respuesta::error($e->getMessage(), "Error interno");
         }
-        return $data;
     }
+
 }

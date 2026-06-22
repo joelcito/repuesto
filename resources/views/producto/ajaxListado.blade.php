@@ -7,7 +7,6 @@
                 <th>Nombre</th>
                 <th>Categoría</th>
                 <th>Marca</th>
-                <!-- <th>Stock</th> -->
                 <th>Precio Venta</th>
                 <th>Imagen</th>
                 <th>Estado</th>
@@ -23,11 +22,6 @@
                     <td>{{ $producto->nombre }}</td>
                     <td>{{ $producto->categoria->nombre ?? '' }}</td>
                     <td>{{ $producto->marca->nombre ?? '' }}</td>
-                    <!-- <td>
-                            <span class="badge bg-primary">
-                                {{ $producto->stock_actual }}
-                            </span>
-                        </td> -->
                     <td>
                         {{ number_format($producto->precio_venta, 2) }}
                     </td>
@@ -72,7 +66,7 @@
 
 <script>
     $(document).ready(function () {
-        $('#kt_table_proveedores').DataTable({
+        $('#kt_table_producto').DataTable({
             lengthMenu: [10, 25, 50, 100], // Opciones de longitud de página
             dom: '<"dt-head row"<"col-md-6"l><"col-md-6"f>><"clear">t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>', // Use dom for basic layout
             language: {
