@@ -7,8 +7,8 @@
                 <th>ID</th>
                 <th>Producto</th>
                 <th>Descripcion</th>
-
                 <th>Fecha</th>
+                <th>Estado</th>
                 <th>Actions</th>
 
             </tr>
@@ -18,35 +18,30 @@
                 <tr>
                     <td>{{ $incorporacion->id }}</td>
                     <td>
-
                         @if($incorporacion->producto)
-
                             {{ $incorporacion->producto->nombre }}
-
                         @else
-
                             {{ $incorporacion->nombre_producto }}
-
                         @endif
-
                     </td>
                     <td>
                         {{ $incorporacion->descripcion_producto }}
                     </td>
 
                     <td> {{ $incorporacion->created_at }} </td>
+                    <td>{{ $incorporacion->estado }}</td>
                     <td>
 
-                        <button class="btn btn-icon btn-sm btn-success btn-circle"
-                            onclick="convertirAProducto({{ $incorporacion->id }})">
-                            <i class="fa fa-box"></i>
-                        </button>
+                        @if(!$incorporacion->producto_id)
+                            <button class="btn btn-success" onclick="convertirAProducto({{ $incorporacion->id }})">
+                                <i class="fa fa-box"></i>
+                            </button>
+                        @endif
+
                         <button class="btn btn-icon btn-sm btn-danger btn-circle"
                             onclick="eliminarIncorporacion({{ $incorporacion->id }})">
                             <i class="fa fa-trash"></i>
                         </button>
-
-
                     </td>
             </tr> @empty
                 <h4 class="text-danger">No hay datos</h4>

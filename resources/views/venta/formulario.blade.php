@@ -55,7 +55,8 @@
                                                         class="form-select form-select-sm" required>
                                                         <option value="">SELECCIONE EL CLIENTE</option>
                                                         @foreach($clientes as $cliente)
-                                                            <option value="{{ $cliente->id }}">
+                                                            <option value="{{ $cliente->id }}"
+                                                                data-imagen="{{ $cliente->imagen }}">
                                                                 {{ $cliente->nombres }}
                                                             </option>
                                                         @endforeach
@@ -107,18 +108,18 @@
                             <form id="formulario_venta">
                                 <div class="row">
                                     <!-- <div class="col-md-3">
-                                                                <label class="fw-semibold fs-6 mb-2">
-                                                                    Producto
-                                                                </label>
-                                                                <select class="form-select form-select-sm" id="producto_id">
-                                                                    @foreach($productos as $producto)
-                                                                        <option value="{{ $producto->id }}" data-normal="{{ $producto->precio_venta }}"
-                                                                            data-mayor="{{ $producto->precio_mayor }}">
-                                                                            {{ $producto->nombre }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </div> -->
+                                                                                                    <label class="fw-semibold fs-6 mb-2">
+                                                                                                        Producto
+                                                                                                    </label>
+                                                                                                    <select class="form-select form-select-sm" id="producto_id">
+                                                                                                        @foreach($productos as $producto)
+                                                                                                            <option value="{{ $producto->id }}" data-normal="{{ $producto->precio_venta }}"
+                                                                                                                data-mayor="{{ $producto->precio_mayor }}">
+                                                                                                                {{ $producto->nombre }}
+                                                                                                            </option>
+                                                                                                        @endforeach
+                                                                                                    </select>
+                                                                                                </div> -->
                                     <div class="col-md-6 position-relative">
 
                                         <label class="fw-semibold fs-6 mb-2">
@@ -129,13 +130,13 @@
                                             placeholder="Ingrese Nombre, Marca, Código, Nro Parte,Vehículo...">
 
                                         <div id="resultado_productos" class="shadow bg-white border rounded mt-1" style="
-                                                                max-height:400px;
-                                                                overflow-y:auto;
-                                                                display:none;
-                                                                position:absolute;
-                                                                z-index:9999;
-                                                                width:100%;
-                                                            ">
+                                                                                                    max-height:400px;
+                                                                                                    overflow-y:auto;
+                                                                                                    display:none;
+                                                                                                    position:absolute;
+                                                                                                    z-index:9999;
+                                                                                                    width:100%;
+                                                                                                ">
                                         </div>
 
                                         <input type="hidden" id="producto_id" name="producto_id">
@@ -196,7 +197,7 @@
                             </form>
                             <hr>
                             <div id="tabla_detalles" style="display: none;">
-                                <h3 class="text-center">CARGAR DE PRDUCTOS</h3>
+                                <h3 class="text-center">CARGAR PRODUCTOS</h3>
                                 <div class="card shadow-sm mb-5">
                                     <div class="card-header">
                                         <h3 class="card-title">
@@ -438,10 +439,10 @@
             productosVenta.forEach(function (item) {
                 let botonEliminar =
                     `<button
-                                                                            class="btn btn-danger btn-sm"
-                                                                            onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
-                                                                            X
-                                                                        </button>`;
+                                                                                                                class="btn btn-danger btn-sm"
+                                                                                                                onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
+                                                                                                                X
+                                                                                                            </button>`;
 
                 tabla.row.add([
                     item.nombre,
@@ -489,7 +490,7 @@
 
                 $('#tipo_pago_pagado_recibo')
                     .val('')
-                    .prop('disabled', true); // ✅ bloquear select
+                    .prop('disabled', true);
             }
         }
 
@@ -619,31 +620,41 @@
                     let html = '';
                     if (productos.length == 0) {
                         html = `
-                                                            <div class="p-3 text-center text-danger">
-                                                                No se encontraron productos
-                                                            </div>
-                                                        `;
+                                                                    <div class="p-3 text-center text-danger">
+                                                                        No se encontraron productos
+                                                                    </div>
+                                                                `;
                     } else {
                         productos.forEach(producto => {
+                            let imagen = producto.imagenes?.length > 0
+                                ? `/imagenes/productos/${producto.imagenes[0].imagen}`
+                                : `/imagenes/productos/default.jpg`;
                             html += `
-                                                                <div class="producto-item p-3 border-bottom"
-                                                                    style="
-                                                                        cursor:pointer;
-                                                                        transition:0.2s;
-                                                                    "
-                                                                    data-id="${producto.id}"
-                                                                    data-nombre="${producto.nombre}"
-                                                                    data-precio="${producto.precio_venta}"
-                                                                    data-precio-mayor="${producto.precio_mayor}">
-                                                                    <div class="row">
-                                                                        <div class="col-md-8">
-                                                                            <h6 class="mb-1 fw-bold text-primary">
-                                                                                ${producto.nombre}
-                                                                            </h6>
-                                                                            <div class="small text-muted">
-                                                                                Marca:
-                                                                                <b>
-                                                                                    ${producto.marca ?
+                                                                    <div class="producto-item p-3 border-bottom"
+                                                                        style="
+                                                                            cursor:pointer;
+                                                                            transition:0.2s;
+                                                                        "
+                                                                        data-id="${producto.id}"
+                                                                        data-nombre="${producto.nombre}"
+                                                                        data-precio="${producto.precio_venta}"
+                                                                        data-precio-mayor="${producto.precio_mayor}">
+
+                                                                        <div class="row">
+                                                                        <div class="col-md-2">
+                                                                                    <img src="${imagen}"
+                                                                                        style="width:60px; height:60px; object-fit:cover; border-radius:8px;"
+                                                                                        alt="producto">
+                                                                                </div>
+
+                                                                            <div class="col-md-6">
+                                                                                <h6 class="mb-1 fw-bold text-primary">
+                                                                                    ${producto.nombre}
+                                                                                </h6>
+                                                                                <div class="small text-muted">
+                                                                                    Marca:
+                                                                                    <b>
+                                                                                        ${producto.marca ?
                                     producto.marca.nombre :
                                     'SIN MARCA'}
                                                                                 </b>
@@ -729,6 +740,21 @@
 
             $('#detalle_venta').html('');
         }
+
+
+
+        $('#cliente_seleccionado').on('change', function () {
+
+            let imagen = $(this).find(':selected').data('imagen');
+
+            let src = imagen
+                ? `/storage/imagenesClientes/${imagen}`
+                : `/assets/img/default.jpg`;
+
+            $('#imagen_cliente').attr('src', src);
+        });
+
+
     </script>
     <style>
         .producto-item:hover {

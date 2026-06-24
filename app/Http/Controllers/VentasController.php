@@ -525,7 +525,7 @@ class VentasController extends Controller
     public function buscarProductos(Request $request)
     {
         $buscar = $request->buscar;
-        $productos = Producto::with('marca')
+        $productos = Producto::with('marca', 'imagenes')
             ->where('estado', 1)
             ->where(function ($query) use ($buscar) {
                 $query->where('nombre', 'LIKE', "%{$buscar}%")

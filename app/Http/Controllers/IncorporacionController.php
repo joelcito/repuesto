@@ -63,44 +63,30 @@ class IncorporacionController extends Controller
     public function guardarIncorporacion(Request $request)
     {
         DB::beginTransaction();
-
         try {
 
             $request->validate([
                 'nombre_producto' => 'required|string|max:255',
                 'descripcion_producto' => 'nullable|string',
             ]);
-
             $usuario = Auth::user();
-
             $incorporacion = new Incorporacion();
-
             $incorporacion->producto_id = null;
-
             $incorporacion->nombre_producto =
                 strtoupper($request->nombre_producto);
-
             $incorporacion->descripcion_producto =
                 $request->descripcion_producto;
-
             $incorporacion->estado = 'ACTIVO';
-
             $incorporacion->usuario_creador_id =
                 $usuario->id;
-
             $incorporacion->save();
-
             DB::commit();
-
             return response()->json([
                 'estado' => true,
                 'mensaje' => 'Incorporación registrada correctamente'
             ]);
-
         } catch (\Exception $e) {
-
             DB::rollBack();
-
             return response()->json([
                 'estado' => false,
                 'mensaje' => $e->getMessage()
@@ -109,21 +95,13 @@ class IncorporacionController extends Controller
     }
     public function eliminarIncorporacion(Request $request)
     {
-
         DB::beginTransaction();
-
         try {
-
             $incorporacion = Incorporacion::find($request->id);
-
             if (!$incorporacion) {
                 throw new \Exception('Registro no encontrado');
             }
-
             $producto = Producto::find($incorporacion->producto_id);
-
-            // DEVOLVER STOCK
-
             $producto->stock_actual =
                 $producto->stock_actual -
                 $incorporacion->cantidad;
@@ -131,22 +109,16 @@ class IncorporacionController extends Controller
             if ($producto->stock_actual < 0) {
                 $producto->stock_actual = 0;
             }
-
             $producto->save();
-
             $incorporacion->delete();
-
             DB::commit();
-
             return response()->json([
                 'estado' => true,
                 'mensaje' => 'Registro eliminado'
             ]);
 
         } catch (\Exception $e) {
-
             DB::rollBack();
-
             return response()->json([
                 'estado' => false,
                 'mensaje' => $e->getMessage()
@@ -177,35 +149,24 @@ class IncorporacionController extends Controller
         DB::beginTransaction();
 
         try {
-
             $incorporacion = Incorporacion::find($request->id);
-
             if (!$incorporacion) {
                 throw new \Exception("Incorporación no encontrada");
             }
-
             if ($incorporacion->producto_id != null) {
                 throw new \Exception("Ya fue convertida");
             }
-
             $usuario = Auth::user();
-
             $producto = new Producto();
             $producto->usuario_creador_id = $usuario->id;
             $producto->nombre = $incorporacion->nombre_producto;
             $producto->descripcion = $incorporacion->descripcion_producto;
             $producto->estado = 1;
             $producto->save();
-
-            // link entre ambos (opcional pero recomendado)
             $incorporacion->producto_id = $producto->id;
             $incorporacion->save();
-
-            // 3. OCULTAR con soft delete (ESTO ES LO QUE TE FALTABA)
             $incorporacion->delete();
-
             DB::commit();
-
             return response()->json([
                 'estado' => true,
                 'mensaje' => 'Producto creado correctamente'
@@ -214,7 +175,6 @@ class IncorporacionController extends Controller
         } catch (\Exception $e) {
 
             DB::rollBack();
-
             return response()->json([
                 'estado' => false,
                 'mensaje' => $e->getMessage()

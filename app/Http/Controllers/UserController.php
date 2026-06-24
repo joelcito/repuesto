@@ -26,7 +26,8 @@ class UserController extends Controller
     {
         if ($request->ajax()) {
             //sacamos el listado
-            $usuarios = User::all();
+            //$usuarios = User::all();
+            $usuarios = User::where('rol_id', '!=', 5)->get();
             $valores = [
                 'listado' => view('user.ajaxListado')->with(compact('usuarios'))->render()
             ];
