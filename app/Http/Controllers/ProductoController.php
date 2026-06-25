@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Incorporacion;
+use App\Models\Movimiento;
 use App\Models\Producto;
 use App\Models\ProductoImagen;
 use App\Utils\Respuesta;
@@ -40,16 +41,63 @@ class ProductoController extends Controller
 
     }
 
+    // public function ajaxListado(Request $request)
+    // {
+    //     $query = Producto::with([
+    //         'categoria',
+    //         'marca',
+    //         'imagenes'
+    //     ])
+    //         ->withSum(['movimientos as ingresos' => fn($q) => $q->where('tipo', 'INGRESO')], 'cantidad')
+    //         ->withSum(['movimientos as salidas' => fn($q) => $q->where('tipo', 'SALIDA')], 'cantidad')
+    //         ->orderBy('created_at', 'desc');
+
+    //     if ($request->buscar) {
+    //         $query->where(function ($q) use ($request) {
+    //             $q->where('nombre', 'like', "%{$request->buscar}%")
+    //                 ->orWhere('codigo_barras', 'like', "%{$request->buscar}%")
+    //                 ->orWhere('codigo_interno', 'like', "%{$request->buscar}%");
+    //         });
+    //     }
+
+    //     $query->when($request->categoria, function ($q) use ($request) {
+    //         $q->where('categoria_id', $request->categoria);
+    //     });
+
+    //     $query->when($request->marca, function ($q) use ($request) {
+    //         $q->where('marca_id', $request->marca);
+    //     });
+
+    //     if ($request->estado !== null && $request->estado !== '') {
+    //         $query->where('estado', $request->estado);
+    //     }
+
+    //     $productos = $query->get();
+
+    //     foreach ($productos as $p) {
+    //         $p->stock_actual = ($p->ingresos ?? 0) - ($p->salidas ?? 0);
+    //     }
+
+    //     if ($request->stock == 'con') {
+    //         $productos = $productos->where('stock_actual', '>', 0);
+    //     }
+
+    //     if ($request->stock == 'sin') {
+    //         $productos = $productos->where('stock_actual', '<=', 0);
+    //     }
+
+    //     return Respuesta::success([
+    //         'listado' => view('producto.ajaxListado', compact('productos'))->render()
+    //     ]);
+    // }
+
     public function ajaxListado(Request $request)
     {
         $query = Producto::with([
             'categoria',
             'marca',
             'imagenes'
-        ])
-            ->withSum(['movimientos as ingresos' => fn($q) => $q->where('tipo', 'INGRESO')], 'cantidad')
-            ->withSum(['movimientos as salidas' => fn($q) => $q->where('tipo', 'SALIDA')], 'cantidad')
-            ->orderBy('created_at', 'desc');
+        ])->orderBy('created_at', 'desc');
 
         if ($request->buscar) {
             $query->where(function ($q) use ($request) {
@@ -73,8 +121,14 @@ class ProductoController extends Controller
 
         $productos = $query->get();
 
-        foreach ($productos as $p) {
-            $p->stock_actual = ($p->ingresos ?? 0) - ($p->salidas ?? 0);
+        // Obtener sucursal
+        $sucursalId = Auth::user()->sucursal_id;
+
+        foreach ($productos as $producto) {
+            $producto->stock_actual = $this->obtenerStock(
+                $producto->id,
+                $sucursalId
+            );
         }
 
         if ($request->stock == 'con') {
@@ -200,6 +254,30 @@ class ProductoController extends Controller
     public function obtenerProducto($id)
     {
         return Producto::find($id);
+    }
+
+    private function obtenerStock($productoId, $sucursalId)
+    {
+        $ingresos = Movimiento::where('producto_id', $productoId)
+            ->where('sucursal_id', $sucursalId)
+            ->whereIn('tipo', [
+                'INGRESO',
+                'DEVOLUCION',
+                'TRANSFERENCIA_INGRESO',
+                'ANULACION_VENTA'
+            ])
+            ->sum('cantidad');
+
+        $salidas = Movimiento::where('producto_id', $productoId)
+            ->where('sucursal_id', $sucursalId)
+            ->whereIn('tipo', [
+                'SALIDA',
+                'VENTA',
+                'TRANSFERENCIA_SALIDA'
+            ])
+            ->sum('cantidad');
+
+        return $ingresos - $salidas;
     }
 
 
