@@ -39,7 +39,6 @@ class MovimientoController extends Controller
     public function guardarIngreso(Request $request)
     {
         if ($request->ajax()) {
-
             $producto_id = $request->idProd;
             $sucursal_id = $request->idSuc;
 
@@ -73,12 +72,12 @@ class MovimientoController extends Controller
                 'estado' => 'INGRESO'
             ]);
 
-            $producto = Producto::find($producto_id);
-
-            $producto->precio_compra = $request->precio_compra;
-            $producto->precio_venta = $request->precio_venta;
-            $producto->compra_ingreso = $request->compra_ingreso;
-            $producto->save();
+            if ($request->precio_compra || $request->precio_venta) {
+                $producto = Producto::find($producto_id);
+                $producto->precio_compra = $request->precio_compra;
+                $producto->precio_venta = $request->precio_venta;
+                $producto->save();
+            }
 
             return Respuesta::success(
                 null,
@@ -300,5 +299,7 @@ class MovimientoController extends Controller
 
         return $ingresos - $salidas;
     }
+
+
 
 }

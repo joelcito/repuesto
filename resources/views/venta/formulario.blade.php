@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('css')
     <link href="{{ asset('assets/plugins/custom/datatables/datatables.bundle.css') }}" rel="stylesheet" type="text/css" />
+
 @endsection
 @section('metadatos')
     <meta name="csrf-token" content="{{ csrf_token() }}" />
@@ -55,7 +56,8 @@
                                                         class="form-select form-select-sm" required>
                                                         <option value="">SELECCIONE EL CLIENTE</option>
                                                         @foreach($clientes as $cliente)
-                                                            <option value="{{ $cliente->id }}">
+                                                            <option value="{{ $cliente->id }}"
+                                                                data-imagen="{{ $cliente->imagen }}">
                                                                 {{ $cliente->nombres }}
                                                             </option>
                                                         @endforeach
@@ -106,19 +108,7 @@
                         <div id="tabla_ventas">
                             <form id="formulario_venta">
                                 <div class="row">
-                                    <!-- <div class="col-md-3">
-                                                                <label class="fw-semibold fs-6 mb-2">
-                                                                    Producto
-                                                                </label>
-                                                                <select class="form-select form-select-sm" id="producto_id">
-                                                                    @foreach($productos as $producto)
-                                                                        <option value="{{ $producto->id }}" data-normal="{{ $producto->precio_venta }}"
-                                                                            data-mayor="{{ $producto->precio_mayor }}">
-                                                                            {{ $producto->nombre }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </div> -->
+
                                     <div class="col-md-6 position-relative">
 
                                         <label class="fw-semibold fs-6 mb-2">
@@ -129,13 +119,13 @@
                                             placeholder="Ingrese Nombre, Marca, Código, Nro Parte,Vehículo...">
 
                                         <div id="resultado_productos" class="shadow bg-white border rounded mt-1" style="
-                                                                max-height:400px;
-                                                                overflow-y:auto;
-                                                                display:none;
-                                                                position:absolute;
-                                                                z-index:9999;
-                                                                width:100%;
-                                                            ">
+                                                                                                                            max-height:400px;
+                                                                                                                            overflow-y:auto;
+                                                                                                                            display:none;
+                                                                                                                            position:absolute;
+                                                                                                                            z-index:9999;
+                                                                                                                            width:100%;
+                                                                                                                        ">
                                         </div>
 
                                         <input type="hidden" id="producto_id" name="producto_id">
@@ -196,7 +186,7 @@
                             </form>
                             <hr>
                             <div id="tabla_detalles" style="display: none;">
-                                <h3 class="text-center">CARGAR DE PRDUCTOS</h3>
+                                <h3 class="text-center">CARGAR PRODUCTOS</h3>
                                 <div class="card shadow-sm mb-5">
                                     <div class="card-header">
                                         <h3 class="card-title">
@@ -208,7 +198,11 @@
                                             <table id="tabla_detalle" class="table align-middle table-row-dashed fs-6 gy-5">
                                                 <thead>
                                                     <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                                        <th>Imagen</th>
                                                         <th>Producto</th>
+                                                        <th>Código Interno</th>
+                                                        <th>Marca</th>
+                                                        <th>Vehiculo</th>
                                                         <th>Cantidad</th>
                                                         <th>Tipo Precio</th>
                                                         <th>Precio</th>
@@ -243,45 +237,29 @@
                                         </div>
                                         <form id="formularioGeneraRecibo">
                                             <div class="row">
-                                                <div class="col-md-2">
-                                                    <label class="required">Tipo Pago</label>
-                                                    <select name="tipo_pago_pagado_recibo" id="tipo_pago_pagado_recibo"
-                                                        class="form-control form-control-sm"
-                                                        onchange="validarCamposRecibo()" disabled>
-                                                        <option value="">Seleccione</option>
-                                                        <option value="EFECTIVO">EFECTIVO</option>
-                                                        <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                                                        <option value="QR">QR</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="required">Realizara algun Pago?</label>
-                                                    <div class="d-flex align-items-center mt-3">
-                                                        <label class="form-check form-check-custom form-check-solid me-3">
-                                                            <input class="form-check-input h-20px w-20px" type="checkbox"
-                                                                name="realizo_pago_recibo" value="pago"
-                                                                id="realizo_pago_recibo" />
-                                                            <span class="form-check-label fw-semibold">Realizo un
-                                                                pago</span>
-                                                        </label>
+                                                <div class="col-md-12">
+                                                    <label class="fw-bold text-success">Pagos realizados</label>
+
+                                                    <div id="lista_pagos">
+                                                        <!-- filas dinámicas -->
                                                     </div>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label class="required">Monto Venta</label>
-                                                    <input type="number" class="form-control form-control-sm" readonly
-                                                        id="monto_total_pagado_recibo" name="monto_total_pagado_recibo"
-                                                        value="0">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="required">Monto Pagado</label>
-                                                    <input type="number" class="form-control form-control-sm"
-                                                        id="monto_pagado_recibo" name="monto_pagado_recibo" value="0"
-                                                        readonly onkeyup="caluclarCambioRecibo(this)">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label class="required">Cambio</label>
-                                                    <input type="number" class="form-control form-control-sm" readonly
-                                                        id="cambio_pagado_recibo" name="cambio_pagado_recibo" value="0">
+                                                    <div class="row mt-3">
+                                                        <div class="col-md-12 text-end">
+                                                            <h4 class="fw-bold">
+                                                                Cambio:
+                                                                <span id="cambio_visual" class="text-success">
+                                                                    0.00
+                                                                </span>
+                                                            </h4>
+                                                        </div>
+                                                    </div>
+
+                                                    <input type="hidden" id="cambio_pagado_recibo" value="0">
+
+                                                    <button type="button" class="btn btn-sm btn-primary mt-2"
+                                                        onclick="agregarPago()">
+                                                        + Agregar pago
+                                                    </button>
                                                 </div>
                                             </div>
                                         </form>
@@ -313,6 +291,11 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         })
+
+
+
+        let productoSeleccionado = null;
+
         let productosVenta = [];
         let tabla = null;
         $(document).ready(function () {
@@ -324,6 +307,11 @@
             });
             actualizarPrecio();
             validarCamposRecibo();
+            agregarPago();
+            $(document).on('input', '.monto_pago, .descuento_pago', function () {
+                calcularCambioGlobal();
+            });
+
         });
         $('#producto_id').change(function () {
             actualizarPrecio();
@@ -380,6 +368,7 @@
             $('#tabla_detalles').show();
             let producto_id = $('#producto_id').val();
             let nombre = $('#buscar_producto').val();
+
             let cantidad = parseFloat($('#cantidad').val());
             let tipo_precio = $('#tipo_precio').val();
             let precio = parseFloat($('#precio_venta').val());
@@ -413,12 +402,18 @@
                 calcularTotal();
                 return;
             }
+            console.log(productoSeleccionado);
             productosVenta.push({
                 producto_id: producto_id,
-                nombre: nombre,
+                nombre: productoSeleccionado.nombre,
+                codigo_interno: productoSeleccionado.codigo_interno || '-',
+                marca: productoSeleccionado.marca || 'SIN MARCA',
+                vehiculo: productoSeleccionado.vehiculo || '-',
+                imagen: productoSeleccionado.imagen || null,
                 cantidad: cantidad,
                 tipo_precio: tipo_precio,
                 precio: precio,
+                descuento: 0,
                 subtotal: subtotal
             });
 
@@ -436,15 +431,32 @@
         function recargarTabla() {
             tabla.clear().draw();
             productosVenta.forEach(function (item) {
+
+                let imagen = item.imagen
+                    ? `/imagenes/productos/${item.imagen}`
+                    : `/imagenes/productos/default.jpg`;
+
+                let img = `
+                                                                                                    <img src="${imagen}"
+                                                                                                    class="imagen-producto"
+                                                                                                            width="45"
+                                                                                                            height="45"
+                                                                                                            style="object-fit:cover;border-radius:6px;cursor:pointer;">
+                                                                                                `;
+
                 let botonEliminar =
                     `<button
-                                                                            class="btn btn-danger btn-sm"
-                                                                            onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
-                                                                            X
-                                                                        </button>`;
+                                                                                                class="btn btn-danger btn-sm"
+                                                                                                onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
+                                                                                                X
+                                                                                            </button>`;
 
                 tabla.row.add([
+                    img,
                     item.nombre,
+                    item.codigo_interno,
+                    item.marca,
+                    item.vehiculo,
                     item.cantidad,
                     item.tipo_precio,
                     parseFloat(item.precio).toFixed(2),
@@ -489,7 +501,7 @@
 
                 $('#tipo_pago_pagado_recibo')
                     .val('')
-                    .prop('disabled', true); // ✅ bloquear select
+                    .prop('disabled', true);
             }
         }
 
@@ -511,29 +523,99 @@
             }
         }
 
-        function caluclarCambioRecibo(select) {
-            let total = parseFloat(
-                $('#total_general').text()
-            ) || 0;
-            let pagado = parseFloat(
-                select.value
-            ) || 0;
-            let cambio = 0;
-            if (pagado > total) {
-                cambio = pagado - total;
+        // function caluclarCambioRecibo(select) {
+        //     let total = parseFloat(
+        //         $('#total_general').text()
+        //     ) || 0;
+        //     let pagado = parseFloat(
+        //         select.value
+        //     ) || 0;
+        //     let cambio = 0;
+        //     if (pagado > total) {
+        //         cambio = pagado - total;
+        //     }
+        //     $('#cambio_pagado_recibo').val(
+        //         cambio.toFixed(2)
+        //     );
+        // }
+
+        function calcularCambioGlobal() {
+
+            let totalVenta = parseFloat($('#total_general').text()) || 0;
+            let descuentoGlobal = parseFloat($('#descuento').val()) || 0;
+
+            let totalFinal = totalVenta - descuentoGlobal;
+
+            let totalPagado = 0;
+
+            $('.pago-item').each(function () {
+
+                let monto = parseFloat($(this).find('.monto_pago').val()) || 0;
+                let descuento = parseFloat($(this).find('.descuento_pago').val()) || 0;
+
+                totalPagado += (monto - descuento);
+            });
+
+            let cambio = totalPagado - totalFinal;
+
+            if (cambio < 0) {
+                cambio = 0;
             }
-            $('#cambio_pagado_recibo').val(
-                cambio.toFixed(2)
-            );
+
+            $('#cambio_pagado_recibo').val(cambio.toFixed(2));
+            $('#cambio_visual').text(cambio.toFixed(2));
         }
 
         function guardarVenta() {
-            if (
-                !$('#formulario_venta_general')[0].checkValidity()
+            let pagos = [];
+            if (!$('#formulario_venta_general')[0].checkValidity()
             ) {
                 $('#formulario_venta_general')[0].reportValidity();
                 return;
             }
+            $('.pago-item').each(function () {
+                let metodo = $(this).find('.metodo_pago').val();
+                let monto = parseFloat($(this).find('.monto_pago').val()) || 0;
+
+                if (monto > 0) {
+                    pagos.push({
+                        metodo: metodo,
+                        monto: monto,
+                        descuento: parseFloat($(this).find('.descuento_pago').val()) || 0
+                    });
+                }
+            });
+            if (pagos.length == 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Debe agregar al menos un pago'
+                });
+                return;
+            }
+
+
+            let totalVenta = parseFloat($('#total_general').text()) || 0;
+
+            let descuentoGlobal = parseFloat($('#descuento').val()) || 0;
+            let totalFinal = totalVenta - descuentoGlobal;
+
+            let totalPagado = 0;
+            pagos.forEach(p => {
+                let monto = parseFloat(p.monto) || 0;
+                let desc = parseFloat(p.descuento) || 0;
+
+                totalPagado += (monto - desc);
+            });
+
+            if (totalPagado < totalFinal) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pago incompleto',
+                    text: 'El pago es menor al total de la venta'
+                });
+                return;
+            }
+
             let realizoPago =
                 $('#realizo_pago_recibo').is(':checked');
 
@@ -559,8 +641,10 @@
                 monto_pagado: montoPagado,
                 cambio: $('#cambio_pagado_recibo').val(),
                 observacion: $('#observacion').val(),
+                descuento: parseFloat($('#descuento').val()) || 0,
                 realizo_pago: realizoPago,
-                productos: productosVenta
+                productos: productosVenta,
+                pagos: pagos
             };
 
             $.ajax({
@@ -619,61 +703,80 @@
                     let html = '';
                     if (productos.length == 0) {
                         html = `
-                                                            <div class="p-3 text-center text-danger">
-                                                                No se encontraron productos
-                                                            </div>
-                                                        `;
+                                                                                                    <div class="p-3 text-center text-danger">
+                                                                                                        No se encontraron productos
+                                                                                                    </div>
+                                                                                                `;
                     } else {
                         productos.forEach(producto => {
+                            let imagen = producto.imagenes?.length > 0
+                                ? `/imagenes/productos/${producto.imagenes[0].imagen}`
+                                : `/imagenes/productos/default.jpg`;
                             html += `
-                                                                <div class="producto-item p-3 border-bottom"
-                                                                    style="
-                                                                        cursor:pointer;
-                                                                        transition:0.2s;
-                                                                    "
-                                                                    data-id="${producto.id}"
-                                                                    data-nombre="${producto.nombre}"
-                                                                    data-precio="${producto.precio_venta}"
-                                                                    data-precio-mayor="${producto.precio_mayor}">
-                                                                    <div class="row">
-                                                                        <div class="col-md-8">
-                                                                            <h6 class="mb-1 fw-bold text-primary">
-                                                                                ${producto.nombre}
-                                                                            </h6>
-                                                                            <div class="small text-muted">
-                                                                                Marca:
-                                                                                <b>
-                                                                                    ${producto.marca ?
+                                                                                        <div class="producto-item p-3 border-bottom"
+                                                                                            style="
+                                                                                                cursor:pointer;
+                                                                                                transition:0.2s;
+                                                                                            "
+                                                                                            data-id="${producto.id}"
+                                                                                            data-nombre="${producto.nombre}"
+                                                                                            data-precio="${producto.precio_venta}"
+                                                                                            data-precio-mayor="${producto.precio_mayor}"
+                                                                                            data-codigo-interno="${producto.codigo_interno ?? ''}"
+                                                                                            data-marca="${producto.marca ? producto.marca.nombre : ''}"
+                                                                                            data-vehiculo="${producto.vehiculos_compatibles ?? ''}"
+                                                                                            data-ubicacion="${producto.ubicacion ?? ''}"
+                                                                                            data-imagen="${producto.imagenes?.length > 0 ? producto.imagenes[0].imagen : ''}">
+
+                                                                                            <div class="row">
+                                                                                            <div class="col-md-2">
+                                                                                                        <img src="${imagen}"
+                                                                                                            style="width:60px; height:60px; object-fit:cover; border-radius:8px;"
+                                                                                                            alt="producto">
+                                                                                                    </div>
+
+                                                                                                <div class="col-md-6">
+                                                                                                    <h6 class="mb-1 fw-bold text-primary">
+                                                                                                        ${producto.nombre}
+                                                                                                    </h6>
+                                                                                                    <div class="small text-muted">
+                                                                                                        Marca:
+                                                                                                        <b>
+                                                                                                            ${producto.marca ?
                                     producto.marca.nombre :
                                     'SIN MARCA'}
-                                                                                </b>
-                                                                            </div>
-                                                                            <div class="small">
-                                                                                Cod Interno:
-                                                                                ${producto.codigo_interno ?? '-'}
-                                                                            </div>
-                                                                            <div class="small">
-                                                                                Nro Parte:
-                                                                                ${producto.numero_parte_vehiculo ?? '-'}
-                                                                            </div>
-                                                                            <div class="small">
-                                                                                Vehículo:
-                                                                                ${producto.vehiculos_compatibles ?? '-'}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-4 text-end">
-                                                                            <span class="badge badge-success mb-2">
-                                                                                Stock:
-                                                                                ${producto.stock_actual}
-                                                                            </span>
-                                                                            <h5 class="text-success">
-                                                                                Bs.
-                                                                                ${producto.precio_venta}
-                                                                            </h5>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            `;
+                                                                                                                </b>
+                                                                                                            </div>
+                                                                                                            <div class="small">
+                                                                                                                Cod Interno:
+                                                                                                                ${producto.codigo_interno ?? '-'}
+                                                                                                            </div>
+                                                                                                            <div class="small">
+                                                                                                                Nro Parte:
+                                                                                                                ${producto.numero_parte_vehiculo ?? '-'}
+                                                                                                            </div>
+                                                                                                            <div class="small">
+                                                                                                                Vehículo:
+                                                                                                                ${producto.vehiculos_compatibles ?? '-'}
+                                                                                                            </div>
+                                                                                                                <div class="small">
+                                                                                                                Ubicaciòn:
+                                                                                                                ${producto.ubicacion ?? '-'}
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="col-md-4 text-end">
+                                                                                                            <span class="badge badge-success mb-2">
+                                                                                                                Stock:
+                                                                                                                ${producto.stock_actual}
+                                                                                                            </span>
+                                                                                                            <h5 class="text-success">
+                                                                                                                Bs.
+                                                                                                                ${producto.precio_venta}
+                                                                                                            </h5>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            `;
                         });
                     }
                     $('#resultado_productos').html(html);
@@ -684,19 +787,26 @@
 
 
         $(document).on('click', '.producto-item', function () {
-            let id = $(this).data('id');
-            let nombre = $(this).data('nombre');
-            let precio = $(this).data('precio');
-            let precioMayor = $(this).data('precio-mayor');
-            $('#producto_id').val(id);
-            $('#buscar_producto').val(nombre);
 
-            precioNormalSeleccionado = precio;
+            productoSeleccionado = {
+                id: $(this).data('id'),
+                nombre: $(this).data('nombre'),
+                precio_venta: $(this).data('precio'),
+                precio_mayor: $(this).data('precio-mayor'),
 
-            precioMayorSeleccionado = precioMayor;
+                codigo_interno: $(this).data('codigo-interno'),
+                marca: $(this).data('marca'),
+                vehiculo: $(this).data('vehiculo'),
+                imagen: $(this).data('imagen')
+            };
+            console.log('res', productoSeleccionado);
+            $('#producto_id').val(productoSeleccionado.id);
+            $('#buscar_producto').val(productoSeleccionado.nombre);
+
+            precioNormalSeleccionado = productoSeleccionado.precio_venta;
+            precioMayorSeleccionado = productoSeleccionado.precio_mayor;
 
             actualizarPrecio();
-
             calcularSubtotalPreview();
             $('#resultado_productos').hide();
         });
@@ -718,21 +828,96 @@
             $('#tipo_pago_pagado_recibo')
                 .val('')
                 .prop('disabled', true);
-
             $('#realizo_pago_recibo')
                 .prop('checked', false);
-
             $('#monto_pagado_recibo')
                 .prop('readonly', true);
-
             $('#subtotal_preview').val('0.00');
-
             $('#detalle_venta').html('');
+
+            $('#lista_pagos').html('');
+            agregarPago();
+            $('#cambio_visual').text('0.00');
+
+            $('#imagen_cliente').attr('src', '/assets/img/default.jpg');
+            $('#cliente_seleccionado').val('');
         }
+
+
+        $('#cliente_seleccionado').on('change', function () {
+
+            let imagen = $(this).find(':selected').data('imagen');
+            let src = imagen
+                ? `/storage/imagenesClientes/${imagen}`
+                : `/assets/img/default.jpg`;
+
+            $('#imagen_cliente').attr('src', src);
+        });
+
+
+        $(document).on('click', '.imagen-producto', function () {
+
+            let src = $(this).attr('src');
+
+            Swal.fire({
+                imageUrl: src,
+                imageWidth: 600,
+                imageAlt: 'Producto',
+                showConfirmButton: false,
+                showCloseButton: true,
+                width: '700px'
+            });
+
+        });
+
+        //pagos divididos:
+
+        function agregarPago() {
+            let html = `
+                            <div class="row pago-item mt-2">
+
+                                <div class="col-md-4">
+                                    <select class="form-control form-control-sm metodo_pago">
+                                        <option value="EFECTIVO">EFECTIVO</option>
+                                        <option value="QR">QR</option>
+                                        <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <input type="number" class="form-control form-control-sm monto_pago" placeholder="Monto">
+                                </div>
+
+                               <div class="col-md-2">
+                                <input type="number" id="descuento" class="form-control form-control-sm"  placeholder="Descuento">
+                            </div>
+
+                            </div>`;
+
+            $('#lista_pagos').append(html);
+        }
+
+        function eliminarPago(btn) {
+            $(btn).closest('.pago-item').remove();
+        }
+
     </script>
     <style>
         .producto-item:hover {
             background: #f5f8fa;
+        }
+
+        .imagen-producto {
+            cursor: zoom-in;
+        }
+
+        #imagenGrande {
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        #imagenGrande:hover {
+            transform: scale(1.8);
         }
     </style>
 @endsection

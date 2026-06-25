@@ -32,6 +32,9 @@ class Producto extends Model
         'observaciones',
         'imagen',
         'estado',
+        'medidas',
+        'ubicacion',
+        'tipo_producto',
         'usuario_creador_id',
         'usuario_modificador_id',
         'usuario_eliminador_id',
@@ -60,5 +63,16 @@ class Producto extends Model
     public function unidad()
     {
         return $this->belongsTo(Unidad::class, 'unidad_id');
+    }
+
+    public function imagenes()
+    {
+        return $this->hasMany(ProductoImagen::class, 'producto_id')
+            ->orderBy('orden');
+    }
+
+    public function movimientos()
+    {
+        return $this->hasMany(Movimiento::class, 'producto_id');
     }
 }

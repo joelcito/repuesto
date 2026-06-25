@@ -44,37 +44,62 @@ class PagoController extends Controller
 
     public function ajaxListado(Request $request)
     {
-        if ($request->ajax()) {
-
-            $sucursal_id = $request->input('sucursal_id');
-            $fecha_ini = $request->input('fecha_ini');
-            $fecha_fin = $request->input('fecha_fin');
-            $usuario_id = $request->input('usuario_busqueda_id');
-
-            $query = Pago::select();
-
-            if ($sucursal_id != null) {
-                $query->where('sucursal_id', $sucursal_id);
-            }
-
-            if ($fecha_ini != null && $fecha_fin != null) {
-                $query->where('fecha', '>=', $fecha_ini . ' 00:00:00')
-                    ->where('fecha', '<=', $fecha_fin . ' 23:59:59');
-            }
-
-            if ($usuario_id != null) {
-                $query->where('usuario_creador_id', $usuario_id);
-            }
-
-            $pagos = $query->orderBy('id', 'desc')->get();
-            $valores = [
-                'listado' => view('pago.ajaxListado')->with(compact('pagos'))->render()
-            ];
-            $data = Respuesta::success($valores, "Datos obtenidos correctamente");
-        } else {
-            $data = Respuesta::error(null, "Error al obtener los datos");
+        if (!$request->ajax()) {
+            return response()->json(['estado' => false]);
         }
-        return $data;
+
+        $sucursal_id = $request->input('sucursal_id');
+        $fecha_ini = $request->input('fecha_ini');
+        $fecha_fin = $request->input('fecha_fin');
+        $usuario_id = $request->input('usuario_busqueda_id');
+
+        $baseQuery = Pago::query()
+            ->with(['venta.detalles.producto']); // IMPORTANTE
+
+        if ($sucursal_id) {
+            $baseQuery->where('sucursal_id', $sucursal_id);
+        }
+
+        if ($fecha_ini && $fecha_fin) {
+            $baseQuery->whereBetween('fecha', [
+                $fecha_ini . ' 00:00:00',
+                $fecha_fin . ' 23:59:59'
+            ]);
+        }
+
+        if ($usuario_id) {
+            $baseQuery->where('usuario_creador_id', $usuario_id);
+        }
+
+
+        $todos = (clone $baseQuery)
+            ->orderBy('id', 'desc')
+            ->get();
+
+
+        $repuestos = (clone $baseQuery)
+            ->whereHas('venta.detalles.producto', function ($q) {
+                $q->where('tipo_producto', 'REPUESTO');
+            })
+            ->orderBy('id', 'desc')
+            ->get();
+
+
+        $lubricantes = (clone $baseQuery)
+            ->whereHas('venta.detalles.producto', function ($q) {
+                $q->where('tipo_producto', 'LUBRICANTE');
+            })
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json([
+            'estado' => true,
+            'data' => [
+                'todos' => view('pago.ajaxListado', ['pagos' => $todos])->render(),
+                'repuestos' => view('pago.ajaxListado', ['pagos' => $repuestos])->render(),
+                'lubricantes' => view('pago.ajaxListado', ['pagos' => $lubricantes])->render(),
+            ]
+        ]);
     }
 
     public function listadoDeuda()

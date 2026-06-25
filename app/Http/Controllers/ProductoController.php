@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Incorporacion;
 use App\Models\Producto;
+use App\Models\ProductoImagen;
 use App\Utils\Respuesta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,11 +24,11 @@ class ProductoController extends Controller
             ->doesntHave('children')
             ->get();
 
-
         $proveedores = Proveedor::where('estado', 1)->get();
         $sucursales = Sucursal::where('estado', 1)->get();
         $marcas = Marca::where('estado', 1)->get();
         $unidades = Unidad::where('estado', 1)->get();
+        $productos = Producto::with('imagenes')->get();
 
         return view('producto.listado', compact(
             'categorias',
@@ -35,29 +37,57 @@ class ProductoController extends Controller
             'marcas',
             'unidades'
         ));
+
     }
 
     public function ajaxListado(Request $request)
     {
-        if ($request->ajax()) {
-            $productos = Producto::with([
-                'categoria',
-                'proveedor',
-                'sucursal',
-                'marca',
-                'unidad'
-            ])->latest()->get();
-            $valores = [
-                'listado' => view('producto.ajaxListado')
-                    ->with(compact('productos'))
-                    ->render()
-            ];
-            $data = Respuesta::success($valores, "Datos obtenidos correctamente");
+        $query = Producto::with([
+            'categoria',
+            'marca',
+            'imagenes'
+        ])
+            ->withSum(['movimientos as ingresos' => fn($q) => $q->where('tipo', 'INGRESO')], 'cantidad')
+            ->withSum(['movimientos as salidas' => fn($q) => $q->where('tipo', 'SALIDA')], 'cantidad')
+            ->orderBy('created_at', 'desc');
 
-        } else {
-            $data = Respuesta::error(null, "Error al obtener los datos");
+        if ($request->buscar) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nombre', 'like', "%{$request->buscar}%")
+                    ->orWhere('codigo_barras', 'like', "%{$request->buscar}%")
+                    ->orWhere('codigo_interno', 'like', "%{$request->buscar}%");
+            });
         }
-        return $data;
+
+        $query->when($request->categoria, function ($q) use ($request) {
+            $q->where('categoria_id', $request->categoria);
+        });
+
+        $query->when($request->marca, function ($q) use ($request) {
+            $q->where('marca_id', $request->marca);
+        });
+
+        if ($request->estado !== null && $request->estado !== '') {
+            $query->where('estado', $request->estado);
+        }
+
+        $productos = $query->get();
+
+        foreach ($productos as $p) {
+            $p->stock_actual = ($p->ingresos ?? 0) - ($p->salidas ?? 0);
+        }
+
+        if ($request->stock == 'con') {
+            $productos = $productos->where('stock_actual', '>', 0);
+        }
+
+        if ($request->stock == 'sin') {
+            $productos = $productos->where('stock_actual', '<=', 0);
+        }
+
+        return Respuesta::success([
+            'listado' => view('producto.ajaxListado', compact('productos'))->render()
+        ]);
     }
 
     public function generarCodigo()
@@ -79,7 +109,7 @@ class ProductoController extends Controller
                 'unidad_id' => 'required',
 
                 'precio_venta' => 'required|numeric',
-                'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+                'imagenes.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             ]);
             $producto_id = $request->input('id');
             $usuario = Auth::user();
@@ -111,27 +141,38 @@ class ProductoController extends Controller
             $producto->sucursal_id = $request->input('sucursal_id');
             $producto->proveedor_id = $request->input('proveedor_id');
             $producto->observaciones = $request->input('observaciones');
-            if ($request->hasFile('imagen')) {
-                if ($producto->imagen != null) {
-                    $rutaAnterior = public_path(
-                        'imagenes/productos/' . $producto->imagen
-                    );
-                    if (file_exists($rutaAnterior)) {
-                        unlink($rutaAnterior);
-                    }
-                }
+            $producto->medidas = $request->input('medidas');
+            $producto->ubicacion = $request->input('ubicacion');
+            $producto->tipo_producto = $request->input('tipo_producto');
 
-                $archivo = $request->file('imagen');
-                $nombreImagen = time() . '.' .
-                    $archivo->getClientOriginalExtension();
-                $archivo->move(
-                    public_path('imagenes/productos'),
-                    $nombreImagen
-                );
-                $producto->imagen = $nombreImagen;
-            }
             $producto->estado = 1;
             $producto->save();
+
+            if ($request->input('incorporacion_id')) {
+
+                $inc = Incorporacion::find($request->input('incorporacion_id'));
+
+                if ($inc) {
+                    $inc->estado = 'PROCESADO';
+                    $inc->producto_id = $producto->id;
+                    $inc->save();
+                }
+            }
+
+            if ($request->hasFile('imagenes')) {
+                foreach ($request->file('imagenes') as $index => $archivo) {
+                    $nombre = time() . '_' . uniqid() . '.' . $archivo->getClientOriginalExtension();
+                    $archivo->move(public_path('imagenes/productos'), $nombre);
+                    ProductoImagen::create([
+                        'producto_id' => $producto->id,
+                        'imagen' => $nombre,
+                        'orden' => $index + 1,
+                        'estado' => 1,
+                        'usuario_creador_id' => Auth::id()
+                    ]);
+                }
+            }
+
             $data = Respuesta::success(null, "Producto guardado correctamente");
         } else {
             $data = Respuesta::error(null, "Error al obtener los datos");
@@ -155,5 +196,11 @@ class ProductoController extends Controller
         }
         return $data;
     }
+
+    public function obtenerProducto($id)
+    {
+        return Producto::find($id);
+    }
+
 
 }

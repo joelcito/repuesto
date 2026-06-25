@@ -102,6 +102,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/eliminarProducto', [ProductoController::class, 'eliminarProducto'])->name('producto.eliminarProducto');
 
         Route::post('/generar-codigo', [ProductoController::class, 'generarCodigo']);
+        Route::get('/{id}', [ProductoController::class, 'obtenerProducto']);
 
     });
 

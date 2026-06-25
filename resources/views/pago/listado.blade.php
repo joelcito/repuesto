@@ -142,7 +142,39 @@
                             </div>
                         </div>
                     </form>
-                    <div id="table_listado">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#tab_todos">
+                                Todos
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab_repuestos">
+                                Repuestos
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab_lubricantes">
+                                Lubricantes
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content mt-3">
+
+                        <div class="tab-pane fade show active" id="tab_todos">
+                            <div id="table_listado"></div>
+                        </div>
+
+                        <div class="tab-pane fade" id="tab_repuestos">
+                            <div id="table_repuestos"></div>
+                        </div>
+
+                        <div class="tab-pane fade" id="tab_lubricantes">
+                            <div id="table_lubricantes"></div>
+                        </div>
 
                     </div>
                 </div>
@@ -174,7 +206,11 @@
                 data: datos,
                 success: function (resultado) {
                     if (resultado.estado) {
-                        $('#table_listado').html(resultado.data.listado)
+
+                        $('#table_listado').html(resultado.data.todos);
+                        $('#table_repuestos').html(resultado.data.repuestos);
+                        $('#table_lubricantes').html(resultado.data.lubricantes);
+
                     } else {
 
                     }
@@ -252,8 +288,8 @@
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Se registro con exito',
-                                showConfirmButton: false, // No mostrar botón de confirmación
-                                timer: 2000, // 5 segundos
+                                showConfirmButton: false,
+                                timer: 2000,
                                 timerProgressBar: true
                             });
                             $('#modalIngreso').modal('hide')

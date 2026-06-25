@@ -1,4 +1,6 @@
 <div style="overflow-x: auto;">
+
+
     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_producto">
         <thead>
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
@@ -9,6 +11,7 @@
                 <th>Marca</th>
                 <th>Precio Venta</th>
                 <th>Imagen</th>
+                <th>Stock</th>
                 <th>Estado</th>
                 <th>Actions</th>
             </tr>
@@ -25,12 +28,21 @@
                     <td>
                         {{ number_format($producto->precio_venta, 2) }}
                     </td>
+
+                    @php
+                        $imagen = $producto->imagenes->first()->imagen ?? null;
+                    @endphp
+
                     <td>
-                        @if($producto->imagen)
-                            <img src="{{ asset('imagenes/productos/' . $producto->imagen) }}" width="60" class="img-thumbnail">
-                        @else
-                            <img src="{{ asset('imagenes/productos/default.jpg') }}" width="60" class="img-thumbnail">
-                        @endif
+                        <img src="{{ $imagen ? asset('imagenes/productos/' . $imagen) : asset('imagenes/productos/default.jpg') }}"
+                            width="60" class="img-thumbnail">
+                    </td>
+
+
+                    <td>
+                        <span class="badge {{ $producto->stock_actual > 0 ? 'bg-success' : 'bg-danger' }}">
+                            {{ $producto->stock_actual ?? 0 }}
+                        </span>
                     </td>
                     <td>
                         @if($producto->estado)

@@ -91,7 +91,8 @@ class VentasController extends Controller
                 'cliente_id' => 'required',
                 'caja_id' => 'required',
                 'metodo_pago' => 'required',
-                'productos' => 'required|array|min:1'
+                'productos' => 'required|array|min:1',
+                'pagos' => 'required|array|min:1'
             ]);
 
             $usuario = Auth::user();
@@ -107,6 +108,8 @@ class VentasController extends Controller
             $numeroFactura = Venta::max('numero_factura');
             $numeroFactura = $numeroFactura ? $numeroFactura + 1 : 1;
 
+            $pagos = $request->pagos ?? [];
+
             $venta = new Venta();
             $venta->usuario_creador_id = $usuario->id;
             $venta->usuario_cliente_id = $request->cliente_id;
@@ -119,9 +122,13 @@ class VentasController extends Controller
             $venta->subtotal = 0;
             $venta->descuento = $request->descuento ?? 0;
             $venta->total = 0;
-            $venta->metodo_pago = $request->metodo_pago;
+
             $venta->descripcion = $request->descripcion;
             $venta->observacion = $request->observacion;
+            $venta->metodo_pago = collect($pagos)
+                ->pluck('metodo')
+                ->unique()
+                ->implode(',');
             $venta->estado = 'SALIDA';
 
 
@@ -137,19 +144,11 @@ class VentasController extends Controller
                     throw new \Exception("Producto no encontrado");
                 }
 
-                // STOCK REAL POR SUCURSAL
                 $stockActual = $this->obtenerStock(
                     $producto->id,
                     $caja->sucursal_id
                 );
 
-                // dd(
-                //     ($stockActual < $item['cantidad']),
-                //     $stockActual,
-                //     $item['cantidad'],
-                //     $producto->id,
-                //     $caja->sucursal_id
-                // );
 
                 if ($stockActual < $item['cantidad']) {
 
@@ -167,22 +166,22 @@ class VentasController extends Controller
                     ($precio * $item['cantidad'])
                     - ($item['descuento'] ?? 0);
 
-                $detalle = new VentaDetalle();
-                $detalle->venta_id = $venta->id;
-                $detalle->producto_id = $producto->id;
-                $detalle->cantidad = $item['cantidad'];
-                $detalle->cantidad_devuelta = 0;
-                $detalle->precio_compra = $producto->precio_compra;
-                $detalle->precio_original = $producto->precio_venta;
-                $detalle->precio_unitario = $precio;
-                $detalle->descuento = $item['descuento'] ?? 0;
-                $detalle->tipo_precio = $item['tipo_precio'];
-                $detalle->subtotal = $subtotal;
-                $detalle->descripcion = $item['descripcion'] ?? null;
-                $detalle->estado = 'SALIDA';
-                $detalle->usuario_creador_id = $usuario->id;
-                $detalle->save();
 
+                VentaDetalle::create([
+                    'venta_id' => $venta->id,
+                    'producto_id' => $producto->id,
+                    'cantidad' => $item['cantidad'],
+                    'cantidad_devuelta' => 0,
+                    'precio_compra' => $producto->precio_compra,
+                    'precio_original' => $producto->precio_venta,
+                    'precio_unitario' => $precio,
+                    'descuento' => $item['descuento'] ?? 0,
+                    'tipo_precio' => $item['tipo_precio'],
+                    'subtotal' => $subtotal,
+                    'descripcion' => $item['descripcion'] ?? null,
+                    'estado' => 'SALIDA',
+                    'usuario_creador_id' => $usuario->id
+                ]);
                 // SOLO MOVIMIENTO
                 Movimiento::create([
                     'producto_id' => $producto->id,
@@ -204,18 +203,31 @@ class VentasController extends Controller
 
             $total = $subtotalGeneral - $venta->descuento;
 
+
             $venta->subtotal = $subtotalGeneral;
             $venta->total = $total;
+            $venta->save();
+            // $montoPagado = $request->monto_pagado ?? $total;
 
-            $montoPagado = $request->monto_pagado ?? $total;
+            $pagos = $request->pagos ?? [];
 
-            $cambio = 0;
-
-            if ($montoPagado > $total) {
-                $cambio = $montoPagado - $total;
+            if (count($pagos) == 0) {
+                throw new \Exception("Debe registrar al menos un pago");
             }
 
-            $montoReal = $montoPagado - $cambio;
+            $totalPagado = collect($pagos)->sum(function ($p) {
+                return ($p['monto'] ?? 0) - ($p['descuento'] ?? 0);
+            });
+
+
+            $cambio = max(0, $totalPagado - $total);
+
+
+            if ($totalPagado > $total) {
+                $cambio = $totalPagado - $total;
+            }
+
+            $montoReal = $totalPagado - $cambio;
 
             if ($montoReal >= $total) {
                 $venta->estado_pago = 'PAGADO';
@@ -225,38 +237,47 @@ class VentasController extends Controller
                 $venta->estado_pago = 'DEUDA';
             }
 
-            $venta->save();
 
-            if ($montoReal > 0) {
 
+            foreach ($pagos as $pago) {
+
+                if (!isset($pago['monto']) || $pago['monto'] <= 0) {
+                    continue;
+                }
+                $monto = ($pago['monto'] ?? 0);
+                $descuento = ($pago['descuento'] ?? 0);
+                $montoNeto = $monto - $descuento;
                 Pago::create([
                     'usuario_creador_id' => $usuario->id,
                     'venta_id' => $venta->id,
                     'caja_id' => $caja->id,
                     'sucursal_id' => $caja->sucursal_id,
-                    'monto' => $montoReal,
-                    'cambio' => $cambio,
+
+                    'monto' => $monto,
+                    'cambio' => max(0, $monto - $descuento - $total), // opcional o simplificado
+
                     'fecha' => now(),
                     'descripcion' => 'PAGO VENTA #' . $venta->numero_factura,
-                    'tipo_pago' => $venta->metodo_pago,
+                    'tipo_pago' => $pago['metodo'],
                     'estado' => 'INGRESO'
                 ]);
+
 
                 MovimientoCaja::create([
                     'caja_id' => $venta->caja_id,
                     'venta_id' => $venta->id,
                     'tipo' => 'INGRESO',
-                    'metodo_pago' => $venta->metodo_pago,
-                    'monto' => $montoReal,
+                    'metodo_pago' => $pago['metodo'],
+                    'monto' => $montoNeto,
                     'descripcion' => 'VENTA #' . $venta->id,
                     'fecha' => now(),
                     'estado' => 'INGRESO',
                     'usuario_creador_id' => $usuario->id
                 ]);
 
-                $caja->total_ingresos += $montoReal;
-                $caja->save();
+                $caja->total_ingresos += $montoNeto;
             }
+            $caja->save();
 
             DB::commit();
 
@@ -470,18 +491,50 @@ class VentasController extends Controller
             return response()->json(['estado' => false, 'mensaje' => $e->getMessage()]);
         }
     }
+    // public function recibo($venta_id)
+    // {
+    //     $usuario = Auth::user();
+    //     $venta = Venta::with(['cliente', 'detalles.producto', 'pagos'])->find($venta_id);
+    //     if (!$venta) {
+    //         return redirect()->back()->with('error', 'Venta no encontrada');
+    //     }
+    //     $data = [
+    //         'usuario' => $usuario,
+    //         'venta' => $venta
+    //     ];
+    //     $pdf = Pdf::loadView('venta.pdf.recibo', $data)->setPaper('a5', 'landscape');
+    //     return $pdf->stream('recibo.pdf');
+    // }
+
     public function recibo($venta_id)
     {
         $usuario = Auth::user();
-        $venta = Venta::with(['cliente', 'detalles.producto', 'pagos'])->find($venta_id);
+
+        $venta = Venta::with(['cliente', 'detalles.producto', 'pagos'])
+            ->find($venta_id);
+
         if (!$venta) {
             return redirect()->back()->with('error', 'Venta no encontrada');
         }
+
+        $totalPagado = $venta->pagos
+            ->where('estado', 'INGRESO')
+            ->sum('monto');
+
+        $saldo = max(0, $venta->total - $totalPagado);
+        $cambio = max(0, $totalPagado - $venta->total);
+
         $data = [
             'usuario' => $usuario,
-            'venta' => $venta
+            'venta' => $venta,
+            'totalPagado' => $totalPagado,
+            'saldo' => $saldo,
+            'cambio' => $cambio
         ];
-        $pdf = Pdf::loadView('venta.pdf.recibo', $data)->setPaper('a5', 'landscape');
+
+        $pdf = Pdf::loadView('venta.pdf.recibo', $data)
+            ->setPaper('a5', 'landscape');
+
         return $pdf->stream('recibo.pdf');
     }
 
@@ -525,7 +578,7 @@ class VentasController extends Controller
     public function buscarProductos(Request $request)
     {
         $buscar = $request->buscar;
-        $productos = Producto::with('marca')
+        $productos = Producto::with('marca', 'imagenes')
             ->where('estado', 1)
             ->where(function ($query) use ($buscar) {
                 $query->where('nombre', 'LIKE', "%{$buscar}%")

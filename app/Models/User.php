@@ -108,4 +108,9 @@ class User extends Authenticatable
         return $this->rol_id == 4;
     }
 
+    public function esCliente()
+    {
+        return $this->rol_id == 5;
+    }
+
 }
