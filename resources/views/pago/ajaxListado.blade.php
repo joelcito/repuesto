@@ -1,6 +1,6 @@
 <div style="overflow-x: auto;">
     <!--begin::Table-->
-    <table class="table align-middle table-row-dashed fs-7 gy-4" id="kt_table_users">
+    <table class="kt_table_pagos table align-middle table-row-dashed fs-7 gy-4">
         <thead>
             <tr class="text-start text-muted fw-bold fs-8 text-uppercase gs-0">
                 <th>Sucursal</th>
@@ -38,7 +38,6 @@
                     <td>{{ $pago->descripcion }}</td>
                     <td>{{ $pago->tipo_pago }}</td>
 
-                    {{-- EFECTIVO --}}
                     <td>
                         @if($pago->tipo_pago == 'EFECTIVO')
                             {{ number_format($pago->monto, 2) }}
@@ -46,8 +45,6 @@
                             0.00
                         @endif
                     </td>
-
-                    {{-- QR / TRANSFERENCIA --}}
                     <td>
                         @if($pago->tipo_pago == 'QR' || $pago->tipo_pago == 'TRANSFERENCIA')
                             {{ number_format($pago->monto, 2) }}
@@ -184,12 +181,16 @@
     </table>
     <!--end::Table-->
 </div>
-
 <script>
     $(document).ready(function () {
-        $('#kt_table_users').DataTable({
-            lengthMenu: [10, 25, 50, 100], // Opciones de longitud de página
-            // dom: '<"dt-head row"<"col-md-6"l><"col-md-6"f>><"clear">t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>', // Use dom for basic layout
+
+        // Evita reinicialización
+        if ($.fn.DataTable.isDataTable('#kt_table_pagos')) {
+            $('#kt_table_pagos').DataTable().destroy();
+        }
+
+        $('#kt_table_pagos').DataTable({
+            lengthMenu: [10, 25, 50, 100],
             dom: '<"dt-head row"><"clear">t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>',
             lengthChange: false,
             searching: false,
@@ -206,5 +207,6 @@
             order: [],
             responsive: true,
         });
+
     });
 </script>

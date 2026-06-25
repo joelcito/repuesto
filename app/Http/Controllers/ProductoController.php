@@ -143,6 +143,7 @@ class ProductoController extends Controller
             $producto->observaciones = $request->input('observaciones');
             $producto->medidas = $request->input('medidas');
             $producto->ubicacion = $request->input('ubicacion');
+            $producto->tipo_producto = $request->input('tipo_producto');
 
             $producto->estado = 1;
             $producto->save();

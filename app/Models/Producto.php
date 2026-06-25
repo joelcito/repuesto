@@ -34,6 +34,7 @@ class Producto extends Model
         'estado',
         'medidas',
         'ubicacion',
+        'tipo_producto',
         'usuario_creador_id',
         'usuario_modificador_id',
         'usuario_eliminador_id',
