@@ -119,13 +119,13 @@
                                             placeholder="Ingrese Nombre, Marca, Código, Nro Parte,Vehículo...">
 
                                         <div id="resultado_productos" class="shadow bg-white border rounded mt-1" style="
-                                                                                            max-height:400px;
-                                                                                            overflow-y:auto;
-                                                                                            display:none;
-                                                                                            position:absolute;
-                                                                                            z-index:9999;
-                                                                                            width:100%;
-                                                                                        ">
+                                                                                                                            max-height:400px;
+                                                                                                                            overflow-y:auto;
+                                                                                                                            display:none;
+                                                                                                                            position:absolute;
+                                                                                                                            z-index:9999;
+                                                                                                                            width:100%;
+                                                                                                                        ">
                                         </div>
 
                                         <input type="hidden" id="producto_id" name="producto_id">
@@ -237,49 +237,6 @@
                                         </div>
                                         <form id="formularioGeneraRecibo">
                                             <div class="row">
-
-                                                <!-- <div class="col-md-2">
-                                                                                        <label class="required">Tipo Pago</label>
-                                                                                        <select name="tipo_pago_pagado_recibo" id="tipo_pago_pagado_recibo"
-                                                                                            class="form-control form-control-sm"
-                                                                                            onchange="validarCamposRecibo()" disabled>
-                                                                                            <option value="">Seleccione</option>
-                                                                                            <option value="EFECTIVO">EFECTIVO</option>
-                                                                                            <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                                                                                            <option value="QR">QR</option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                    <div class="col-md-3">
-                                                                                        <label class="required">Realizara algun Pago?</label>
-                                                                                        <div class="d-flex align-items-center mt-3">
-                                                                                            <label class="form-check form-check-custom form-check-solid me-3">
-                                                                                                <input class="form-check-input h-20px w-20px" type="checkbox"
-                                                                                                    name="realizo_pago_recibo" value="pago"
-                                                                                                    id="realizo_pago_recibo" />
-                                                                                                <span class="form-check-label fw-semibold">Realizo un
-                                                                                                    pago</span>
-                                                                                            </label>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <label class="required">Monto Venta</label>
-                                                                                        <input type="number" class="form-control form-control-sm" readonly
-                                                                                            id="monto_total_pagado_recibo" name="monto_total_pagado_recibo"
-                                                                                            value="0">
-                                                                                    </div>
-                                                                                    <div class="col-md-3">
-                                                                                        <label class="required">Monto Pagado</label>
-                                                                                        <input type="number" class="form-control form-control-sm"
-                                                                                            id="monto_pagado_recibo" name="monto_pagado_recibo" value="0"
-                                                                                            readonly onkeyup="caluclarCambioRecibo(this)">
-                                                                                    </div>
-                                                                                    <div class="col-md-2">
-                                                                                        <label class="required">Cambio</label>
-                                                                                        <input type="number" class="form-control form-control-sm" readonly
-                                                                                            id="cambio_pagado_recibo" name="cambio_pagado_recibo" value="0">
-                                                                                    </div> -->
-
-
                                                 <div class="col-md-12">
                                                     <label class="fw-bold text-success">Pagos realizados</label>
 
@@ -456,6 +413,7 @@
                 cantidad: cantidad,
                 tipo_precio: tipo_precio,
                 precio: precio,
+                descuento: 0,
                 subtotal: subtotal
             });
 
@@ -479,19 +437,19 @@
                     : `/imagenes/productos/default.jpg`;
 
                 let img = `
-                                                                    <img src="${imagen}"
-                                                                    class="imagen-producto"
-                                                                            width="45"
-                                                                            height="45"
-                                                                            style="object-fit:cover;border-radius:6px;cursor:pointer;">
-                                                                `;
+                                                                                                    <img src="${imagen}"
+                                                                                                    class="imagen-producto"
+                                                                                                            width="45"
+                                                                                                            height="45"
+                                                                                                            style="object-fit:cover;border-radius:6px;cursor:pointer;">
+                                                                                                `;
 
                 let botonEliminar =
                     `<button
-                                                                class="btn btn-danger btn-sm"
-                                                                onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
-                                                                X
-                                                            </button>`;
+                                                                                                class="btn btn-danger btn-sm"
+                                                                                                onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
+                                                                                                X
+                                                                                            </button>`;
 
                 tabla.row.add([
                     img,
@@ -618,13 +576,12 @@
             $('.pago-item').each(function () {
                 let metodo = $(this).find('.metodo_pago').val();
                 let monto = parseFloat($(this).find('.monto_pago').val()) || 0;
-                let descuento = parseFloat($(this).find('.descuento_pago').val()) || 0;
 
                 if (monto > 0) {
                     pagos.push({
                         metodo: metodo,
                         monto: monto,
-                        descuento: descuento
+                        descuento: parseFloat($(this).find('.descuento_pago').val()) || 0
                     });
                 }
             });
@@ -650,7 +607,7 @@
                 totalPagado += (monto - desc);
             });
 
-            if (totalPagado < totalVenta) {
+            if (totalPagado < totalFinal) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Pago incompleto',
@@ -684,6 +641,7 @@
                 monto_pagado: montoPagado,
                 cambio: $('#cambio_pagado_recibo').val(),
                 observacion: $('#observacion').val(),
+                descuento: parseFloat($('#descuento').val()) || 0,
                 realizo_pago: realizoPago,
                 productos: productosVenta,
                 pagos: pagos
@@ -745,80 +703,80 @@
                     let html = '';
                     if (productos.length == 0) {
                         html = `
-                                                                    <div class="p-3 text-center text-danger">
-                                                                        No se encontraron productos
-                                                                    </div>
-                                                                `;
+                                                                                                    <div class="p-3 text-center text-danger">
+                                                                                                        No se encontraron productos
+                                                                                                    </div>
+                                                                                                `;
                     } else {
                         productos.forEach(producto => {
                             let imagen = producto.imagenes?.length > 0
                                 ? `/imagenes/productos/${producto.imagenes[0].imagen}`
                                 : `/imagenes/productos/default.jpg`;
                             html += `
-                                                        <div class="producto-item p-3 border-bottom"
-                                                            style="
-                                                                cursor:pointer;
-                                                                transition:0.2s;
-                                                            "
-                                                            data-id="${producto.id}"
-                                                            data-nombre="${producto.nombre}"
-                                                            data-precio="${producto.precio_venta}"
-                                                            data-precio-mayor="${producto.precio_mayor}"
-                                                            data-codigo-interno="${producto.codigo_interno ?? ''}"
-                                                            data-marca="${producto.marca ? producto.marca.nombre : ''}"
-                                                            data-vehiculo="${producto.vehiculos_compatibles ?? ''}"
-                                                            data-ubicacion="${producto.ubicacion ?? ''}"
-                                                            data-imagen="${producto.imagenes?.length > 0 ? producto.imagenes[0].imagen : ''}">
+                                                                                        <div class="producto-item p-3 border-bottom"
+                                                                                            style="
+                                                                                                cursor:pointer;
+                                                                                                transition:0.2s;
+                                                                                            "
+                                                                                            data-id="${producto.id}"
+                                                                                            data-nombre="${producto.nombre}"
+                                                                                            data-precio="${producto.precio_venta}"
+                                                                                            data-precio-mayor="${producto.precio_mayor}"
+                                                                                            data-codigo-interno="${producto.codigo_interno ?? ''}"
+                                                                                            data-marca="${producto.marca ? producto.marca.nombre : ''}"
+                                                                                            data-vehiculo="${producto.vehiculos_compatibles ?? ''}"
+                                                                                            data-ubicacion="${producto.ubicacion ?? ''}"
+                                                                                            data-imagen="${producto.imagenes?.length > 0 ? producto.imagenes[0].imagen : ''}">
 
-                                                            <div class="row">
-                                                            <div class="col-md-2">
-                                                                        <img src="${imagen}"
-                                                                            style="width:60px; height:60px; object-fit:cover; border-radius:8px;"
-                                                                            alt="producto">
-                                                                    </div>
+                                                                                            <div class="row">
+                                                                                            <div class="col-md-2">
+                                                                                                        <img src="${imagen}"
+                                                                                                            style="width:60px; height:60px; object-fit:cover; border-radius:8px;"
+                                                                                                            alt="producto">
+                                                                                                    </div>
 
-                                                                <div class="col-md-6">
-                                                                    <h6 class="mb-1 fw-bold text-primary">
-                                                                        ${producto.nombre}
-                                                                    </h6>
-                                                                    <div class="small text-muted">
-                                                                        Marca:
-                                                                        <b>
-                                                                            ${producto.marca ?
+                                                                                                <div class="col-md-6">
+                                                                                                    <h6 class="mb-1 fw-bold text-primary">
+                                                                                                        ${producto.nombre}
+                                                                                                    </h6>
+                                                                                                    <div class="small text-muted">
+                                                                                                        Marca:
+                                                                                                        <b>
+                                                                                                            ${producto.marca ?
                                     producto.marca.nombre :
                                     'SIN MARCA'}
-                                                                                </b>
-                                                                            </div>
-                                                                            <div class="small">
-                                                                                Cod Interno:
-                                                                                ${producto.codigo_interno ?? '-'}
-                                                                            </div>
-                                                                            <div class="small">
-                                                                                Nro Parte:
-                                                                                ${producto.numero_parte_vehiculo ?? '-'}
-                                                                            </div>
-                                                                            <div class="small">
-                                                                                Vehículo:
-                                                                                ${producto.vehiculos_compatibles ?? '-'}
-                                                                            </div>
-                                                                                <div class="small">
-                                                                                Ubicaciòn:
-                                                                                ${producto.ubicacion ?? '-'}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-4 text-end">
-                                                                            <span class="badge badge-success mb-2">
-                                                                                Stock:
-                                                                                ${producto.stock_actual}
-                                                                            </span>
-                                                                            <h5 class="text-success">
-                                                                                Bs.
-                                                                                ${producto.precio_venta}
-                                                                            </h5>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            `;
+                                                                                                                </b>
+                                                                                                            </div>
+                                                                                                            <div class="small">
+                                                                                                                Cod Interno:
+                                                                                                                ${producto.codigo_interno ?? '-'}
+                                                                                                            </div>
+                                                                                                            <div class="small">
+                                                                                                                Nro Parte:
+                                                                                                                ${producto.numero_parte_vehiculo ?? '-'}
+                                                                                                            </div>
+                                                                                                            <div class="small">
+                                                                                                                Vehículo:
+                                                                                                                ${producto.vehiculos_compatibles ?? '-'}
+                                                                                                            </div>
+                                                                                                                <div class="small">
+                                                                                                                Ubicaciòn:
+                                                                                                                ${producto.ubicacion ?? '-'}
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="col-md-4 text-end">
+                                                                                                            <span class="badge badge-success mb-2">
+                                                                                                                Stock:
+                                                                                                                ${producto.stock_actual}
+                                                                                                            </span>
+                                                                                                            <h5 class="text-success">
+                                                                                                                Bs.
+                                                                                                                ${producto.precio_venta}
+                                                                                                            </h5>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            `;
                         });
                     }
                     $('#resultado_productos').html(html);
@@ -876,6 +834,13 @@
                 .prop('readonly', true);
             $('#subtotal_preview').val('0.00');
             $('#detalle_venta').html('');
+
+            $('#lista_pagos').html('');
+            agregarPago();
+            $('#cambio_visual').text('0.00');
+
+            $('#imagen_cliente').attr('src', '/assets/img/default.jpg');
+            $('#cliente_seleccionado').val('');
         }
 
 
@@ -909,23 +874,25 @@
 
         function agregarPago() {
             let html = `
-                                        <div class="row pago-item mt-2">
-                                            <div class="col-md-5">
-                                                <select class="form-control form-control-sm metodo_pago">
-                                                    <option value="EFECTIVO">EFECTIVO</option>
-                                                    <option value="QR">QR</option>
-                                                    <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                                                </select>
-                                            </div>
+                            <div class="row pago-item mt-2">
 
-                                            <div class="col-md-4">
-                            <input type="number" class="form-control form-control-sm monto_pago" placeholder="Monto">
-                        </div>
+                                <div class="col-md-4">
+                                    <select class="form-control form-control-sm metodo_pago">
+                                        <option value="EFECTIVO">EFECTIVO</option>
+                                        <option value="QR">QR</option>
+                                        <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                                    </select>
+                                </div>
 
-                        <div class="col-md-4">
-                            <input type="number" class="form-control form-control-sm descuento_pago" placeholder="Descuento">
-                        </div>
-                                        </div>`;
+                                <div class="col-md-4">
+                                    <input type="number" class="form-control form-control-sm monto_pago" placeholder="Monto">
+                                </div>
+
+                               <div class="col-md-2">
+                                <input type="number" id="descuento" class="form-control form-control-sm"  placeholder="Descuento">
+                            </div>
+
+                            </div>`;
 
             $('#lista_pagos').append(html);
         }
@@ -933,10 +900,6 @@
         function eliminarPago(btn) {
             $(btn).closest('.pago-item').remove();
         }
-
-
-
-
 
     </script>
     <style>

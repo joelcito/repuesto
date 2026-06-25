@@ -119,16 +119,20 @@
                     <td> {{ number_format($venta->descuento, 2) }} </td>
                 </tr>
                 <tr>
+                    <td colspan="3"><strong>CAMBIO</strong></td>
+                    <td>{{ number_format($cambio, 2) }}</td>
+                </tr>
+                <tr>
                     <td colspan="3"> <strong>TOTAL</strong> </td>
                     <td> {{ number_format($venta->total, 2) }} </td>
                 </tr>
                 <tr>
                     <td colspan="3"> <strong>PAGADO</strong> </td>
-                    <td> {{ number_format($venta->pagos->sum('monto'), 2) }} </td>
+                    <td> {{ number_format($totalPagado, 2) }} </td>
                 </tr>
                 <tr>
                     <td colspan="3"> <strong>SALDO</strong> </td>
-                    <td> {{ number_format($venta->total - $venta->pagos->sum('monto'), 2) }} </td>
+                    <td> {{ number_format($saldo, 2) }} </td>
                 </tr>
             </tfoot>
         </table>
