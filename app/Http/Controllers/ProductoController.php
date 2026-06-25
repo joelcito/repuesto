@@ -40,53 +40,6 @@ class ProductoController extends Controller
 
     }
 
-    // public function ajaxListado(Request $request)
-    // {
-    //     if ($request->ajax()) {
-    //         $productos = Producto::with([
-    //             'categoria',
-    //             'proveedor',
-    //             'sucursal',
-    //             'marca',
-    //             'unidad',
-    //             'imagenes'
-    //         ])
-    //             ->withSum([
-    //                 'movimientos as ingresos' => function ($q) {
-    //                     $q->where('tipo', 'INGRESO');
-    //                 }
-    //             ], 'cantidad')
-    //             ->withSum([
-    //                 'movimientos as salidas' => function ($q) {
-    //                     $q->where('tipo', 'SALIDA');
-    //                 }
-    //             ], 'cantidad')
-    //             ->latest()
-    //             ->get()
-    //             ->map(function ($p) {
-
-    //                 $p->stock_actual =
-    //                     ($p->ingresos ?? 0) - ($p->salidas ?? 0);
-
-    //                 return $p;
-    //             });
-
-
-
-    //         $valores = [
-    //             'listado' => view('producto.ajaxListado')
-    //                 ->with(compact('productos'))
-    //                 ->render()
-    //         ];
-    //         $data = Respuesta::success($valores, "Datos obtenidos correctamente");
-
-    //     } else {
-    //         $data = Respuesta::error(null, "Error al obtener los datos");
-    //     }
-    //     return $data;
-    // }
-
-
     public function ajaxListado(Request $request)
     {
         $query = Producto::with([
@@ -95,9 +48,9 @@ class ProductoController extends Controller
             'imagenes'
         ])
             ->withSum(['movimientos as ingresos' => fn($q) => $q->where('tipo', 'INGRESO')], 'cantidad')
-            ->withSum(['movimientos as salidas' => fn($q) => $q->where('tipo', 'SALIDA')], 'cantidad');
+            ->withSum(['movimientos as salidas' => fn($q) => $q->where('tipo', 'SALIDA')], 'cantidad')
+            ->orderBy('created_at', 'desc');
 
-        // BUSCAR
         if ($request->buscar) {
             $query->where(function ($q) use ($request) {
                 $q->where('nombre', 'like', "%{$request->buscar}%")
@@ -106,18 +59,14 @@ class ProductoController extends Controller
             });
         }
 
-        // CATEGORIA
         $query->when($request->categoria, function ($q) use ($request) {
             $q->where('categoria_id', $request->categoria);
         });
 
-        // MARCA
         $query->when($request->marca, function ($q) use ($request) {
             $q->where('marca_id', $request->marca);
         });
 
-
-        // ESTADO
         if ($request->estado !== null && $request->estado !== '') {
             $query->where('estado', $request->estado);
         }
@@ -128,7 +77,6 @@ class ProductoController extends Controller
             $p->stock_actual = ($p->ingresos ?? 0) - ($p->salidas ?? 0);
         }
 
-        // STOCK
         if ($request->stock == 'con') {
             $productos = $productos->where('stock_actual', '>', 0);
         }
@@ -194,6 +142,7 @@ class ProductoController extends Controller
             $producto->proveedor_id = $request->input('proveedor_id');
             $producto->observaciones = $request->input('observaciones');
             $producto->medidas = $request->input('medidas');
+            $producto->ubicacion = $request->input('ubicacion');
 
             $producto->estado = 1;
             $producto->save();

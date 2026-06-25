@@ -33,6 +33,7 @@ class Producto extends Model
         'imagen',
         'estado',
         'medidas',
+        'ubicacion',
         'usuario_creador_id',
         'usuario_modificador_id',
         'usuario_eliminador_id',

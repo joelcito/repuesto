@@ -91,7 +91,8 @@ class VentasController extends Controller
                 'cliente_id' => 'required',
                 'caja_id' => 'required',
                 'metodo_pago' => 'required',
-                'productos' => 'required|array|min:1'
+                'productos' => 'required|array|min:1',
+                'pagos' => 'required|array|min:1'
             ]);
 
             $usuario = Auth::user();
@@ -119,6 +120,8 @@ class VentasController extends Controller
             $venta->subtotal = 0;
             $venta->descuento = $request->descuento ?? 0;
             $venta->total = 0;
+
+
             $venta->metodo_pago = $request->metodo_pago;
             $venta->descripcion = $request->descripcion;
             $venta->observacion = $request->observacion;
@@ -167,22 +170,38 @@ class VentasController extends Controller
                     ($precio * $item['cantidad'])
                     - ($item['descuento'] ?? 0);
 
-                $detalle = new VentaDetalle();
-                $detalle->venta_id = $venta->id;
-                $detalle->producto_id = $producto->id;
-                $detalle->cantidad = $item['cantidad'];
-                $detalle->cantidad_devuelta = 0;
-                $detalle->precio_compra = $producto->precio_compra;
-                $detalle->precio_original = $producto->precio_venta;
-                $detalle->precio_unitario = $precio;
-                $detalle->descuento = $item['descuento'] ?? 0;
-                $detalle->tipo_precio = $item['tipo_precio'];
-                $detalle->subtotal = $subtotal;
-                $detalle->descripcion = $item['descripcion'] ?? null;
-                $detalle->estado = 'SALIDA';
-                $detalle->usuario_creador_id = $usuario->id;
-                $detalle->save();
+                // $detalle = new VentaDetalle();
+                // $detalle->venta_id = $venta->id;
+                // $detalle->producto_id = $producto->id;
+                // $detalle->cantidad = $item['cantidad'];
+                // $detalle->cantidad_devuelta = 0;
+                // $detalle->precio_compra = $producto->precio_compra;
+                // $detalle->precio_original = $producto->precio_venta;
+                // $detalle->precio_unitario = $precio;
+                // $detalle->descuento = $item['descuento'] ?? 0;
+                // $detalle->tipo_precio = $item['tipo_precio'];
+                // $detalle->subtotal = $subtotal;
+                // $detalle->descripcion = $item['descripcion'] ?? null;
+                // $detalle->estado = 'SALIDA';
+                // $detalle->usuario_creador_id = $usuario->id;
+                // $detalle->save();
 
+
+                VentaDetalle::create([
+                    'venta_id' => $venta->id,
+                    'producto_id' => $producto->id,
+                    'cantidad' => $item['cantidad'],
+                    'cantidad_devuelta' => 0,
+                    'precio_compra' => $producto->precio_compra,
+                    'precio_original' => $producto->precio_venta,
+                    'precio_unitario' => $precio,
+                    'descuento' => $item['descuento'] ?? 0,
+                    'tipo_precio' => $item['tipo_precio'],
+                    'subtotal' => $subtotal,
+                    'descripcion' => $item['descripcion'] ?? null,
+                    'estado' => 'SALIDA',
+                    'usuario_creador_id' => $usuario->id
+                ]);
                 // SOLO MOVIMIENTO
                 Movimiento::create([
                     'producto_id' => $producto->id,
@@ -207,15 +226,24 @@ class VentasController extends Controller
             $venta->subtotal = $subtotalGeneral;
             $venta->total = $total;
 
-            $montoPagado = $request->monto_pagado ?? $total;
+            // $montoPagado = $request->monto_pagado ?? $total;
+
+            $pagos = $request->pagos ?? [];
+
+            if (count($pagos) == 0) {
+                throw new \Exception("Debe registrar al menos un pago");
+            }
+
+            $totalPagado = collect($pagos)->sum('monto');
+
 
             $cambio = 0;
 
-            if ($montoPagado > $total) {
-                $cambio = $montoPagado - $total;
+            if ($totalPagado > $total) {
+                $cambio = $totalPagado - $total;
             }
 
-            $montoReal = $montoPagado - $cambio;
+            $montoReal = $totalPagado - $cambio;
 
             if ($montoReal >= $total) {
                 $venta->estado_pago = 'PAGADO';
@@ -227,18 +255,22 @@ class VentasController extends Controller
 
             $venta->save();
 
-            if ($montoReal > 0) {
+            foreach ($pagos as $pago) {
+
+                if (!isset($pago['monto']) || $pago['monto'] <= 0) {
+                    continue;
+                }
 
                 Pago::create([
                     'usuario_creador_id' => $usuario->id,
                     'venta_id' => $venta->id,
                     'caja_id' => $caja->id,
                     'sucursal_id' => $caja->sucursal_id,
-                    'monto' => $montoReal,
-                    'cambio' => $cambio,
+                    'monto' => $pago['monto'],
+                    'cambio' => 0,
                     'fecha' => now(),
                     'descripcion' => 'PAGO VENTA #' . $venta->numero_factura,
-                    'tipo_pago' => $venta->metodo_pago,
+                    'tipo_pago' => $pago['metodo'],
                     'estado' => 'INGRESO'
                 ]);
 
@@ -254,9 +286,9 @@ class VentasController extends Controller
                     'usuario_creador_id' => $usuario->id
                 ]);
 
-                $caja->total_ingresos += $montoReal;
-                $caja->save();
+                $caja->total_ingresos += $pago['monto'];
             }
+            $caja->save();
 
             DB::commit();
 

@@ -155,6 +155,12 @@
                                     <label class="form-label fw-bold">Medidas</label>
                                     <input type="text" class="form-control form-control-sm" id="medidas" name="medidas">
                                 </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Ubicación</label>
+                                    <input type="text" class="form-control form-control-sm" id="ubicacion"
+                                        name="ubicacion">
+                                </div>
                             </div>
                         </div>
 
@@ -601,6 +607,8 @@
             formData.append('proveedor_id', $('#proveedor_id').val());
             formData.append('observaciones', $('#observaciones').val());
             formData.append('medidas', $('#medidas').val());
+            formData.append('ubicacion', $('#ubicacion').val());
+
             listaImagenes.forEach(img => {
                 if (img.file instanceof File) {
                     formData.append('imagenes[]', img.file);
@@ -652,6 +660,7 @@
             $('#precio_mayor').val(producto.precio_mayor);
             $('#observaciones').val(producto.observaciones);
             $('#medidas').val(producto.medidas);
+            $('#ubicacion').val(producto.ubicacion);
             indiceActual = 0;
             listaImagenes = [];
             if (producto.imagenes && producto.imagenes.length > 0) {
@@ -769,10 +778,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                                                                <div class="invalid-feedback">
-                                                                                                                    ${mensaje}
-                                                                                                                </div>
-                                                                                                            `);
+                                                                                                                    <div class="invalid-feedback">
+                                                                                                                        ${mensaje}
+                                                                                                                    </div>
+                                                                                                                `);
                             }
                         } else {
                             Swal.fire({
@@ -863,10 +872,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                                                                <div class="invalid-feedback">
-                                                                                                                    ${mensaje}
-                                                                                                                </div>
-                                                                                                            `);
+                                                                                                                    <div class="invalid-feedback">
+                                                                                                                        ${mensaje}
+                                                                                                                    </div>
+                                                                                                                `);
                             }
                         } else {
                             Swal.fire({
@@ -986,27 +995,27 @@
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                                                                                        <div class="position-relative d-inline-block">
+                                                                                            <div class="position-relative d-inline-block">
 
-                                                                                            <img
-                                                                                                src="${img.url}"
-                                                                                                width="80"
-                                                                                                height="80"
-                                                                                                class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                                                                                style="cursor:pointer;object-fit:cover"
-                                                                                                onclick="mostrarImagen(${index})">
+                                                                                                <img
+                                                                                                    src="${img.url}"
+                                                                                                    width="80"
+                                                                                                    height="80"
+                                                                                                    class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                                                                                    style="cursor:pointer;object-fit:cover"
+                                                                                                    onclick="mostrarImagen(${index})">
 
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                class="btn btn-danger btn-sm position-absolute"
-                                                                                                style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                                                                                onclick="eliminarImagen('${img.id}')">
+                                                                                                <button
+                                                                                                    type="button"
+                                                                                                    class="btn btn-danger btn-sm position-absolute"
+                                                                                                    style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                                                                                    onclick="eliminarImagen('${img.id}')">
 
-                                                                                                ×   
-                                                                                            </button>
+                                                                                                    ×   
+                                                                                                </button>
 
-                                                                                        </div>
-                                                                                    `);
+                                                                                            </div>
+                                                                                        `);
             });
 
             if (listaImagenes.length > 0) {
