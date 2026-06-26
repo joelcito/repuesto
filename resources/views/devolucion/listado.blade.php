@@ -12,7 +12,6 @@
 @endsection
 @section('content')
 
-<!--begin::Modal - Add task-->
 <div class="modal fade" id="modalDevolucion" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content border-0 shadow-lg">
@@ -21,13 +20,13 @@
                     type="button" class="btn-close" data-bs-dismiss="modal"> </button>
             </div>
             <div class="modal-body">
-                <form id="formularioDevolucion"> <input type="hidden" name="id" id="id"> <!-- DATOS GENERALES -->
+                <form id="formularioDevolucion"> <input type="hidden" name="id" id="id">
                     <div class="card shadow-sm mb-4">
                         <div class="card-header">
                             <h3 class="card-title"> Datos Generales </h3>
                         </div>
                         <div class="card-body">
-                            <div class="row"> <!-- VENTA -->
+                            <div class="row">
                                 <div class="col-md-4"> <label class="fw-semibold fs-6 mb-2"> Venta </label> <select
                                         class="form-select form-select-sm" name="venta_id" id="venta_id">
                                         <option value=""> Seleccione </option> @foreach($ventas as $venta) <option
@@ -35,23 +34,23 @@
                                             {{ $venta->cliente->nombres ?? 'S/N' }} | Bs.
                                             {{ number_format($venta->total, 2) }}
                                         </option> @endforeach
-                                    </select> </div> <!-- TIPO -->
+                                    </select> </div>
                                 <div class="col-md-4"> <label class="fw-semibold fs-6 mb-2"> Tipo </label> <select
                                         class="form-select form-select-sm" name="tipo" id="tipo">
                                         <option value="DINERO"> DEVOLUCIÓN DINERO </option>
                                         <option value="PRODUCTO"> DEVOLUCIÓN PRODUCTO </option>
-                                    </select> </div> <!-- MONTO -->
+                                    </select> </div>
                                 <div class="col-md-4"> <label class="fw-semibold fs-6 mb-2"> Monto </label> <input
                                         type="number" step="0.01" class="form-control form-control-sm" name="monto"
                                         id="monto" readonly value="0"> </div>
-                            </div> <!-- MOTIVO -->
+                            </div>
                             <div class="row mt-4">
                                 <div class="col-md-12"> <label class="fw-semibold fs-6 mb-2"> Motivo </label> <textarea
                                         class="form-control form-control-sm" rows="3" name="motivo"
                                         id="motivo"></textarea> </div>
                             </div>
                         </div>
-                    </div> <!-- PRODUCTOS -->
+                    </div>
                     <div class="card shadow-sm">
                         <div class="card-header">
                             <h3 class="card-title"> Productos de la Venta </h3>
@@ -85,7 +84,7 @@
                     Guardar Devolución </button> </div>
         </div>
     </div>
-</div> <!--end::Modal - Add task-->
+</div>
 <div class="d-flex flex-column flex-column-fluid">
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxlg">
@@ -112,7 +111,7 @@
     <script>
         $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
         $(document).ready(function () { ajaxListado(); });
-        // ============================ // LISTADO // ============================ 
+
         function ajaxListado() {
             $.ajax({
                 url: "{{ route('devolucion.ajaxListado') }}",
@@ -124,14 +123,14 @@
                 }
             });
         }
-        // ============================ // MODAL NUEVO // ============================ 
+
         function modalNuevaDevolucion() {
             $('#formularioDevolucion')[0].reset();
             $('#monto').val(0);
             $('#detalle_devolucion').html(` <tr> <td colspan="5" class="text-center text-muted py-5"> Seleccione una venta </td> </tr> `);
             $('#modalDevolucion').modal('show');
         }
-        // ============================ // OBTENER DETALLE VENTA // ============================ 
+
         $('#venta_id').change(function () {
             let venta_id = $(this).val(); if (venta_id == '') { return; }
             $.ajax({
@@ -140,17 +139,17 @@
                     let html = ''; resultado.data.forEach(item => {
                         let devuelto = item.cantidad_devuelta ?? 0;
                         let disponible = item.cantidad - devuelto; html += ` <tr> <td> 
-                                    ${item.producto.nombre} </td> <td class="text-center"> ${item.cantidad} 
-                                    </td> <td class="text-center text-danger fw-bold"> ${devuelto} </td> <td class="text-center"> Bs. 
-                                    ${parseFloat(item.precio_unitario).toFixed(2)} </td> <td> <input type="number" min="0" max="${disponible}" 
-                                    value="0" class="form-control form-control-sm cantidad_devolucion" data-precio="${item.precio_unitario}" 
-                                    data-producto="${item.producto_id}"> <small class="text-danger"> Disponible: ${disponible} </small> </td> </tr> `;
+                                        ${item.producto.nombre} </td> <td class="text-center"> ${item.cantidad} 
+                                        </td> <td class="text-center text-danger fw-bold"> ${devuelto} </td> <td class="text-center"> Bs. 
+                                        ${parseFloat(item.precio_unitario).toFixed(2)} </td> <td> <input type="number" min="0" max="${disponible}" 
+                                        value="0" class="form-control form-control-sm cantidad_devolucion" data-precio="${item.precio_unitario}" 
+                                        data-producto="${item.producto_id}"> <small class="text-danger"> Disponible: ${disponible} </small> </td> </tr> `;
                     });
                     $('#detalle_devolucion').html(html); calcularMonto();
                 }
             });
         });
-        // ============================ // CALCULAR MONTO // ============================
+
         function calcularMonto() {
             let total = 0;
             $('.cantidad_devolucion').each(function () {
@@ -159,9 +158,9 @@
             });
             $('#monto').val(total.toFixed(2));
         }
-        // ============================ // ACTUALIZAR MONTO // ============================ 
+
         $(document).on('keyup change', '.cantidad_devolucion', function () { calcularMonto(); });
-        // ============================ // GUARDAR DEVOLUCION // ============================ 
+
         function guardarDevolucion() {
             let productos = []; $('.cantidad_devolucion').each(function () {
                 let cantidad = parseFloat($(this).val()) || 0; if (cantidad > 0) {
@@ -205,22 +204,16 @@
                         data: {
                             id: id
                         },
-
                         success: function (resultado) {
-
                             if (resultado.estado) {
-
                                 Swal.fire({
                                     icon: 'success',
                                     title: resultado.mensaje,
                                     timer: 2000,
                                     showConfirmButton: false
                                 });
-
                                 ajaxListado();
-
                             } else {
-
                                 Swal.fire({
                                     icon: 'error',
                                     title: resultado.mensaje
@@ -229,13 +222,11 @@
                         },
 
                         error: function (xhr) {
-
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
                                 text: 'Ocurrió un error al eliminar'
                             });
-
                             console.log(xhr.responseText);
                         }
                     });

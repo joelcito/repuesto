@@ -21,15 +21,11 @@ class HomeController extends Controller
         // $this->middleware('auth');
     }
 
-    /**
-     * Show dashboard
-     */
+
     public function index()
     {
 
-        // =====================================================
-        // CARDS
-        // =====================================================
+
 
         $totalProductos = Producto::count();
 
@@ -48,17 +44,13 @@ class HomeController extends Controller
             'stock_minimo'
         )->count();
 
-        // =====================================================
-        // UTILIDADES
-        // =====================================================
+
 
         $utilidades = Producto::sum(
             DB::raw('precio_venta - precio_compra')
         );
 
-        // =====================================================
-        // STOCK BAJO
-        // =====================================================
+
 
         $stockBajo = Producto::whereColumn(
             'stock_actual',
@@ -68,25 +60,19 @@ class HomeController extends Controller
             ->take(10)
             ->get();
 
-        // =====================================================
-        // ÚLTIMOS PRODUCTOS
-        // =====================================================
+
 
         $ultimosProductos = Producto::latest()
             ->take(10)
             ->get();
 
-        // =====================================================
-        // ÚLTIMAS VENTAS
-        // =====================================================
+
 
         $ultimasVentas = Venta::latest()
             ->take(10)
             ->get();
 
-        // =====================================================
-        // VENTAS MENSUALES
-        // =====================================================
+
 
         $ventasMensuales = Venta::selectRaw('
                 MONTH(created_at) as mes_numero,
@@ -118,9 +104,7 @@ class HomeController extends Controller
                 ];
             });
 
-        // =====================================================
-        // RETORNO
-        // =====================================================
+
 
         return view('home.inicio', compact(
             'totalProductos',

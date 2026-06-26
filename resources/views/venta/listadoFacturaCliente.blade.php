@@ -12,13 +12,9 @@
 @endsection
 @section('content')
 
-<!--begin::Content wrapper-->
 <div class="d-flex flex-column flex-column-fluid">
-    <!--begin::Content-->
     <div id="kt_app_content" class="app-content flex-column-fluid">
-        <!--begin::Content container-->
         <div id="kt_app_content_container" class="app-container container-xxlg">
-            <!--begin::Card-->
             <div class="card">
                 <div class="card-header flex-wrap bg-light-info py-4">
                     <h3
@@ -55,20 +51,14 @@
                         </div>
                     </form>
                     <div id="tabla_facturas">
-
                     </div>
                 </div>
-                <!--end::Card body-->
             </div>
-            <!--end::Card-->
         </div>
-        <!--end::Content container-->
     </div>
-    <!--end::Content-->
-</div>
-<!--end::Content wrapper-->
-@stop()
 
+</div>
+@stop()
 @section('js')
     <script src="{{ asset('assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
     <script>
@@ -79,9 +69,7 @@
         })
 
         $(document).ready(function () {
-
             ajaxListado();
-
         });
 
         function ajaxListado() {
@@ -89,9 +77,9 @@
             Swal.fire({
                 title: 'Generando Listado...',
                 text: 'Por favor espera mientras generamos el listado.',
-                allowOutsideClick: false, // Evitar que se cierre al hacer clic fuera
+                allowOutsideClick: false,
                 didOpen: () => {
-                    Swal.showLoading(); // Mostrar el spinner de carga
+                    Swal.showLoading();
                 }
             });
 
@@ -124,10 +112,10 @@
 
         function anularFactura() {
             if ($("#formularioAnulaciion")[0].checkValidity()) {
-                // Obtén el botón y el icono de carga
+
                 var boton = $("#boton_anular_factura");
                 var iconoCarga = boton.find("i");
-                // Deshabilita el botón y muestra el icono de carga
+
                 boton.attr("disabled", true);
                 iconoCarga.show();
                 let datos = $('#formularioAnulaciion').serializeArray()
@@ -150,12 +138,10 @@
                                 icon: 'error',
                                 title: data.mensaje.descripcion.codigoDescripcion,
                                 text: JSON.stringify(data.mensaje.descripcion.mensajesList),
-                                // timer:1500
+
                             })
                             $('#modalAnular').modal('hide')
                         }
-
-                        // Habilita el botón y oculta el icono de carga después de completar
                         boton.attr("disabled", false);
                         iconoCarga.hide();
                     }
@@ -228,9 +214,7 @@
         function mandarFacturasPaquete() {
 
             $('#boton_enviar_paquete').prop('disabled', true);
-
             let arraye = $('#formularioEnvioPaquete').serializeArray();
-            // Agregar un nuevo elemento al array
             arraye.push({
                 name: 'evento_significativo_id',
                 value: $('#evento_significativo_contingencia_select').val()
@@ -247,8 +231,8 @@
                         Swal.fire({
                             icon: 'success',
                             title: JSON.stringify(data.mensaje),
-                            showConfirmButton: false, // No mostrar botón de confirmación
-                            // timer            : 2000,        // 5 segundos
+                            showConfirmButton: false,
+
                             timerProgressBar: true
                         });
                         $('#boton_enviar_paquete').prop('disabled', false);
@@ -256,8 +240,8 @@
                         Swal.fire({
                             icon: 'error',
                             title: JSON.stringify(data.data),
-                            showConfirmButton: false, // No mostrar botón de confirmación
-                            // timer            : 2000,        // 5 segundos
+                            showConfirmButton: false,
+
                             timerProgressBar: true
                         });
                     }
@@ -293,8 +277,7 @@
                                     icon: 'success',
                                     title: "EXITO",
                                     text: JSON.stringify(data.msg),
-                                    showConfirmButton: false, // No mostrar botón de confirmación
-                                    // timer            : 2000,        // 5 segundos
+                                    showConfirmButton: false,
                                     timerProgressBar: true
                                 });
                             } else {
@@ -302,8 +285,7 @@
                                     icon: 'error',
                                     text: JSON.stringify(data.msg),
                                     title: "ERROR",
-                                    showConfirmButton: false, // No mostrar botón de confirmación
-                                    // timer            : 2000,        // 5 segundos
+                                    showConfirmButton: false,
                                     timerProgressBar: true
                                 });
                             }
@@ -316,14 +298,12 @@
         function reportePDF() {
 
             let datos = $('#formulario-busqueda-factura').serializeArray();
-
-            // Mostrar SweetAlert2 antes de enviar la solicitud
             Swal.fire({
                 title: 'Generando PDF...',
                 text: 'Por favor espera mientras generamos el archivo.',
-                allowOutsideClick: false, // Evitar que se cierre al hacer clic fuera
+                allowOutsideClick: false,
                 didOpen: () => {
-                    Swal.showLoading(); // Mostrar el spinner de carga
+                    Swal.showLoading();
                 }
             });
 
@@ -332,23 +312,21 @@
                 method: "POST",
                 data: datos,
                 xhrFields: {
-                    responseType: 'blob' // Esto le dice a jQuery que espere un archivo binario (PDF)
+                    responseType: 'blob'
                 },
                 success: function (data, status, xhr) {
-                    // Ocultar SweetAlert2 cuando la solicitud sea exitosa
-                    Swal.close();
 
-                    // Crear un enlace temporal para iniciar la descarga
+                    Swal.close();
                     var blob = new Blob([data], {
                         type: 'application/pdf'
                     });
                     var link = document.createElement('a');
                     link.href = window.URL.createObjectURL(blob);
-                    link.download = "reporte_facturas.pdf"; // Nombre del archivo
+                    link.download = "reporte_facturas.pdf";
                     link.click();
                 },
                 error: function (xhr, status, error) {
-                    // Mostrar error si algo falla
+
                     Swal.fire({
                         title: 'Error',
                         text: 'No se pudo generar el PDF. Inténtalo de nuevo.',
@@ -366,9 +344,9 @@
             Swal.fire({
                 title: 'Generando Excel...',
                 text: 'Por favor espera mientras generamos el archivo.',
-                allowOutsideClick: false, // Evitar que se cierre al hacer clic fuera
+                allowOutsideClick: false,
                 didOpen: () => {
-                    Swal.showLoading(); // Mostrar el spinner de carga
+                    Swal.showLoading();
                 }
             });
 
@@ -377,25 +355,25 @@
                 method: "POST",
                 data: datos,
                 xhrFields: {
-                    responseType: 'blob' // Esto le dice a jQuery que espere un archivo binario (PDF)
+                    responseType: 'blob'
                 },
                 success: function (data, status, xhr) {
-                    // // Ocultar SweetAlert2 cuando la solicitud sea exitosa
+
                     Swal.close();
 
-                    // Assume `data` contains the binary response from the server
+
                     var blob = new Blob([data], {
                         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                     });
                     var link = document.createElement('a');
                     link.href = window.URL.createObjectURL(blob);
-                    link.download = 'reporte_facturas.xlsx'; // Nombre del archivo Excel
-                    document.body.appendChild(link); // Required for Firefox
+                    link.download = 'reporte_facturas.xlsx';
+                    document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
                 },
                 error: function (xhr, status, error) {
-                    // Mostrar error si algo falla
+
                     Swal.fire({
                         title: 'Error',
                         text: 'No se pudo generar el PDF. Inténtalo de nuevo.',
@@ -432,8 +410,8 @@
                                     icon: 'success',
                                     title: "EXITO",
                                     text: JSON.stringify(data.msg),
-                                    showConfirmButton: false, // No mostrar botón de confirmación
-                                    // timer            : 2000,        // 5 segundos
+                                    showConfirmButton: false,
+
                                     timerProgressBar: true
                                 });
                             } else {
@@ -441,8 +419,8 @@
                                     icon: 'error',
                                     text: JSON.stringify(data.msg),
                                     title: "ERROR",
-                                    showConfirmButton: false, // No mostrar botón de confirmación
-                                    // timer            : 2000,        // 5 segundos
+                                    showConfirmButton: false,
+
                                     timerProgressBar: true
                                 });
                             }
@@ -452,7 +430,6 @@
             });
         }
 
-        //FORMULARIO DEUDAS
         function limpiarErorres() {
             $('.error-message').html('');
             $('.is-invalid').removeClass('is-invalid');
@@ -461,19 +438,18 @@
         function cambiaEstadoVenta(factura, estado) {
 
             let estados = [];
-
             if (estado == 'RECEPCIONADO') {
                 estados = {
                     'TRABAJANDO': 'TRABAJANDO',
                     'TERMINADO': 'TERMINADO'
                 }
             } else if (estado == 'TRABAJANDO') {
-                // } else if (estado == 'TRABAJANDO' || estado == 'TERMINADO') {
+
                 estados = {
                     'TERMINADO': 'TERMINADO'
                 }
             } else if (estado == 'TERMINADO') {
-                // } else if (estado == 'TRABAJANDO' || estado == 'TERMINADO') {
+
                 estados = {
                     'ENTREGADO': 'ENTREGADO'
                 }
@@ -516,7 +492,7 @@
                                     title: data.mensaje.descripcion.codigoDescripcion,
                                     text: JSON.stringify(data.mensaje.descripcion
                                         .mensajesList),
-                                    // timer:1500
+
                                 })
 
                             }
@@ -534,36 +510,36 @@
 
         function imprimeREcibo(recibo) {
             href = "{{ url('factura/recibo') }}/" + recibo;
-            // window.location.href = href;
+
             window.open(href, '_blank');
         }
 
         {
             {
-                --
-                    function ajaxFacturaVenta(factura) {
-                        $('#datosFacturacion').html('');
-                        datos = {
-                            factura_id: factura
-                        }
-                        $.ajax({
-                            url: "{{ route('factura.ajaxFacturaVenta') }}",
-                            method: "POST",
-                            data: datos,
-                            success: function (resultado) {
-                                if (resultado.estado) {
-                                    $('#datosFacturacion').html(resultado.data.formularioFacturacion);
 
-                                    $('#datosFacturacion').find('[data-control="select2"]').select2({
-                                        dropdownParent: $('#modalFacturacion')
-                                    });
-
-
-                                    $('#modalFacturacion').modal('show');
-                                }
-                            }
-                        });
+                function ajaxFacturaVenta(factura) {
+                    $('#datosFacturacion').html('');
+                    datos = {
+                        factura_id: factura
                     }
+                    $.ajax({
+                        url: "{{ route('factura.ajaxFacturaVenta') }}",
+                        method: "POST",
+                        data: datos,
+                        success: function (resultado) {
+                            if (resultado.estado) {
+                                $('#datosFacturacion').html(resultado.data.formularioFacturacion);
+
+                                $('#datosFacturacion').find('[data-control="select2"]').select2({
+                                    dropdownParent: $('#modalFacturacion')
+                                });
+
+
+                                $('#modalFacturacion').modal('show');
+                            }
+                        }
+                    });
+                }
 
                 function cambiarUnidaMedida(detalle, select) {
                     datos = {
@@ -590,7 +566,7 @@
 
                 function cambiarProductoServicio(detalle, select) {
                     let option = select.options[select.selectedIndex];
-                    // Recuperamos los datos
+
                     let idProducto = option.value;
                     let codigoProducto = option.dataset.codigo_producto;
                     let codigoActividad = option.dataset.codigo_actividad;
@@ -640,7 +616,7 @@
                                     if (data.numero != null && data.numero != '') {
                                         window.open("{{ url('factura/generaPdfFacturaNewCv') }}/" + data.numero,
                                             "_blank", "width=800,height=600");
-                                        // window.location.reload();
+
                                         $('#modalFacturacion').modal('hide')
                                         ajaxListado();
                                     } else {
@@ -652,7 +628,7 @@
                                         title: 'Error!',
                                         text: data.text,
                                     })
-                                    // Habilita el botón y oculta el icono de carga después de completar
+
                                     boton.attr("disabled", false);
                                     iconoCarga.hide();
                                 } else if (data.estado === "OFFLINE") {
@@ -669,7 +645,7 @@
                                         title: data.text,
                                         text: 'EMISION DE FACTURA RECHAZADO',
                                     })
-                                    // Habilita el botón y oculta el icono de carga después de completar
+
                                     boton.attr("disabled", false);
                                     iconoCarga.hide();
                                 } else {
@@ -678,7 +654,7 @@
                                         title: data.text + " " + data.data,
                                         text: 'LA FACTURA FUE RECHAZADA',
                                     })
-                                    // Habilita el botón y oculta el icono de carga después de completar
+
                                     boton.attr("disabled", false);
                                     iconoCarga.hide();
                                 }
@@ -770,7 +746,7 @@
 
         function verificarExcepcion(tipo_documento, emision, uso_cafse) {
             if (emision === "offline") {
-                if (tipo_documento == "5") { //VERIFICAMOS QUE SEA NIT
+                if (tipo_documento == "5") {
                     $('#execpcion').prop('checked', true);
                 } else {
                     $('#execpcion').prop('checked', false);
@@ -783,7 +759,7 @@
                     data: {},
                     success: function (data) {
                         if (data.estado) {
-                            // REMPLAZAR LOS CUFDS VIGENTES
+
                             $('#select_cufd_vigentes').html(data.data.select)
                             $('#bloque_cufd_offline').show('toggle');
                         } else {
@@ -823,8 +799,8 @@
                                     icon: 'success',
                                     title: "EXITO",
                                     text: JSON.stringify(data.msg),
-                                    showConfirmButton: false, // No mostrar botón de confirmación
-                                    // timer            : 2000,        // 5 segundos
+                                    showConfirmButton: false,
+
                                     timerProgressBar: true
                                 });
                             } else {
@@ -832,8 +808,8 @@
                                     icon: 'error',
                                     text: JSON.stringify(data.msg),
                                     title: "ERROR",
-                                    showConfirmButton: false, // No mostrar botón de confirmación
-                                    // timer            : 2000,        // 5 segundos
+                                    showConfirmButton: false,
+
                                     timerProgressBar: true
                                 });
                             }

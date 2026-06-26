@@ -16,12 +16,8 @@ class RolController extends Controller
 
     public function ajaxListado(Request $request)
     {
-
         if ($request->ajax()) {
-
-            //SACAMOS EL LISTADO
             $roles = Rol::all();
-
             $valores = [
                 'listado' => view('rol.ajaxListado')->with(compact('roles'))->render()
             ];
@@ -36,53 +32,38 @@ class RolController extends Controller
 
     public function guardarRol(Request $request)
     {
-
         if ($request->ajax()) {
-
-            //AL INICIO DECLARACION DE VARIABLES
             $rol_id = $request->input('id');
             $nombre = $request->input('nombre');
             $usuario = Auth::user();
 
             if ($rol_id == '0') {
-                //LA CREACION DE UN NUEVO ROL
                 $rol = new Rol();
                 $rol->usuario_creador_id = $usuario->id;
 
             } else {
-                //LA EDICION DE UN NUEVO ROL
+
                 $rol = Rol::find($rol_id);
                 $rol->usuario_modificador_id = $usuario->id;
             }
-
             $rol->nombre = $nombre;
             $rol->save();
-
             $data = Respuesta::success(null, "Datos Obtenidos correctamente");
-
         } else {
             $data = Respuesta::error(null, "Error al obtener los datos");
         }
-
         return $data;
-
     }
 
     public function eliminarRol(Request $request)
     {
 
         if ($request->ajax()) {
-
-            //INICIALIZAMOS LAS VARIABLES
             $rol_id = $request->input('rol');
             $usuario = Auth::user();
-
-            //BUSCAMOS AL ROL
             $rol = Rol::find($rol_id);
             $rol->usuario_eliminador_id = $usuario->id;
             $rol->save();
-
-            //AHORA ELIMINAMOS
             Rol::destroy($rol_id);
 
             $data = Respuesta::success(null, "Se elimino con exito");

@@ -235,7 +235,7 @@
                                                         </div>
 
                                                         <div class="tab-pane fade" id="tab_total_{{ $keyPri }}">
-                                                           dfdgfdgfdg
+                                                            dfdgfdgfdg
                                                         </div>
                                                         <div class="tab-pane fade show active"
                                                             id="kt_tab_pane_7_ots_{{ $keyPri }}" role="tabpanel">
@@ -593,7 +593,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
         <script>
             $.ajaxSetup({
-                // definimos cabecera donde estarra el token y poder hacer nuestras operaciones de put,post...
+
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }

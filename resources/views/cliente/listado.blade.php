@@ -12,7 +12,7 @@
 @endsection
 @section('content')
 
-<!--begin::Modal - Add task-->
+
 <div class="modal fade" id="modalCliente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -91,15 +91,9 @@
                     </div>
                 </div>
             </div>
-            <!--end::Modal body-->
         </div>
     </div>
-    <!--end::Modal dialog-->
 </div>
-<!--end::Modal - Add task-->
-
-
-
 
 <div class="modal fade" id="modalListadoVehiculos" tabindex="-1">
     <div class="modal-dialog modal-xl">
@@ -159,7 +153,6 @@
                 </div>
 
                 <div class="card-body py-4" id="table_listado">
-                    <!-- El listado se carga por AJAX -->
                 </div>
             </div>
         </div>
@@ -175,7 +168,7 @@
     <script src="{{ asset('assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
     <script>
         $.ajaxSetup({
-            // definimos cabecera donde estarra el token y poder hacer nuestras operaciones de put,post...
+
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
@@ -440,6 +433,5 @@
                 }
             });
         }
-
     </script>
 @endsection

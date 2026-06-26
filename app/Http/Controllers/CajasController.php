@@ -13,7 +13,6 @@ class CajasController extends Controller
     {
         return view('caja.listado');
     }
-
     public function ajaxListado()
     {
         $cajas = Caja::with([

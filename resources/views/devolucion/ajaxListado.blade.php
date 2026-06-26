@@ -1,6 +1,5 @@
 <div style="overflow-x: auto;">
 
-    <!--begin::Table-->
     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_devolucion">
         <thead>
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
@@ -9,6 +8,7 @@
                 <th>Tipo</th>
                 <th>Total</th>
                 <th>Motivo</th>
+                <th>Estado</th>
                 <th>Fecha</th>
                 <th>Actions</th>
 
@@ -24,6 +24,7 @@
                     <td> Bs. {{ number_format($devolucion->total, 2) }} </td>
                     <td> {{ $devolucion->motivo }} </td>
                     <td> {{ $devolucion->created_at }} </td>
+                    <td> {{ $devolucion->estado }} </td>
                     <td> <a href="{{ route('devolucion.detalledevolucion', $devolucion->id) }}" target="_blank"
                             class="btn btn-info btn-sm btn-icon" title="Ver detalle">
                             <i class="fa fa-eye"></i>
@@ -41,14 +42,13 @@
             @endforelse
         </tbody>
     </table>
-    <!--end::Table-->
 </div>
 
 <script>
     $(document).ready(function () {
         $('#kt_table_devolucion').DataTable({
-            lengthMenu: [10, 25, 50, 100], // Opciones de longitud de página
-            dom: '<"dt-head row"<"col-md-6"l><"col-md-6"f>><"clear">t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>', // Use dom for basic layout
+            lengthMenu: [10, 25, 50, 100],
+            dom: '<"dt-head row"<"col-md-6"l><"col-md-6"f>><"clear">t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>',
             language: {
                 paginate: {
                     first: 'Primero',
@@ -62,10 +62,7 @@
                 emptyTable: 'No hay datos disponibles'
             },
             order: [],
-            //  searching: true,
             responsive: true
         });
-
-
     });
 </script>

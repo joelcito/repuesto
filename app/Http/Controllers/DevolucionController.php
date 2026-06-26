@@ -362,15 +362,12 @@ class DevolucionController extends Controller
     public function detalledevolucion($devolucion_id)
     {
         $usuario = Auth::user();
-
         $devolucion = Devolucion::with([
             'venta.cliente',
             'venta.detalles.producto',
             'caja'
         ])->find($devolucion_id);
-
         if (!$devolucion) {
-
             return redirect()
                 ->back()
                 ->with(

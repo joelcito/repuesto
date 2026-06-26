@@ -23,7 +23,6 @@ use Illuminate\Validation\Rule;
 
 class IncorporacionController extends Controller
 {
-
     public function listado()
     {
         $productos = Producto::where('estado', 1)
@@ -125,8 +124,6 @@ class IncorporacionController extends Controller
             ]);
         }
     }
-
-
 
     public function obtener(Request $request)
     {

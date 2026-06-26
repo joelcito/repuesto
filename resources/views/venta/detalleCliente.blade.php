@@ -278,8 +278,6 @@
             $('#sub_total').val(cantidad * precio);
         }
 
-
-
         function cambiarDato(tipo, ordenTrabajo, dato) {
 
             $.ajax({

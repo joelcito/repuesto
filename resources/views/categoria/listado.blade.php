@@ -12,7 +12,6 @@
 @endsection
 @section('content')
 
-<!--begin::Modal - Add task-->
 <div class="modal fade" id="modalRol" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -76,16 +75,9 @@
                     </div>
                 </div>
             </div>
-            <!--end::Modal body-->
         </div>
     </div>
-    <!--end::Modal dialog-->
 </div>
-<!--end::Modal - Add task-->
-
-<!--begin::Content wrapper-->
-
-
 
 <div class="d-flex flex-column flex-column-fluid">
     <div id="kt_app_content" class="app-content flex-column-fluid">
@@ -101,7 +93,7 @@
                 </div>
 
                 <div class="card-body py-4" id="table_listado">
-                    <!-- El listado se carga por AJAX -->
+
                 </div>
             </div>
         </div>
@@ -113,7 +105,7 @@
     <script src="{{ asset('assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
     <script>
         $.ajaxSetup({
-            // definimos cabecera donde estarra el token y poder hacer nuestras operaciones de put,post...
+
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
@@ -169,7 +161,7 @@
                         Swal.fire({
                             title: "EL REGISTRO FUE EXITOSO.",
                             icon: "success",
-                            timer: 3000, // Se cierra en 3 segundos
+                            timer: 3000,
                             showConfirmButton: false
                         });
                         ajaxListado();
@@ -204,13 +196,11 @@
 
         function editarRol(rol) {
             limpiarErorres();
-
             $('#id').val(rol.id)
             $('#nombre').val(rol.nombre)
             $('#descripcion').val(rol.descripcion)
             $('#tipo').val(rol.tipo)
             $('#parent_id').val(rol.parent_id)
-
             $('#modalRol').modal('show')
         }
 
@@ -239,7 +229,6 @@
                                 icon: 'error',
                                 title: 'Error',
                                 text: 'Ocurrió un error inesperado.',
-
                             });
                         }
                     });
@@ -251,7 +240,6 @@
                     )
                 }
             });
-
         }
 
     </script>

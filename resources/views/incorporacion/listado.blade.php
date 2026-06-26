@@ -12,7 +12,6 @@
 @endsection
 @section('content')
 
-<!--begin::Modal - Add task-->
 <div class="modal fade" id="modalIncorporacion" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg">
@@ -77,7 +76,7 @@
                 </div>
 
                 <div class="card-body py-4" id="table_listado">
-                    <!-- El listado se carga por AJAX -->
+
                 </div>
             </div>
         </div>
@@ -234,11 +233,7 @@
 
                         <div class="col-lg-6">
                             <div class="row">
-
-
-
                                 <div class="card shadow-sm">
-
                                     <div class="card-header">
                                         <h5 class="mb-0">Imágenes</h5>
                                     </div>
@@ -287,7 +282,7 @@
     <script src="{{ asset('assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
     <script>
         $.ajaxSetup({
-            // definimos cabecera donde estarra el token y poder hacer nuestras operaciones de put,post...
+
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
@@ -320,8 +315,7 @@
                     } else {
 
                     }
-                    // Ocultar SweetAlert2 cuando la solicitud sea exitosa
-                    // Swal.close();
+
                 }
             })
         }
@@ -535,27 +529,27 @@
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                                <div class="position-relative d-inline-block">
+                                        <div class="position-relative d-inline-block">
 
-                                    <img
-                                        src="${img.url}"
-                                        width="80"
-                                        height="80"
-                                        class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                        style="cursor:pointer;object-fit:cover"
-                                        onclick="mostrarImagen(${index})">
+                                            <img
+                                                src="${img.url}"
+                                                width="80"
+                                                height="80"
+                                                class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                                style="cursor:pointer;object-fit:cover"
+                                                onclick="mostrarImagen(${index})">
 
-                                    <button
-                                        type="button"
-                                        class="btn btn-danger btn-sm position-absolute"
-                                        style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                        onclick="eliminarImagen('${img.id}')">
+                                            <button
+                                                type="button"
+                                                class="btn btn-danger btn-sm position-absolute"
+                                                style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                                onclick="eliminarImagen('${img.id}')">
 
-                                        ×   
-                                    </button>
+                                                ×   
+                                            </button>
 
-                                </div>
-                            `);
+                                        </div>
+                                    `);
             });
 
             if (listaImagenes.length > 0) {
@@ -661,9 +655,7 @@
                 }
 
             });
-
             return ok;
         }
-
     </script>
 @endsection

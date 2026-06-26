@@ -334,7 +334,7 @@
                                     icon: 'success',
                                     title: "EXITO",
                                     text: JSON.stringify(data.msg),
-                                    showConfirmButton: false, // No mostrar botón de confirmación
+                                    showConfirmButton: false,
                                     timerProgressBar: true
                                 });
                             } else {
@@ -342,7 +342,7 @@
                                     icon: 'error',
                                     text: JSON.stringify(data.msg),
                                     title: "ERROR",
-                                    showConfirmButton: false, // No mostrar botón de confirmación
+                                    showConfirmButton: false,
                                     timerProgressBar: true
                                 });
                             }
@@ -360,14 +360,11 @@
 
 
         function imprimirRecibo(venta_id) {
-
             let url = "{{ url('venta/recibo') }}/" + venta_id;
-
             window.open(url, '_blank');
         }
 
         function anularVenta(venta_id) {
-
             Swal.fire({
                 title: '¿Anular venta?',
                 text: 'Esta acción devolverá el stock',
@@ -379,51 +376,31 @@
                 if (result.isConfirmed) {
 
                     $.ajax({
-
                         url: "{{ url('venta/anularVenta') }}",
-
                         method: "POST",
-
                         data: {
                             venta_id: venta_id
                         },
-
                         success: function (data) {
-
                             if (data.estado) {
-
                                 Swal.fire({
                                     icon: 'success',
                                     title: data.mensaje
                                 });
-
                                 ajaxListado();
-
                             } else {
-
                                 Swal.fire({
                                     icon: 'error',
                                     title: data.mensaje
                                 });
-
                             }
-
                         },
-
                         error: function (xhr) {
-
                             console.log(xhr.responseText);
-
                         }
-
                     });
-
                 }
-
             });
-
         }
-
-
     </script>
 @endsection

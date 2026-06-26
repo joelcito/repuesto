@@ -12,7 +12,6 @@
 @endsection
 @section('content')
 
-<!--begin::Modal - Add task-->
 <div class="modal fade" id="modalRol" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -40,12 +39,9 @@
                     </div>
                 </div>
             </div>
-            <!--end::Modal body-->
         </div>
     </div>
-    <!--end::Modal dialog-->
 </div>
-<!--end::Modal - Add task-->
 
 
 <div class="d-flex flex-column flex-column-fluid">
@@ -158,11 +154,9 @@
         }
 
         function editarRol(rol) {
-
             $('#nombre').val(rol.nombre)
             $('#id').val(rol.id)
             $('#modalRol').modal('show')
-
         }
 
         function eliminarRol(rol, nombre) {
@@ -178,7 +172,6 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-
                     $.ajax({
                         url: "{{ route('rol.eliminarRol') }}",
                         method: "POST",

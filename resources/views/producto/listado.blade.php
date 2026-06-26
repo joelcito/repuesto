@@ -71,7 +71,6 @@
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Marca</label>
                                     <select class="form-select form-select-sm" name="marca_id" id="marca_id">
-
                                         <option value="">
                                             Seleccione
                                         </option>
@@ -494,9 +493,6 @@
                             <option value="sin">Sin stock</option>
                         </select>
                     </div>
-
-
-
                     <div class="col-md-1">
                         <button class="btn btn-sm btn-secondary w-100" onclick="limpiarFiltros()">X Limpiar</button>
                     </div>
@@ -712,18 +708,6 @@
             });
         }
 
-        // function modalIngreso(productoId, sucursalId, nombreSuc) {
-        //     document.getElementById('sucursal').value = nombreSuc;
-        //     document.getElementById('idSuc').value = sucursalId;
-        //     document.getElementById('idProd').value = productoId;
-        //     $('#descripcion').val('')
-        //     $('#cantidad_ingreso').val('')
-        //     $('#precio_compra').val('')
-        //     $('#compra_ingreso').val('')
-        //     $('#compra_ingreso').val('')
-        //     $('#id').val(0)
-        //     $('#modalIngreso').modal('show')
-        // }
 
         function modalIngreso(productoId, sucursalId, nombreSuc) {
 
@@ -788,10 +772,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                                                                        <div class="invalid-feedback">
-                                                                                                                            ${mensaje}
-                                                                                                                        </div>
-                                                                                                                    `);
+                                                <div class="invalid-feedback">
+                                                    ${mensaje}
+                                                </div>
+                                            `);
                             }
                         } else {
                             Swal.fire({
@@ -882,10 +866,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                                                                        <div class="invalid-feedback">
-                                                                                                                            ${mensaje}
-                                                                                                                        </div>
-                                                                                                                    `);
+                                                <div class="invalid-feedback">
+                                                    ${mensaje}
+                                                </div>
+                                            `);
                             }
                         } else {
                             Swal.fire({
@@ -939,7 +923,6 @@
             $('#modalTransferencia').modal('show');
         }
         function guardarTransferencia() {
-
             if ($("#formularioTransferencia")[0].checkValidity()) {
                 let datos =
                     $('#formularioTransferencia').serializeArray();
@@ -964,7 +947,6 @@
                             });
                         }
                     },
-
                     error: function (xhr) {
                         Swal.fire({
                             icon: 'error',
@@ -1005,27 +987,27 @@
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                                                                                                <div class="position-relative d-inline-block">
+                        <div class="position-relative d-inline-block">
 
-                                                                                                    <img
-                                                                                                        src="${img.url}"
-                                                                                                        width="80"
-                                                                                                        height="80"
-                                                                                                        class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                                                                                        style="cursor:pointer;object-fit:cover"
-                                                                                                        onclick="mostrarImagen(${index})">
+                            <img
+                                src="${img.url}"
+                                width="80"
+                                height="80"
+                                class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                style="cursor:pointer;object-fit:cover"
+                                onclick="mostrarImagen(${index})">
 
-                                                                                                    <button
-                                                                                                        type="button"
-                                                                                                        class="btn btn-danger btn-sm position-absolute"
-                                                                                                        style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                                                                                        onclick="eliminarImagen('${img.id}')">
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm position-absolute"
+                                style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                onclick="eliminarImagen('${img.id}')">
 
-                                                                                                        ×   
-                                                                                                    </button>
+                                ×   
+                            </button>
 
-                                                                                                </div>
-                                                                                            `);
+                        </div>
+                    `);
             });
 
             if (listaImagenes.length > 0) {
@@ -1129,9 +1111,7 @@
                     el.addClass('is-invalid');
                     ok = false;
                 }
-
             });
-
             return ok;
         }
 

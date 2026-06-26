@@ -18,10 +18,7 @@ class UnidadController extends Controller
     {
 
         if ($request->ajax()) {
-
-            //SACAMOS EL LISTADO
             $unidades = Unidad::all();
-
             $valores = [
                 'listado' => view('unidad.ajaxListado')->with(compact('unidades'))->render()
             ];
@@ -38,19 +35,15 @@ class UnidadController extends Controller
     {
 
         if ($request->ajax()) {
-
-            //AL INICIO DECLARACION DE VARIABLES
             $unidad_id = $request->input('id');
             $nombre = $request->input('nombre');
             $usuario = Auth::user();
 
             if ($unidad_id == '0') {
-                //LA CREACION DE UN NUEVa unidad
                 $unidad = new Unidad();
                 $unidad->usuario_creador_id = $usuario->id;
 
             } else {
-                //LA EDICION DE UN NUEVO unidad
                 $unidad = Unidad::find($unidad_id);
                 $unidad->usuario_modificador_id = $usuario->id;
             }
@@ -74,17 +67,11 @@ class UnidadController extends Controller
     {
 
         if ($request->ajax()) {
-
-            //INICIALIZAMOS LAS VARIABLES
             $unidad_id = $request->input('unidad');
             $usuario = Auth::user();
-
-            //BUSCAMOS AL unidad
             $unidad = Unidad::find($unidad_id);
             $unidad->usuario_eliminador_id = $usuario->id;
             $unidad->save();
-
-            //AHORA ELIMINAMOS
             Unidad::destroy($unidad_id);
 
             $data = Respuesta::success(null, "Se elimino con exito");

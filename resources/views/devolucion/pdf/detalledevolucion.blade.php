@@ -7,7 +7,6 @@
     <style>
         @page {
             margin: 0;
-            /* elimina márgenes del PDF */
         }
 
         body {
@@ -15,18 +14,15 @@
             margin: 0;
             padding: 0;
             background-color: #ffffff;
-            /* opcional */
             font-size: 10px;
         }
 
         .devolucion {
             width: 95%;
             height: 5.3in;
-            /* un poco menos que 5.5 para evitar salto */
             border: 1px solid #000;
             padding: 20px;
             box-sizing: border-box;
-            /* background-color:red; */
         }
 
         .titulo {
@@ -39,7 +35,6 @@
         .contenido {
             font-size: 14px;
             line-height: 1.5;
-            /* background-color:red; */
         }
 
         p {

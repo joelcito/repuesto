@@ -12,7 +12,6 @@
 @endsection
 @section('content')
 
-<!--begin::Modal - Add task-->
 <div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -121,13 +120,9 @@
                     </div>
                 </div>
             </div>
-            <!--end::Modal body-->
         </div>
     </div>
-    <!--end::Modal dialog-->
 </div>
-<!--end::Modal - Add task-->
-
 
 <div class="d-flex flex-column flex-column-fluid">
     <div id="kt_app_content" class="app-content flex-column-fluid">
@@ -143,7 +138,7 @@
                 </div>
 
                 <div class="card-body py-4" id="table_listado">
-                    <!-- El listado se carga por AJAX -->
+
                 </div>
             </div>
         </div>
@@ -160,7 +155,7 @@
     <script>
 
         $.ajaxSetup({
-            // definimos cabecera donde estarra el token y poder hacer nuestras operaciones de put,post...
+
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
@@ -184,8 +179,7 @@
                     } else {
 
                     }
-                    // Ocultar SweetAlert2 cuando la solicitud sea exitosa
-                    // Swal.close();
+
                 }
             })
         }
@@ -219,7 +213,7 @@
                             Swal.fire({
                                 title: "EL REGISTRO FUE EXITOSO.",
                                 icon: "success",
-                                timer: 3000, // Se cierra en 3 segundos
+                                timer: 3000,
                                 showConfirmButton: false
                             });
                             ajaxListado();
@@ -290,7 +284,7 @@
                         data: { user: user },
                         success: function (resultado) {
                             if (resultado.estado) {
-                                ajaxListado(); // recarga el listado
+                                ajaxListado();
                                 Swal.fire(
                                     'Eliminado!',
                                     'El usuario ha sido eliminado correctamente.',

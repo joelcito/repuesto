@@ -50,12 +50,9 @@
                     </div>
                 </div>
             </div>
-            <!--end::Modal body-->
         </div>
     </div>
-    <!--end::Modal dialog-->
 </div>
-<!--end::Modal - Add task-->
 
 
 <div class="d-flex flex-column flex-column-fluid">
@@ -70,9 +67,8 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="card-body py-4" id="table_listado">
-                    <!-- El listado se carga por AJAX -->
+
                 </div>
             </div>
         </div>
@@ -89,7 +85,7 @@
     <script>
 
         $.ajaxSetup({
-            // definimos cabecera donde estarra el token y poder hacer nuestras operaciones de put,post...
+
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
@@ -113,8 +109,7 @@
                     } else {
 
                     }
-                    // Ocultar SweetAlert2 cuando la solicitud sea exitosa
-                    // Swal.close();
+
                 }
             })
         }
@@ -139,7 +134,7 @@
                         Swal.fire({
                             title: "EL REGISTRO FUE EXITOSO.",
                             icon: "success",
-                            timer: 3000, // Se cierra en 3 segundos
+                            timer: 3000,
                             showConfirmButton: false
                         });
                         ajaxListado();
@@ -202,7 +197,7 @@
                         data: { sucursal: sucursal },
                         success: function (resultado) {
                             if (resultado.estado) {
-                                ajaxListado(); // resga el listado
+                                ajaxListado();
                                 Swal.fire(
                                     'Eliminado!',
                                     'La sucursal ha sido eliminado correctamente.',

@@ -25,7 +25,6 @@
                     </div>
                 </div>
                 <div class="card-body py-4" id="table_listado">
-                    <!-- El listado se carga por AJAX -->
                 </div>
             </div>
         </div>
@@ -59,10 +58,7 @@
                     if (resultado.estado) {
                         $('#table_listado').html(resultado.data.listado)
                     } else {
-
                     }
-                    // Ocultar SweetAlert2 cuando la solicitud sea exitosa
-                    // Swal.close();
                 }
             })
         }
@@ -71,28 +67,28 @@
             Swal.fire({
                 title: '<span class="fw-bold">APERTURA DE CAJA</span>',
                 html: `
-                            <div class="text-start">
-                                <label class="fw-semibold mb-2">
-                                    Monto de apertura
-                                </label>
-                                <input type="number"
-                                    id="monto_apertura"
-                                    class="swal2-input"
-                                    placeholder="Ingrese el monto"
-                                    min="0"
-                                    value="0">
-                            </div>
-                        `,
+                                <div class="text-start">
+                                    <label class="fw-semibold mb-2">
+                                        Monto de apertura
+                                    </label>
+                                    <input type="number"
+                                        id="monto_apertura"
+                                        class="swal2-input"
+                                        placeholder="Ingrese el monto"
+                                        min="0"
+                                        value="0">
+                                </div>
+                            `,
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonText: `
-                            <i class="fa fa-unlock me-1"></i>
-                            Abrir Caja
-                        `,
+                                <i class="fa fa-unlock me-1"></i>
+                                Abrir Caja
+                            `,
                 cancelButtonText: `
-                            <i class="fa fa-times me-1"></i>
-                            Cancelar
-                        `,
+                                <i class="fa fa-times me-1"></i>
+                                Cancelar
+                            `,
                 confirmButtonColor: '#009ef7',
                 cancelButtonColor: '#6c757d',
                 focusConfirm: false,
@@ -159,27 +155,27 @@
             Swal.fire({
                 title: '<span class="fw-bold text-danger">CERRAR CAJA</span>',
                 html: `
-                        <div class="text-center">
-                            <i class="fa fa-lock text-danger"
-                                style="font-size: 55px;"></i>
-                            <p class="mt-3 mb-0 fs-6 text-gray-700">
-                                ¿Está seguro de cerrar esta caja?
-                            </p>
-                            <small class="text-muted">
-                                Esta acción registrará el cierre de caja actual.
-                            </small>
-                        </div>
-                    `,
+                            <div class="text-center">
+                                <i class="fa fa-lock text-danger"
+                                    style="font-size: 55px;"></i>
+                                <p class="mt-3 mb-0 fs-6 text-gray-700">
+                                    ¿Está seguro de cerrar esta caja?
+                                </p>
+                                <small class="text-muted">
+                                    Esta acción registrará el cierre de caja actual.
+                                </small>
+                            </div>
+                        `,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: `
-                        <i class="fa fa-lock me-1"></i>
-                        Sí, cerrar
-                    `,
+                            <i class="fa fa-lock me-1"></i>
+                            Sí, cerrar
+                        `,
                 cancelButtonText: `
-                        <i class="fa fa-times me-1"></i>
-                        Cancelar
-                    `,
+                            <i class="fa fa-times me-1"></i>
+                            Cancelar
+                        `,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#6c757d',
                 reverseButtons: true

@@ -15,11 +15,10 @@ class CategoriaController extends Controller
 
         return view('categoria.listado', compact('categoriasPadre'));
     }
-
     public function ajaxListado(Request $request)
     {
         if ($request->ajax()) {
-            //$categorias = Categoria::where('estado', 'PAGO')->get();
+
             $categorias = Categoria::with('parent')->get();
             $valores = [
                 'listado' => view('categoria.ajaxListado')->with(compact('categorias'))->render()
@@ -34,9 +33,6 @@ class CategoriaController extends Controller
     public function guardar(Request $request)
     {
         if ($request->ajax()) {
-
-            // dd($request->all());
-
             $request->validate([
                 'nombre' => 'required',
                 'tipo' => 'required',
@@ -77,18 +73,13 @@ class CategoriaController extends Controller
     public function eliminar(Request $request)
     {
         if ($request->ajax()) {
-
             $id = $request->input('id');
             $usuario = Auth::user();
-
             $categoria = Categoria::find($id);
             $categoria->usuario_eliminador_id = $usuario->id;
             $categoria->save();
-
             Categoria::destroy($id);
-
             $data = Respuesta::success(null, "Datos obtenidos correctamente");
-
         } else {
             $data = Respuesta::error(null, "No existe");
         }

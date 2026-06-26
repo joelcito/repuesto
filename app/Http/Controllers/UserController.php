@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Rol;
 use App\Models\Sucursal;
 use App\Models\User;
@@ -14,19 +12,15 @@ class UserController extends Controller
 {
     public function listado()
     {
-
         $roles = Rol::all();
-
         $sucursales = Sucursal::all();
-
         return view('user.listado')->with(compact('roles', 'sucursales'));
     }
 
     public function ajaxListado(Request $request)
     {
         if ($request->ajax()) {
-            //sacamos el listado
-            //$usuarios = User::all();
+
             $usuarios = User::where('rol_id', '!=', 5)->get();
             $valores = [
                 'listado' => view('user.ajaxListado')->with(compact('usuarios'))->render()
@@ -34,7 +28,6 @@ class UserController extends Controller
             $data = Respuesta::success($valores, "Datos Obtenidos correctamente");
         } else {
             $data = Respuesta::error(null, "Error al obtener los datos");
-
         }
         return $data;
     }
@@ -79,7 +72,6 @@ class UserController extends Controller
         } else {
             $data = Respuesta::error(null, "Error al obtener los datos");
         }
-
         return $data;
     }
 
@@ -87,21 +79,13 @@ class UserController extends Controller
     {
 
         if ($request->ajax()) {
-
-            //INICIALIZAMOS LAS VARIABLES
             $user_id = $request->input('user');
             $usuario = Auth::user();
-
-            //BUSCAMOS AL USER
             $user = User::find($user_id);
             $user->usuario_eliminador_id = $usuario->id;
             $user->save();
-
-            //AHORA ELIMINAMOS
             User::destroy($user_id);
-
             $data = Respuesta::success(null, "Se elimino con exito");
-
         } else {
 
             $data = Respuesta::error(null, "Error al obtener los datos");

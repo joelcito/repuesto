@@ -16,12 +16,8 @@ class SucursalController extends Controller
 
     public function ajaxListado(Request $request)
     {
-
         if ($request->ajax()) {
-
-            //SACAMOS EL LISTADO
             $sucursales = Sucursal::all();
-
             $valores = [
                 'listado' => view('sucursal.ajaxListado')->with(compact('sucursales'))->render()
             ];
@@ -36,10 +32,7 @@ class SucursalController extends Controller
 
     public function guardarSucursal(Request $request)
     {
-
         if ($request->ajax()) {
-
-            //AL INICIO DECLARACION DE VARIABLES
             $sucursal_id = $request->input('id');
             $codigo_sucursal = $request->input('codigo_sucursal');
             $nombre = $request->input('nombre');
@@ -47,12 +40,10 @@ class SucursalController extends Controller
             $usuario = Auth::user();
 
             if ($sucursal_id == '0') {
-                //LA CREACION DE UN NUEVa sucursal
                 $sucursal = new Sucursal();
                 $sucursal->usuario_creador_id = $usuario->id;
 
             } else {
-                //LA EDICION DE UN NUEVO sucursal
                 $sucursal = Sucursal::find($sucursal_id);
                 $sucursal->usuario_modificador_id = $usuario->id;
             }
@@ -62,42 +53,27 @@ class SucursalController extends Controller
             $sucursal->direccion = $direccion;
             $sucursal->estado = 1;
             $sucursal->save();
-
             $data = Respuesta::success(null, "Datos Obtenidos correctamente");
-
         } else {
             $data = Respuesta::error(null, "Error al obtener los datos");
         }
-
         return $data;
 
     }
 
     public function eliminarSucursal(Request $request)
     {
-
         if ($request->ajax()) {
-
-            //INICIALIZAMOS LAS VARIABLES
             $sucursal_id = $request->input('sucursal');
             $usuario = Auth::user();
-
-            //BUSCAMOS AL SUCURSAL
             $sucursal = Sucursal::find($sucursal_id);
             $sucursal->usuario_eliminador_id = $usuario->id;
             $sucursal->save();
-
-            //AHORA ELIMINAMOS
             Sucursal::destroy($sucursal_id);
-
             $data = Respuesta::success(null, "Se elimino con exito");
-
         } else {
-
             $data = Respuesta::error(null, "Error al obtener los datos");
         }
-
         return $data;
-
     }
 }

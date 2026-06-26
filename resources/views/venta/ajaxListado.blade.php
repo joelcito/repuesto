@@ -1,5 +1,4 @@
 <div style="overflow-x: auto;">
-    <!--begin::Table-->
     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_venta">
         <thead>
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
@@ -114,7 +113,6 @@
             </tr>
         </tfoot>
     </table>
-    <!--end::Table-->
 </div>
 <script>
 
@@ -123,8 +121,8 @@
             $('#kt_table_venta').DataTable().destroy();
         }
         $('#kt_table_venta').DataTable({
-            lengthMenu: [10, 25, 50, 100], // Opciones de longitud de página
-            dom: '<"dt-head row"<"col-md-6"l><"col-md-6"f>><"clear">t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>', // Use dom for basic layout
+            lengthMenu: [10, 25, 50, 100],
+            dom: '<"dt-head row"<"col-md-6"l><"col-md-6"f>><"clear">t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>',
             language: {
                 paginate: {
                     first: 'Primero',

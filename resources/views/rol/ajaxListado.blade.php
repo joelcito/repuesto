@@ -1,5 +1,4 @@
 <div style="overflow-x: auto;">
-    <!--begin::Table-->
     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_roles">
         <thead>
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
@@ -24,7 +23,6 @@
             @endforelse
         </tbody>
     </table>
-    <!--end::Table-->
 </div>
 
 <script>
@@ -45,10 +43,7 @@
                 emptyTable: 'No hay datos disponibles'
             },
             order: [],
-            //  searching: true,
             responsive: true
         });
-
-
     });
 </script>
