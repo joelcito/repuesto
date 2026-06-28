@@ -108,7 +108,7 @@
                                         id="stock_minimo">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Ubicación</label>
+                                    <label class="form-label fw-bold">Sucursal</label>
                                     <select class="form-select form-select-sm" name="sucursal_id" id="sucursal_id">
                                         <option value="">Seleccione</option>
                                         @foreach($sucursales as $sucursal)
@@ -151,7 +151,7 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Medidas</label>
+                                    <label class="form-label fw-bold">Medida/Especificación</label>
                                     <input type="text" class="form-control form-control-sm" id="medidas" name="medidas">
                                 </div>
 
@@ -772,10 +772,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                <div class="invalid-feedback">
-                                                    ${mensaje}
-                                                </div>
-                                            `);
+                                                        <div class="invalid-feedback">
+                                                            ${mensaje}
+                                                        </div>
+                                                    `);
                             }
                         } else {
                             Swal.fire({
@@ -866,10 +866,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                <div class="invalid-feedback">
-                                                    ${mensaje}
-                                                </div>
-                                            `);
+                                                        <div class="invalid-feedback">
+                                                            ${mensaje}
+                                                        </div>
+                                                    `);
                             }
                         } else {
                             Swal.fire({
@@ -987,27 +987,27 @@
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                        <div class="position-relative d-inline-block">
+                                <div class="position-relative d-inline-block">
 
-                            <img
-                                src="${img.url}"
-                                width="80"
-                                height="80"
-                                class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                style="cursor:pointer;object-fit:cover"
-                                onclick="mostrarImagen(${index})">
+                                    <img
+                                        src="${img.url}"
+                                        width="80"
+                                        height="80"
+                                        class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                        style="cursor:pointer;object-fit:cover"
+                                        onclick="mostrarImagen(${index})">
 
-                            <button
-                                type="button"
-                                class="btn btn-danger btn-sm position-absolute"
-                                style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                onclick="eliminarImagen('${img.id}')">
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger btn-sm position-absolute"
+                                        style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                        onclick="eliminarImagen('${img.id}')">
 
-                                ×   
-                            </button>
+                                        ×   
+                                    </button>
 
-                        </div>
-                    `);
+                                </div>
+                            `);
             });
 
             if (listaImagenes.length > 0) {
