@@ -85,18 +85,61 @@ class ReporteController extends Controller
         $ventas = Venta::with([
             'cliente',
             'usuario',
-            'pagos'
+            'pagos',
+            'detalles' => function ($q) {
+                $q->with([
+                    'producto.marca',
+                    'producto.unidad'
+                ]);
+            }
         ])
             ->whereBetween('fecha', [
                 $request->fecha_inicio,
                 $request->fecha_fin
             ])
             ->get();
+
+        $ventas->each(function ($venta) {
+            $venta->metodos_pago = $venta->pagos
+                ->pluck('metodo')
+                ->implode(', ');
+        });
         $pdf = Pdf::loadView(
             'reporte.pdf.ventas_pdf',
             compact('ventas')
         );
         return $pdf->stream('ventas.pdf');
+    }
+
+    public function tiquetPdf(Request $request)
+    {
+        $ventas = Venta::with([
+            'cliente',
+            'usuario',
+            'pagos',
+            'detalles' => function ($q) {
+                $q->with([
+                    'producto.marca',
+                    'producto.unidad'
+                ]);
+            }
+        ])
+            ->whereBetween('fecha', [
+                $request->fecha_inicio,
+                $request->fecha_fin
+            ])
+            ->get();
+
+        $ventas->each(function ($venta) {
+            $venta->metodos_pago = $venta->pagos
+                ->pluck('metodo')
+                ->implode(', ');
+        });
+        $pdf = Pdf::loadView(
+            'reporte.pdf.tiquet_pdf',
+            compact('ventas')
+        );
+        return $pdf->stream('tiquet.pdf');
     }
 
     public function cajasPdf(Request $request)

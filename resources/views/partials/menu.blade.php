@@ -103,6 +103,40 @@
 
                 @endif
 
+                @if(
+                        auth()->user()->esAlmacen()
+                    )
+                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                        <span class="menu-link">
+                            <span class="menu-icon">
+                                <i class="fa fa-university"></i>
+                            </span>
+                            <span class="menu-title text-white">
+                                ADMINISTRACIÓN
+                            </span>
+                            <span class="menu-arrow"></span>
+                        </span>
+
+                        <div class="menu-sub menu-sub-accordion">
+                            <div class="menu-item">
+                                <a class="menu-link {{ Route::currentRouteName() == 'caja.listado' ? 'active' : '' }}"
+                                    href="{{ route('caja.listado') }}">
+
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot"></span>
+                                    </span>
+
+                                    <span class="menu-title text-white">
+                                        Caja
+                                    </span>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                @endif
+
 
                 @if(auth()->user()->esAdministrador())
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">

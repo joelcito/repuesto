@@ -305,10 +305,10 @@
 
         }
 
-        function imprimeREcibo(recibo) {
-            href = "{{ url('factura/recibo') }}/" + recibo;
-            window.open(href, '_blank');
-        }
+        // function imprimeREcibo(recibo) {
+        //     href = "{{ url('factura/recibo') }}/" + recibo;
+        //     window.open(href, '_blank');
+        // }
 
 
         function anularRecibo(recibo, numero) {
@@ -361,6 +361,11 @@
 
         function imprimirRecibo(venta_id) {
             let url = "{{ url('venta/recibo') }}/" + venta_id;
+            window.open(url, '_blank');
+        }
+
+        function imprimirTiquet(venta_id) {
+            let url = "{{ url('venta/tiquet') }}/" + venta_id;
             window.open(url, '_blank');
         }
 

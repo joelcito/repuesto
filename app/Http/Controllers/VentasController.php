@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use Log;
 use PDF;
 
 class VentasController extends Controller
@@ -536,6 +537,40 @@ class VentasController extends Controller
             ->setPaper('a5', 'landscape');
 
         return $pdf->stream('recibo.pdf');
+    }
+
+
+    public function tiquet($venta_id)
+    {
+
+        $usuario = Auth::user();
+
+        $venta = Venta::with(['cliente', 'detalles.producto', 'pagos'])
+            ->find($venta_id);
+
+        if (!$venta) {
+            return redirect()->back()->with('error', 'Venta no encontrada');
+        }
+
+        $totalPagado = $venta->pagos
+            ->where('estado', 'INGRESO')
+            ->sum('monto');
+
+        $saldo = max(0, $venta->total - $totalPagado);
+        $cambio = max(0, $totalPagado - $venta->total);
+
+        $data = [
+            'usuario' => $usuario,
+            'venta' => $venta,
+            'totalPagado' => $totalPagado,
+            'saldo' => $saldo,
+            'cambio' => $cambio
+        ];
+
+        $pdf = Pdf::loadView('venta.pdf.tiquet', $data)
+            ->setPaper([0, 0, 226.77, 800], 'portrait');
+
+        return $pdf->stream('tiquet.pdf');
     }
 
     public function formulario()

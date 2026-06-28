@@ -78,62 +78,152 @@
         <div class="titulo"> NOTA DE VENTA N° {{ sprintf('%06d', $venta->numero_factura) }} </div>
         <table id="tabla">
             <tr>
-                <td> <strong>Cliente:</strong> </td>
-                <td class="text-left"> {{ $venta->cliente?->nombres }} {{ $venta->cliente?->ap_paterno }}
-                    {{ $venta->cliente?->ap_materno }}
+                <!-- Columna 1 -->
+                <td width="40%" valign="top">
+                    <table width="100%">
+                        <tr>
+                            <td><strong>Cliente:</strong></td>
+                            <td>{{ $venta->cliente?->nombres }}
+                                {{ $venta->cliente?->ap_paterno }}
+                                {{ $venta->cliente?->ap_materno }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Celular:</strong></td>
+                            <td>{{ $venta->cliente?->celular }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>C.I.:</strong></td>
+                            <td>{{ $venta->cliente?->cedula }}</td>
+                        </tr>
+                    </table>
                 </td>
-                <td> <strong>Fecha:</strong> </td>
-                <td class="text-left"> {{ date('d/m/Y', strtotime($venta->fecha)) }} </td>
-            </tr>
-            <tr>
-                <td> <strong>Dirección:</strong> </td>
-                <td class="text-left"> {{ $venta->cliente?->direccion }} </td>
-                <td> <strong>Celular:</strong> </td>
-                <td class="text-left"> {{ $venta->cliente?->celular }} </td>
+
+                <!-- Columna 2 -->
+                <td width="30%" valign="top">
+                    <table width="100%">
+                        <tr>
+                            <td><strong>NIT:</strong></td>
+                            <td>{{ $venta->cliente?->nit }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Usuario:</strong></td>
+                            <td>
+                                {{ $venta->usuario?->nombres }}
+                                {{ $venta->usuario?->ap_paterno }}
+                                {{ $venta->usuario?->ap_materno }}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+
+                <!-- Columna 3 -->
+                <td width="30%" valign="top">
+                    <table width="100%">
+                        <tr>
+                            <td><strong>Fecha:</strong></td>
+                            <td>{{ date('d/m/Y', strtotime($venta->fecha)) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hora:</strong></td>
+                            <td>{{ date('H:i', strtotime($venta->created_at)) }}</td>
+                        </tr>
+                    </table>
+                </td>
             </tr>
         </table>
         <hr>
         <table class="table">
             <thead>
                 <tr>
-                    <th>PRODUCTO</th>
-                    <th>CANTIDAD</th>
-                    <th>TIPO PRECIO</th>
-                    <th>SUBTOTAL</th>
+                    <th width="4%">N°</th>
+                    <th width="28%">PRODUCTO</th>
+                    <th width="10%">CÓDIGO</th>
+                    <th width="12%">MARCA</th>
+                    <th width="8%">UNIDAD</th>
+                    <th width="8%">CANT.</th>
+                    <th width="10%">TIPO</th>
+                    <th width="10%">PRECIO</th>
+                    <th width="10%">SUBTOTAL</th>
                 </tr>
             </thead>
-            <tbody> @php $total = 0; @endphp @foreach ($venta->detalles as $detalle)
-                @php $total += $detalle->subtotal; @endphp <tr>
-                    <td> {{ $detalle->producto?->nombre }} </td>
-                    <td> {{ $detalle->cantidad }} </td>
-                    <td> {{ $detalle->tipo_precio }} </td>
-                    <td> {{ number_format($detalle->subtotal, 2) }} </td>
-            </tr> @endforeach </tbody>
+            <tbody> @php
+                $total = 0;
+            @endphp
+
+                @foreach ($venta->detalles as $detalle)
+                    @php
+                        $total += $detalle->subtotal;
+                    @endphp
+
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $detalle->producto?->nombre }}</td>
+                        <td>{{ $detalle->producto?->codigo_interno }}</td>
+                        <td>{{ $detalle->producto?->marca?->nombre ?? '-' }}</td>
+                        <td>{{ optional($detalle->producto->unidad)->nombre ?? '-' }}</td>
+                        <td>{{ $detalle->cantidad }}</td>
+                        <td>{{ $detalle->tipo_precio }}</td>
+                        <td>{{ number_format($detalle->precio_unitario, 2) }}</td>
+                        <td>{{ number_format($detalle->subtotal, 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
             <tfoot>
-                <tr>
-                    <td colspan="3"> <strong>SUBTOTAL</strong> </td>
+                <!-- <tr>
+                    <td colspan="8"> <strong>SUBTOTAL</strong> </td>
                     <td> {{ number_format($venta->subtotal, 2) }} </td>
                 </tr>
                 <tr>
-                    <td colspan="3"> <strong>DESCUENTO</strong> </td>
+                    <td colspan="8"> <strong>DESCUENTO</strong> </td>
                     <td> {{ number_format($venta->descuento, 2) }} </td>
-                </tr>
+                </tr> 
+
                 <tr>
-                    <td colspan="3"><strong>CAMBIO</strong></td>
+                    <td colspan="8"><strong>CAMBIO</strong></td>
                     <td>{{ number_format($cambio, 2) }}</td>
-                </tr>
+                </tr> -->
                 <tr>
-                    <td colspan="3"> <strong>TOTAL</strong> </td>
+                    <td colspan="8" style="text-align:right"> <strong>TOTAL A PAGAR</strong> </td>
                     <td> {{ number_format($venta->total, 2) }} </td>
                 </tr>
-                <tr>
-                    <td colspan="3"> <strong>PAGADO</strong> </td>
+                <!-- <tr>
+                    <td colspan="8"> <strong>PAGADO</strong> </td>
                     <td> {{ number_format($totalPagado, 2) }} </td>
                 </tr>
                 <tr>
-                    <td colspan="3"> <strong>SALDO</strong> </td>
+                    <td colspan="8"> <strong>SALDO</strong> </td>
                     <td> {{ number_format($saldo, 2) }} </td>
+                </tr> -->
+                @php
+                    $metodos = explode(',', $venta->metodo_pago);
+
+                    $efectivo = in_array('EFECTIVO', $metodos);
+                    $transferencia = in_array('TRANSFERENCIA', $metodos);
+                    $qr = in_array('QR', $metodos);
+                @endphp
+                <tr>
+                    <td width="20%"><strong>FORMA DE PAGO:</strong></td>
+
+                    <td width="12%" align="right">EFECTIVO</td>
+                    <td width="5%" align="center">
+                        {!! $efectivo ? '☑' : '☐' !!}
+                    </td>
+
+                    <td width="18%" align="right">TRANSFERENCIA</td>
+                    <td width="5%" align="center">
+                        {!! $transferencia ? '☑' : '☐' !!}
+                    </td>
+
+                    <td width="8%" align="right">QR</td>
+                    <td width="5%" align="center">
+                        {!! $qr ? '☑' : '☐' !!}
+                    </td>
+
+                    <td width="8%" align="right">OTRO:</td>
+                    <td style="border-bottom:1px solid #000;"></td>
                 </tr>
+
             </tfoot>
         </table>
     </div>

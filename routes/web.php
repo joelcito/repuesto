@@ -180,6 +180,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/recepcionar', [VentasController::class, 'recepcionar'])->name('venta.recepcionar');
         Route::get('/listado', [VentasController::class, 'listado'])->name('venta.listado');
         Route::get('/recibo/{venta_id}', [VentasController::class, 'recibo'])->name('venta.recibo');
+        Route::get('/tiquet/{venta_id}', [VentasController::class, 'tiquet'])->name('venta.tiquet');
         Route::get('/detalle/{venta_id}', [VentasController::class, 'detalle'])->name('venta.detalle');
         Route::post('/anularRecibo', [VentasController::class, 'anularRecibo']);
         Route::post('/agregarNuevoOrdenTrabajo', [VentasController::class, 'agregarNuevoOrdenTrabajo']);
@@ -223,7 +224,10 @@ Route::middleware('auth')->group(function () {
 
 
         Route::post('/inventarios/pdf', [ReporteController::class, 'inventariosPdf'])->name('reporte.inventarios.pdf');
+
         Route::post('/ventas/pdf', [ReporteController::class, 'ventasPdf'])->name('reporte.ventas.pdf');
+        Route::post('/tiquet/pdf', [ReporteController::class, 'tiquetPdf'])->name('reporte.tiquet.pdf');
+
         Route::post('/cajas/pdf', [ReporteController::class, 'cajasPdf'])->name('reporte.cajas.pdf');
         Route::post('/utilidades/pdf', [ReporteController::class, 'utilidadesPdf'])->name('reporte.utilidades.pdf');
         Route::post('/ingreso-salida/pdf', [ReporteController::class, 'ingresoSalidaPdf'])->name('reporte.ingreso_salida.pdf');

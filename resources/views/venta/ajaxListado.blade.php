@@ -86,6 +86,12 @@
                             title="Imprimir">
                             <i class="fa fa-file-pdf"></i>
                         </button>
+
+                        <button class="btn btn-warning btn-sm btn-icon" onclick="imprimirTiquet('{{ $venta->id }}')"
+                            title="Imprimir Tiquet">
+                            <i class="fa fa-file-pdf"></i>
+                        </button>
+
                         @if($venta->estado != 'ANULADO')
                             <button class="btn btn-danger btn-sm btn-icon" onclick="anularVenta('{{ $venta->id }}')"
                                 title="Anular">
