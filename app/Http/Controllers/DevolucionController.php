@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Caja;
 use App\Models\Cliente;
 use App\Models\Devolucion;
+use App\Models\DevolucionDetalle;
 use App\Models\Movimiento;
 use App\Models\MovimientoCaja;
 use App\Models\Pago;
@@ -74,90 +75,88 @@ class DevolucionController extends Controller
     public function guardarDevolucion(Request $request)
     {
         DB::beginTransaction();
+
         try {
+
             $request->validate([
                 'venta_id' => 'required',
                 'productos' => 'required|array|min:1',
                 'tipo' => 'required',
                 'motivo' => 'required'
             ]);
+
             $usuario = Auth::user();
-            $venta = Venta::findOrFail($request->venta_id);
+            $venta = Venta::with('caja')->findOrFail($request->venta_id);
+
             if ($request->tipo == 'CAMBIO') {
-                throw new \Exception(
-                    'Cambio de producto aún no implementado'
-                );
+                throw new \Exception('Cambio de producto aún no implementado');
             }
+
             $totalGeneral = 0;
+
             foreach ($request->productos as $item) {
-                $ventaDetalle = VentaDetalle::where(
-                    'venta_id',
-                    $request->venta_id
-                )
-                    ->where(
-                        'producto_id',
-                        $item['producto_id']
-                    )
+
+                $ventaDetalle = VentaDetalle::where('venta_id', $venta->id)
+                    ->where('producto_id', $item['producto_id'])
                     ->first();
 
                 if (!$ventaDetalle) {
-                    throw new \Exception(
-                        'Producto no encontrado en la venta'
-                    );
+                    throw new \Exception('Producto no encontrado en la venta');
                 }
 
                 $cantidadDevuelta = $ventaDetalle->cantidad_devuelta ?? 0;
-                $cantidadDisponible = $ventaDetalle->cantidad - $cantidadDevuelta;
-                if ($item['cantidad'] > $cantidadDisponible) {
-                    throw new \Exception(
-                        'Cantidad excede lo vendido'
-                    );
+                $disponible = $ventaDetalle->cantidad - $cantidadDevuelta;
+
+                if ($item['cantidad'] > $disponible) {
+                    throw new \Exception('Cantidad excede lo vendido');
                 }
-                $subtotal =
-                    $item['cantidad'] *
-                    $ventaDetalle->precio_unitario;
+
+
+                $subtotal = $item['cantidad'] * $ventaDetalle->precio_unitario;
+
                 $totalGeneral += $subtotal;
             }
 
-            $devolucion = new Devolucion();
-            $devolucion->venta_id = $request->venta_id;
-            $devolucion->caja_id = $venta->caja_id;
-            $devolucion->usuario_cliente_id = $venta->usuario_cliente_id;
-            $devolucion->tipo = $request->tipo;
-            $devolucion->motivo = $request->motivo;
-            $devolucion->total = $totalGeneral;
-            $devolucion->estado = 'INGRESO';
-            $devolucion->usuario_creador_id = $usuario->id;
-            $devolucion->save();
+
+            $devolucion = Devolucion::create([
+                'venta_id' => $venta->id,
+                'caja_id' => $venta->caja_id,
+                'usuario_cliente_id' => $venta->usuario_cliente_id,
+                'tipo' => $request->tipo,
+                'motivo' => $request->motivo,
+                'total' => $totalGeneral,
+                'estado' => 'INGRESO',
+                'usuario_creador_id' => $usuario->id
+            ]);
+
+
             foreach ($request->productos as $item) {
-                $ventaDetalle = VentaDetalle::where(
-                    'venta_id',
-                    $request->venta_id
-                )
-                    ->where(
-                        'producto_id',
-                        $item['producto_id']
-                    )
+
+                $ventaDetalle = VentaDetalle::where('venta_id', $venta->id)
+                    ->where('producto_id', $item['producto_id'])
                     ->first();
 
-                $producto = Producto::findOrFail(
-                    $item['producto_id']
-                );
+                $producto = Producto::findOrFail($item['producto_id']);
 
-                $subtotal =
-                    $item['cantidad'] *
-                    $ventaDetalle->precio_unitario;
-                if (
-                    $request->tipo == 'DINERO' ||
-                    $request->tipo == 'PRODUCTO'
-                ) {
 
-                    $ventaDetalle->cantidad_devuelta =
-                        ($ventaDetalle->cantidad_devuelta ?? 0)
-                        + $item['cantidad'];
+                $subtotal = $item['cantidad'] * $ventaDetalle->precio_unitario;
 
-                    $ventaDetalle->save();
-                }
+
+                DevolucionDetalle::create([
+                    'devolucion_id' => $devolucion->id,
+                    'producto_id' => $item['producto_id'],
+                    'cantidad' => $item['cantidad'],
+                    'precio_unitario' => $ventaDetalle->precio_unitario,
+                    'subtotal' => $subtotal,
+                    'usuario_creador_id' => $usuario->id
+                ]);
+
+
+                $ventaDetalle->cantidad_devuelta =
+                    ($ventaDetalle->cantidad_devuelta ?? 0) + $item['cantidad'];
+
+                $ventaDetalle->save();
+
 
                 Movimiento::create([
                     'producto_id' => $producto->id,
@@ -166,14 +165,15 @@ class DevolucionController extends Controller
                     'cantidad' => $item['cantidad'],
                     'precio_compra' => $producto->precio_compra,
                     'precio_venta' => $ventaDetalle->precio_unitario,
-                    'motivo' => 'DEVOLUCION',
                     'fecha' => now(),
                     'descripcion' => 'DEVOLUCION #' . $devolucion->id,
                     'estado' => 'INGRESO',
                     'usuario_creador_id' => $usuario->id
                 ]);
 
+
                 if ($request->tipo == 'DINERO') {
+
                     MovimientoCaja::create([
                         'caja_id' => $venta->caja_id,
                         'venta_id' => $venta->id,
@@ -185,48 +185,43 @@ class DevolucionController extends Controller
                         'estado' => 'SALIDA',
                         'usuario_creador_id' => $usuario->id
                     ]);
+
                     Pago::create([
                         'usuario_creador_id' => $usuario->id,
                         'venta_id' => $venta->id,
                         'sucursal_id' => $venta->caja->sucursal_id,
                         'monto' => $subtotal,
-                        'cambio' => 0,
-                        'fecha' => now(),
-                        'descripcion' => 'DEVOLUCION',
                         'tipo_pago' => $venta->metodo_pago,
+                        'descripcion' => 'DEVOLUCION',
                         'estado' => 'SALIDA'
                     ]);
-                    $caja = Caja::find($venta->caja_id);
-                    $caja->total_egresos =
-                        $caja->total_egresos + $subtotal;
-                    $caja->save();
+
+                    $venta->caja->increment('total_egresos', $subtotal);
                 }
             }
 
-            $detallesPendientes = VentaDetalle::where(
-                'venta_id',
-                $venta->id
-            )
-                ->whereRaw(
-                    'cantidad > COALESCE(cantidad_devuelta,0)'
-                )
+
+            $pendientes = VentaDetalle::where('venta_id', $venta->id)
+                ->whereRaw('cantidad > COALESCE(cantidad_devuelta,0)')
                 ->count();
-            if ($detallesPendientes == 0) {
-                $venta->estado = 'DEVUELTO';
-            } else {
-                $venta->estado = 'DEVOLUCION_PARCIAL';
-            }
+
+            $venta->estado = $pendientes == 0
+                ? 'DEVUELTO'
+                : 'DEVOLUCION_PARCIAL';
 
             $venta->save();
 
             DB::commit();
+
             return response()->json([
                 'estado' => true,
-                'mensaje' =>
-                    'Devolución registrada correctamente'
+                'mensaje' => 'Devolución registrada correctamente'
             ]);
+
         } catch (\Exception $e) {
+
             DB::rollBack();
+
             return response()->json([
                 'estado' => false,
                 'mensaje' => $e->getMessage()

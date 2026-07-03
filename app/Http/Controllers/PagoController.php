@@ -21,24 +21,15 @@ class PagoController extends Controller
 {
     public function listado(Request $request)
     {
-
         $usuario = Auth::user();
         $sucursal = $usuario->sucursal;
-
         $fechaIni = date('Y-m-d');
         $fechaFin = date('Y-m-d');
-
-
         $usuarios = User::where('id', $usuario->id)->get();
         $sucursales = Sucursal::where('id', $sucursal->id)->get();
-
-
         $categoriasIngreso = Categoria::whereNull('parent_id')->get();
-
         $categoriasSalida = Categoria::whereNull('parent_id')->get();
-
         $subCategorias = Categoria::whereNotNull('parent_id')->get();
-
         return view('pago.listado')->with(compact('sucursales', 'fechaIni', 'fechaFin', 'usuarios', 'usuario', 'categoriasIngreso', 'categoriasSalida', 'subCategorias'));
     }
 
@@ -47,44 +38,34 @@ class PagoController extends Controller
         if (!$request->ajax()) {
             return response()->json(['estado' => false]);
         }
-
         $sucursal_id = $request->input('sucursal_id');
         $fecha_ini = $request->input('fecha_ini');
         $fecha_fin = $request->input('fecha_fin');
         $usuario_id = $request->input('usuario_busqueda_id');
-
         $baseQuery = Pago::query()
             ->with(['venta.detalles.producto']); // IMPORTANTE
 
         if ($sucursal_id) {
             $baseQuery->where('sucursal_id', $sucursal_id);
         }
-
         if ($fecha_ini && $fecha_fin) {
             $baseQuery->whereBetween('fecha', [
                 $fecha_ini . ' 00:00:00',
                 $fecha_fin . ' 23:59:59'
             ]);
         }
-
         if ($usuario_id) {
             $baseQuery->where('usuario_creador_id', $usuario_id);
         }
-
-
         $todos = (clone $baseQuery)
             ->orderBy('id', 'desc')
             ->get();
-
-
         $repuestos = (clone $baseQuery)
             ->whereHas('venta.detalles.producto', function ($q) {
                 $q->where('tipo_producto', 'REPUESTO');
             })
             ->orderBy('id', 'desc')
             ->get();
-
-
         $lubricantes = (clone $baseQuery)
             ->whereHas('venta.detalles.producto', function ($q) {
                 $q->where('tipo_producto', 'LUBRICANTE');
@@ -104,10 +85,8 @@ class PagoController extends Controller
 
     public function listadoDeuda()
     {
-
         $usuario = Auth::user();
         $sucursal = $usuario->sucursal;
-
         return view('pago.listadoDeuda')->with(compact('usuario'));
     }
 
@@ -115,7 +94,6 @@ class PagoController extends Controller
     {
         if ($request->ajax()) {
             $ventas = Venta::with(['cliente', 'sucursal'])->where('estado_pago', 'DEUDA')->orderBy('id', 'desc')->get();
-
             $valores = [
                 'listado' => view('pago.ajaxListadoDeuda')->with(compact('ventas'))->render()
             ];
@@ -152,14 +130,12 @@ class PagoController extends Controller
     public function guardarPagoDeuda(Request $request)
     {
         if ($request->ajax()) {
-
             $request->validate([
                 'venta_id' => 'required',
                 'tipo_pago' => 'required',
                 'importe_pago' => 'required',
                 'saldo' => 'required',
             ]);
-
             $venta_id = $request->input('venta_id');
             $tipo_pago = $request->input('tipo_pago');
             $importe_pago = $request->input('importe_pago');
@@ -178,7 +154,6 @@ class PagoController extends Controller
                 $nuevo->descripcion = 'VENTA';
                 $nuevo->tipo_pago = $tipo_pago;
                 $nuevo->estado = 'INGRESO';
-
                 $nuevo->save();
 
                 if (($saldo - $importe_pago) == 0) {
@@ -199,9 +174,7 @@ class PagoController extends Controller
 
     public function guardarTipoIngresoSalida(Request $request)
     {
-
         if ($request->ajax()) {
-
             $usuario = Auth::user();
             $monto = $request->input('monto');
             $descripcion = $request->input('descripcion');
@@ -225,38 +198,29 @@ class PagoController extends Controller
             $data = Respuesta::error(null, "Error al obtener los datos");
         }
         return $data;
-
     }
 
     public function formularioDecuentoAdicional(Request $request)
     {
-
         if ($request->ajax()) {
-
             $venta_id = $request->input('venta_id');
             $venta = Venta::find($venta_id);
-
             $pagado = pago::where('venta_id', $venta_id)
                 ->where('estado', 'INGRESO')
                 ->sum('monto');
-
             $valores = [
                 'formulario' => view('pago.formularioDecuentoAdicional')->with(compact('venta', 'pagado'))->render()
             ];
             $data = Respuesta::success($valores, "Datos obtenidos correctamente");
-
         } else {
             $data = Respuesta::error(null, "Error al obtener los datos");
         }
         return $data;
-
     }
 
     public function guardarDescuentoAdicional(Request $request)
     {
-
         if ($request->ajax()) {
-
             $usuario = Auth::user();
             $venta_id = $request->input('venta_id');
             $descuento_adicional = $request->input('descuento_adicional');
@@ -266,19 +230,15 @@ class PagoController extends Controller
             $venta->descuento_adicional = $descuento_adicional;
             $venta->descripcion = $descripcion_descuento_adicional;
             $venta->save();
-
             $data = Respuesta::success(null, "Datos obtenidos correctamente");
-
         } else {
             $data = Respuesta::error(null, "Error al obtener los datos");
         }
         return $data;
-
     }
 
     public function generaExcelPago(Request $request)
     {
-
         if ($request->ajax()) {
             $sucursal_id = $request->input('sucursal_id');
             $fecha_ini = $request->input('fecha_ini');

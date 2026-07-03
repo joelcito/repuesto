@@ -108,13 +108,16 @@
                     <th>SUBTOTAL</th>
                 </tr>
             </thead>
-            <tbody> @php $total = 0; @endphp @foreach ($venta->detalles as $detalle)
-                @php $total += $detalle->subtotal; @endphp <tr>
-                    <td> {{ $detalle->producto?->nombre }} </td>
-                    <td> {{ $detalle->cantidad }} </td>
-                    <td> {{ $detalle->tipo_precio }} </td>
-                    <td> {{ number_format($detalle->subtotal, 2) }} </td>
-            </tr> @endforeach </tbody>
+            <tbody> @php $total = 0; @endphp @foreach ($devolucion->detalles as $detalle)
+                @php $total += $detalle->subtotal; @endphp
+                <tr>
+                    <td>{{ $detalle->producto?->nombre }}</td>
+                    <td>{{ $detalle->cantidad }}</td>
+                    <td>{{ $detalle->precio_unitario }}</td>
+                    <td>{{ number_format($detalle->subtotal, 2) }}</td>
+                </tr>
+            @endforeach
+            </tbody>
             <tfoot>
                 <tr>
                     <td colspan="3">

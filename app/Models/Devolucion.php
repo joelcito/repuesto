@@ -45,5 +45,10 @@ class Devolucion extends Model
 
     }
 
+    public function detalles()
+    {
+        return $this->hasMany(DevolucionDetalle::class, 'devolucion_id');
+    }
+
 
 }

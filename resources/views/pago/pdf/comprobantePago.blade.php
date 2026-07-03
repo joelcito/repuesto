@@ -90,6 +90,7 @@
                 <th>DESCRIPCION</th>
                 <th>TIPO PAGO</th>
                 <th>MONTO</th>
+                <th>DESCUENTO</th>
                 <th>SALDO</th>
             </tr>
         </thead>
@@ -103,7 +104,15 @@
                 <td>{{ $pago->descripcion }}</td>
                 <td>{{ $pago->tipo_pago }}</td>
                 <td>{{ number_format($pago->monto, 2) }}</td>
-                <td>{{ number_format(($pago->venta?->total - $pago->venta?->pagos->sum('monto')), 2) }}</td>
+                <td>{{ number_format($pago->venta?->descuento ?? 0, 2) }}</td>
+                <td>{{ number_format(
+    (
+        $pago->venta?->total ?? 0
+        - ($pago->venta?->pagos->where('estado', 'INGRESO')->sum('monto') ?? 0)
+        - ($pago->venta?->devoluciones->sum('total') ?? 0)
+    ),
+    2
+) }}</td>
             </tr>
         </tbody>
     </table>

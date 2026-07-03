@@ -383,7 +383,7 @@
                             Swal.fire({
                                 title: "EL REGISTRO FUE EXITOSO.",
                                 icon: "success",
-                                timer: 3000, // Se cierra en 3 segundos
+                                timer: 3000,
                                 showConfirmButton: false
                             });
 
@@ -485,6 +485,8 @@
             });
 
         }
+
+
 
     </script>
 @endsection

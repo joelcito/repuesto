@@ -78,4 +78,26 @@ class Venta extends Model
             'usuario_venta_id'
         );
     }
+
+    public function devoluciones()
+    {
+        return $this->hasMany(Devolucion::class, 'venta_id');
+    }
+
+    public function totalDevoluciones()
+    {
+        return $this->devoluciones()->sum('total');
+    }
+
+    public function saldo()
+    {
+        $pagos = $this->pagos()
+            ->where('estado', 'INGRESO')
+            ->sum('monto');
+
+        $devoluciones = $this->devoluciones()
+            ->sum('total');
+
+        return round($this->total - $pagos - $devoluciones, 2);
+    }
 }
