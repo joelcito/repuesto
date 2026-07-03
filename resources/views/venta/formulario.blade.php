@@ -113,13 +113,13 @@
                                             placeholder="Ingrese Nombre, Marca, Código, Nro Parte,Vehículo...">
                                         <div id="resultado_productos" class="shadow bg-white border rounded mt-1"
                                             style="
-                                                                                                                                                max-height:400px;
-                                                                                                                                                overflow-y:auto;
-                                                                                                                                                display:none;
-                                                                                                                                                position:absolute;
-                                                                                                                                                z-index:9999;
-                                                                                                                                                width:100%;
-                                                                                                                                            ">
+                                                    max-height:400px;
+                                                    overflow-y:auto;
+                                                    display:none;
+                                                    position:absolute;
+                                                    z-index:9999;
+                                                    width:100%;
+                                                ">
                                         </div>
 
                                         <input type="hidden" id="producto_id" name="producto_id">
@@ -441,24 +441,26 @@
             tabla.clear().draw();
             productosVenta.forEach(function (item) {
 
-                let imagen = item.imagen
-                    ? `/imagenes/productos/${item.imagen}`
+                let imagen = item.imagen.length > 0
+                    ? `/imagenes/productos/${item.imagen[0].imagen}`
                     : `/imagenes/productos/default.jpg`;
 
                 let img = `
-                                                                                                                            <img src="${imagen}"
-                                                                                                                            class="imagen-producto"
-                                                                                                                                    width="45"
-                                                                                                                                    height="45"
-                                                                                                                                    style="object-fit:cover;border-radius:6px;cursor:pointer;">
-                                                                                                                        `;
+                            <img src="${imagen}"
+                            class="imagen-producto"
+                                    width="45"
+                                    height="45"
+                                    style="object-fit:cover;border-radius:6px;cursor:pointer;"
+                                    data-imagenes='${JSON.stringify(item.imagen)}'
+                                    >
+                        `;
 
                 let botonEliminar =
                     `<button
-                                                                                                                            class="btn btn-danger btn-sm"
-                                                                                                                            onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
-                                                                                                                            X
-                                                                                                                        </button>`;
+                        class="btn btn-danger btn-sm"
+                        onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
+                        X
+                    </button>`;
 
                 tabla.row.add([
                     img,
@@ -689,10 +691,10 @@
                     let html = '';
                     if (productos.length == 0) {
                         html = `
-                                                                                                                                <div class="p-3 text-center text-danger">
-                                                                                                                                    No se encontraron productos
-                                                                                                                                </div>
-                                                                                                                            `;
+                                <div class="p-3 text-center text-danger">
+                                    No se encontraron productos
+                                </div>
+                            `;
                     } else {
                         productos.forEach(producto => {
                             console.log(producto.imagenes);
@@ -711,7 +713,7 @@
                                                                                         data-vehiculo="${producto.vehiculos_compatibles ?? ''}"
                                                                                         data-ubicacion="${producto.ubicacion ?? ''}"
                                                                                         data-medida="${producto.medidas ?? ''}"
-                                                                                        data-imagen="${producto.imagenes?.length > 0 ? producto.imagenes[0].imagen : ''}">
+                                                                                        data-imagen='${JSON.stringify(producto.imagenes?.length ? producto.imagenes : [])}'>
 
                                                                                         <div class="row align-items-center">
 
@@ -949,17 +951,73 @@
         });
 
 
+        // $(document).on('click', '.imagen-producto', function () {
+
+        //     let src = $(this).attr('src');
+
+        //     Swal.fire({
+        //         imageUrl: src,
+        //         imageWidth: 600,
+        //         imageAlt: 'Producto',
+        //         showConfirmButton: false,
+        //         showCloseButton: true,
+        //         width: '700px'
+        //     });
+
+        // });
+
         $(document).on('click', '.imagen-producto', function () {
 
-            let src = $(this).attr('src');
+            let imagenes = JSON.parse($(this).attr('data-imagenes'));
+            let items = '';
+
+            imagenes.forEach(function (img, index) {
+
+                let ruta = img.imagen
+                ? `/imagenes/productos/${img.imagen}`
+                : `/imagenes/productos/default.jpg`;
+
+                items += `
+                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                    <div class="contenedor-imagen">
+                        <img src="${ruta}" class="imagen-carrusel">
+                    </div>
+                </div>
+                `;
+
+            });
 
             Swal.fire({
-                imageUrl: src,
-                imageWidth: 600,
-                imageAlt: 'Producto',
+                html: `
+                <div id="carouselProducto" class="carousel slide" data-bs-ride="false">
+
+                    <div class="carousel-inner">
+                        ${items}
+                    </div>
+
+                    ${imagenes.length > 1 ? `
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselProducto" data-bs-slide="prev">
+                        <span class="btn-carrusel">
+                            ❮
+                        </span>
+                    </button>
+
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselProducto" data-bs-slide="next">
+                        <span class="btn-carrusel">
+                            ❯
+                        </span>
+                    </button>
+                    ` : ''}
+
+                </div>
+                `,
+                width: '90%',
+                padding: 10,
                 showConfirmButton: false,
                 showCloseButton: true,
-                width: '700px'
+                customClass: {
+                    popup: 'swal-imagen-popup'
+                }
             });
 
         });
@@ -1012,6 +1070,74 @@
 
         #imagenGrande:hover {
             transform: scale(1.8);
+        }
+
+
+
+
+
+        .swal-imagen-popup{
+        width:50% !important;
+        max-width:1200px !important;
+        height:50vh !important;
+        padding:10px !important;
+        }
+
+        .swal-imagen-popup .swal2-html-container{
+        margin:0 !important;
+        padding:0 !important;
+        height:calc(90vh - 40px);
+        overflow:hidden;
+        }
+
+        #carouselProducto{
+        height:100%;
+        }
+
+        #carouselProducto .carousel-inner{
+        height:100%;
+        }
+
+        #carouselProducto .carousel-item{
+        height:100%;
+        }
+
+        .contenedor-imagen{
+        height:100%;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        }
+
+        .imagen-carrusel{
+        max-width:100%;
+        max-height:100%;
+        object-fit:contain;
+        }
+
+        .btn-carrusel{
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(0,0,0,.75);
+        color: #fff;
+        font-size: 42px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: .2s;
+        }
+
+        .btn-carrusel:hover{
+        background: rgba(0,0,0,.95);
+        transform: scale(1.1);
+        }
+
+        #carouselProducto .carousel-control-prev,
+        #carouselProducto .carousel-control-next{
+        opacity: 1 !important;
+        width: 8%;
         }
     </style>
 @endsection
