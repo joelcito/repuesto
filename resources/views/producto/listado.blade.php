@@ -121,17 +121,20 @@
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Precio Compra</label>
                                     <input type="number" step="0.01" class="form-control form-control-sm"
-                                        name="precio_compra" id="precio_compra">
+                                        name="precio_compra" id="precio_compra" @if(auth()->user()->esOperador())
+                                        readonly @endif>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Precio Venta</label>
                                     <input type="number" step="0.01" class="form-control form-control-sm"
-                                        name="precio_venta" id="precio_venta">
+                                        name="precio_venta" id="precio_venta" @if(auth()->user()->esOperador()) readonly
+                                        @endif>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Precio Mayor</label>
                                     <input type="number" step="0.01" class="form-control form-control-sm"
-                                        name="precio_mayor" id="precio_mayor">
+                                        name="precio_mayor" id="precio_mayor" @if(auth()->user()->esOperador()) readonly
+                                        @endif>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Proveedor</label>
@@ -772,10 +775,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                        <div class="invalid-feedback">
-                                                            ${mensaje}
-                                                        </div>
-                                                    `);
+                                                            <div class="invalid-feedback">
+                                                                ${mensaje}
+                                                            </div>
+                                                        `);
                             }
                         } else {
                             Swal.fire({
@@ -866,10 +869,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                        <div class="invalid-feedback">
-                                                            ${mensaje}
-                                                        </div>
-                                                    `);
+                                                            <div class="invalid-feedback">
+                                                                ${mensaje}
+                                                            </div>
+                                                        `);
                             }
                         } else {
                             Swal.fire({
@@ -987,27 +990,27 @@
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                                <div class="position-relative d-inline-block">
+                                    <div class="position-relative d-inline-block">
 
-                                    <img
-                                        src="${img.url}"
-                                        width="80"
-                                        height="80"
-                                        class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                        style="cursor:pointer;object-fit:cover"
-                                        onclick="mostrarImagen(${index})">
+                                        <img
+                                            src="${img.url}"
+                                            width="80"
+                                            height="80"
+                                            class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                            style="cursor:pointer;object-fit:cover"
+                                            onclick="mostrarImagen(${index})">
 
-                                    <button
-                                        type="button"
-                                        class="btn btn-danger btn-sm position-absolute"
-                                        style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                        onclick="eliminarImagen('${img.id}')">
+                                        <button
+                                            type="button"
+                                            class="btn btn-danger btn-sm position-absolute"
+                                            style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                            onclick="eliminarImagen('${img.id}')">
 
-                                        ×   
-                                    </button>
+                                            ×   
+                                        </button>
 
-                                </div>
-                            `);
+                                    </div>
+                                `);
             });
 
             if (listaImagenes.length > 0) {

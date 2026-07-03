@@ -92,7 +92,7 @@
                             <i class="fa fa-file-pdf"></i>
                         </button>
 
-                        @if($venta->estado != 'ANULADO')
+                        @if($venta->estado != 'ANULADO' && !auth()->user()->esOperador())
                             <button class="btn btn-danger btn-sm btn-icon" onclick="anularVenta('{{ $venta->id }}')"
                                 title="Anular">
                                 <i class="fa fa-trash"></i>

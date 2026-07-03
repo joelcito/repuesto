@@ -133,9 +133,11 @@ class ProductoController extends Controller
 
             $producto->stock_minimo = $request->input('stock_minimo');
             $producto->unidad_id = $request->input('unidad_id');
-            $producto->precio_compra = $request->input('precio_compra');
-            $producto->precio_venta = $request->input('precio_venta');
-            $producto->precio_mayor = $request->input('precio_mayor');
+            if (!auth()->user()->esOperador()) {
+                $producto->precio_compra = $request->input('precio_compra');
+                $producto->precio_venta = $request->input('precio_venta');
+                $producto->precio_mayor = $request->input('precio_mayor');
+            }
             //$producto->compra_ingreso = $request->input('compra_ingreso');
             $producto->sucursal_id = $request->input('sucursal_id');
             $producto->proveedor_id = $request->input('proveedor_id');

@@ -20,7 +20,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-
 use PDF;
 
 class DevolucionController extends Controller
@@ -29,7 +28,18 @@ class DevolucionController extends Controller
     {
         $devoluciones = Devolucion::all();
         $ventas = Venta::with('cliente')->orderBy('id', 'desc')->get();
-        return view('devolucion.listado')->with(compact('devoluciones', 'ventas'));
+        $clientes = User::where('rol_id', 5)
+            ->orderBy('ap_paterno')
+            ->orderBy('ap_materno')
+            ->orderBy('nombres')
+            ->get();
+        $vendedores = User::where('rol_id', '!=', 5)
+            ->orderBy('ap_paterno')
+            ->orderBy('ap_materno')
+            ->orderBy('nombres')
+            ->get();
+
+        return view('devolucion.listado')->with(compact('devoluciones', 'ventas', 'clientes', 'vendedores'));
 
     }
 
@@ -38,7 +48,6 @@ class DevolucionController extends Controller
         $detalle = VentaDetalle::with('producto')
             ->where('venta_id', $request->venta_id)
             ->get();
-
         return response()->json([
             'estado' => true,
             'data' => $detalle
@@ -47,22 +56,19 @@ class DevolucionController extends Controller
 
     public function ajaxListado(Request $request)
     {
-        if ($request->ajax()) {
-            $devoluciones = Devolucion::with('venta')
-                ->whereNull('deleted_at')
-                ->orderBy('id', 'desc')
-                ->get();
-            $valores = [
-                'listado' => view('devolucion.ajaxListado')
-                    ->with(compact('devoluciones'))
-                    ->render()
-            ];
+        $devoluciones = Devolucion::with('venta')
+            ->orderByDesc('id')
+            ->get();
 
-            return response()->json([
-                'estado' => true,
-                'data' => $valores
-            ]);
-        }
+        return response()->json([
+            'estado' => true,
+            'data' => [
+                'listado' => view(
+                    'devolucion.ajaxListado',
+                    compact('devoluciones')
+                )->render()
+            ]
+        ]);
     }
 
     public function guardarDevolucion(Request $request)
@@ -168,7 +174,6 @@ class DevolucionController extends Controller
                 ]);
 
                 if ($request->tipo == 'DINERO') {
-
                     MovimientoCaja::create([
                         'caja_id' => $venta->caja_id,
                         'venta_id' => $venta->id,
@@ -180,7 +185,6 @@ class DevolucionController extends Controller
                         'estado' => 'SALIDA',
                         'usuario_creador_id' => $usuario->id
                     ]);
-
                     Pago::create([
                         'usuario_creador_id' => $usuario->id,
                         'venta_id' => $venta->id,
@@ -193,12 +197,9 @@ class DevolucionController extends Controller
                         'estado' => 'SALIDA'
                     ]);
                     $caja = Caja::find($venta->caja_id);
-
                     $caja->total_egresos =
                         $caja->total_egresos + $subtotal;
-
                     $caja->save();
-
                 }
             }
 
@@ -336,7 +337,6 @@ class DevolucionController extends Controller
                         'cantidad > COALESCE(cantidad_devuelta,0)'
                     )
                     ->count();
-
             if ($detallesPendientes == 0) {
                 $venta->estado = 'DEVUELTO';
             } else {
@@ -392,5 +392,60 @@ class DevolucionController extends Controller
             '.pdf'
         );
     }
-}
 
+
+
+    public function buscarVentas(Request $request)
+    {
+        $query = Venta::with([
+            'cliente',
+            'usuario'
+        ]);
+        if ($request->numero) {
+            $query->where('id', $request->numero);
+        }
+
+        if ($request->cliente) {
+            $query->where(
+                'usuario_cliente_id',
+                $request->cliente
+            );
+        }
+
+        if ($request->vendedor) {
+            $query->where(
+                'usuario_creador_id',
+                $request->vendedor
+            );
+        }
+
+        if ($request->desde) {
+            $query->whereDate(
+                'created_at',
+                '>=',
+                $request->desde
+            );
+        }
+
+        if ($request->hasta) {
+            $query->whereDate(
+                'created_at',
+                '<=',
+                $request->hasta
+            );
+        }
+
+        $ventas = $query
+            ->orderByDesc('id')
+            ->get();
+
+        return response()->json([
+            'estado' => true,
+            'html' => view(
+                'devolucion.ajaxVentas',
+                compact('ventas')
+            )->render()
+        ]);
+
+    }
+}

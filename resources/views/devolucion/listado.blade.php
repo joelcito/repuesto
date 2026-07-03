@@ -89,13 +89,124 @@
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxlg">
             <div class="card shadow-sm">
-                <div class="card-header bg-light-info py-4 d-flex align-items-center justify-content-between">
-                    <h3 class="card-title fw-bold"> Listado de Devoluciones </h3>
-                    <div class="card-toolbar"> <button class="btn btn-danger btn-sm me-2"
-                            onclick="modalNuevaDevolucion()"> <i class="fa fa-rotate-left"></i> Nueva Devolución
-                        </button> </div>
+                <div class="card-header bg-light-danger py-4 d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fa fa-rotate-left me-2"></i>
+                        Devoluciones
+                    </h3>
+
+                    <button class="btn btn-danger btn-sm" onclick="modalNuevaDevolucion()">
+                        <i class="fa fa-plus"></i>
+                        Nueva Devolución
+                    </button>
                 </div>
-                <div class="card-body py-4" id="table_listado"> </div>
+
+                <div class="card-body">
+
+                    <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#tabVentas">
+                                <i class="fa fa-search me-2"></i>
+                                Buscar Ventas
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tabHistorial">
+                                <i class="fa fa-clock-rotate-left me-2"></i>
+                                Historial de Devoluciones
+                            </a>
+                        </li>
+
+                    </ul>
+
+                    <div class="tab-content">
+
+                        <!-- TAB BUSCAR VENTAS -->
+                        <div class="tab-pane fade show active" id="tabVentas">
+
+                            <!-- AQUÍ VAN TUS FILTROS -->
+
+                            <div class="row g-3 mb-4">
+
+
+                                <div class="card shadow-sm mb-5">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            <i class="fa fa-search me-2"></i>
+                                            Buscar Venta
+                                        </h3>
+                                    </div>
+
+                                    <div class="card-body">
+
+                                        <div class="row g-3 mb-4">
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">N° Venta</label>
+                                                <input type="text" class="form-control" id="buscar_venta">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="form-label">Cliente</label>
+                                                <select id="cliente" class="form-select">
+                                                    <option value="">Todos</option>
+
+                                                    @foreach($clientes as $cliente)
+                                                        <option value="{{ $cliente->id }}">
+                                                            {{ $cliente->ap_paterno }}
+                                                            {{ $cliente->ap_materno }}
+                                                            {{ $cliente->nombres }}
+                                                        </option>
+                                                    @endforeach
+
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="form-label">Vendedor</label>
+                                                <select id="vendedor" class="form-select">
+
+                                                    <option value="">Todos</option>
+
+                                                    @foreach($vendedores as $vendedor)
+                                                        <option value="{{ $vendedor->id }}">
+                                                            {{ $vendedor->nombres }}
+                                                        </option>
+                                                    @endforeach
+
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">Desde</label>
+                                                <input type="date" class="form-control" id="fecha_desde">
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">Hasta</label>
+                                                <input type="date" class="form-control" id="fecha_hasta">
+                                            </div>
+
+                                        </div>
+
+                                        <div id="tablaVentas"></div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="tablaVentas"></div>
+
+                        </div>
+
+                        <!-- TAB HISTORIAL -->
+                        <div class="tab-pane fade" id="tabHistorial">
+                            <div id="table_listado"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -103,23 +214,39 @@
 
 
 @stop()
-
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script src="{{ asset('assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
     <script>
         $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
-        $(document).ready(function () { ajaxListado(); });
+        $(document).ready(function () {
+            ajaxListado();
+            buscarVentas();
+        });
+
+        $('#buscar_venta,#cliente,#vendedor,#fecha_desde,#fecha_hasta')
+            .on('keyup change', function () {
+                buscarVentas();
+            });
+
 
         function ajaxListado() {
             $.ajax({
                 url: "{{ route('devolucion.ajaxListado') }}",
-                method: "POST", success: function (resultado) {
-                    if (resultado.estado) {
-                        $('#table_listado').html(resultado.data.listado);
+                method: "POST",
+                success: function (resultado) {
 
+                    $('#table_listado').html(resultado.data.listado);
+                    iniciarTabla('#kt_table_devolucion');
+                    if ($.fn.DataTable.isDataTable('#kt_table_devolucion')) {
+                        $('#kt_table_devolucion').DataTable().destroy();
                     }
+
+                    $('#kt_table_devolucion').DataTable({
+                        responsive: true,
+                        destroy: true
+                    });
+
                 }
             });
         }
@@ -139,11 +266,11 @@
                     let html = ''; resultado.data.forEach(item => {
                         let devuelto = item.cantidad_devuelta ?? 0;
                         let disponible = item.cantidad - devuelto; html += ` <tr> <td> 
-                                        ${item.producto.nombre} </td> <td class="text-center"> ${item.cantidad} 
-                                        </td> <td class="text-center text-danger fw-bold"> ${devuelto} </td> <td class="text-center"> Bs. 
-                                        ${parseFloat(item.precio_unitario).toFixed(2)} </td> <td> <input type="number" min="0" max="${disponible}" 
-                                        value="0" class="form-control form-control-sm cantidad_devolucion" data-precio="${item.precio_unitario}" 
-                                        data-producto="${item.producto_id}"> <small class="text-danger"> Disponible: ${disponible} </small> </td> </tr> `;
+                                                                                            ${item.producto.nombre} </td> <td class="text-center"> ${item.cantidad} 
+                                                                                            </td> <td class="text-center text-danger fw-bold"> ${devuelto} </td> <td class="text-center"> Bs. 
+                                                                                            ${parseFloat(item.precio_unitario).toFixed(2)} </td> <td> <input type="number" min="0" max="${disponible}" 
+                                                                                            value="0" class="form-control form-control-sm cantidad_devolucion" data-precio="${item.precio_unitario}" 
+                                                                                            data-producto="${item.producto_id}"> <small class="text-danger"> Disponible: ${disponible} </small> </td> </tr> `;
                     });
                     $('#detalle_devolucion').html(html); calcularMonto();
                 }
@@ -234,5 +361,101 @@
             });
         }
 
+        function buscarVentas() {
+            $.ajax({
+                url: "{{ route('devolucion.buscarVentas') }}",
+                method: "POST",
+                data: {
+                    numero: $('#buscar_venta').val(),
+                    cliente: $('#cliente').val(),
+                    vendedor: $('#vendedor').val(),
+                    desde: $('#fecha_desde').val(),
+                    hasta: $('#fecha_hasta').val()
+                },
+                success: function (resultado) {
+
+                    $('#tablaVentas').html(resultado.html);
+                    iniciarTabla('#kt_table_ventas');
+
+                    if ($.fn.DataTable.isDataTable('#kt_table_ventas')) {
+                        $('#kt_table_ventas').DataTable().destroy();
+                    }
+
+                    $('#kt_table_ventas').DataTable({
+                        responsive: true,
+                        destroy: true
+                    });
+
+                }
+            });
+        }
+
+        function seleccionarVenta(id) {
+            $('#venta_id').val(id);
+            $('#modalDevolucion').modal('show');
+            $.ajax({
+                url: "{{ route('devolucion.obtenerDetalleVenta') }}",
+                method: "POST",
+                data: {
+                    venta_id: id
+                },
+                success: function (resultado) {
+                    let html = '';
+                    resultado.data.forEach(item => {
+                        let devuelto = item.cantidad_devuelta ?? 0;
+                        let disponible = item.cantidad - devuelto;
+                        html += `
+                                                                                        <tr>
+                                                                                            <td>${item.producto.nombre}</td>
+                                                                                            <td class="text-center">${item.cantidad}</td>
+                                                                                            <td class="text-center">${devuelto}</td>
+                                                                                            <td>Bs ${parseFloat(item.precio_unitario).toFixed(2)}</td>
+                                                                                            <td>
+                                                                                                <input
+                                                                                                    type="number"
+                                                                                                    min="0"
+                                                                                                    max="${disponible}"
+                                                                                                    value="0"
+                                                                                                    class="form-control cantidad_devolucion"
+                                                                                                    data-precio="${item.precio_unitario}"
+                                                                                                    data-producto="${item.producto_id}">
+                                                                                            </td>
+                                                                                        </tr>`;
+                    });
+
+                    $('#detalle_devolucion').html(html);
+                    calcularMonto();
+                }
+            });
+        }
+
+
+        function iniciarTabla(id) {
+
+            if ($.fn.DataTable.isDataTable(id)) {
+                $(id).DataTable().destroy();
+            }
+
+            $(id).DataTable({
+                destroy: true,
+                responsive: true,
+                lengthMenu: [10, 25, 50, 100],
+                order: [],
+                dom: '<"dt-head row"<"col-md-6"l><"col-md-6"f>>t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>',
+                language: {
+                    paginate: {
+                        first: 'Primero',
+                        last: 'Último',
+                        next: 'Siguiente',
+                        previous: 'Anterior'
+                    },
+                    search: 'Buscar:',
+                    lengthMenu: 'Mostrar _MENU_ registros por página',
+                    info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+                    emptyTable: 'No hay datos disponibles'
+                }
+            });
+
+        }
     </script>
 @endsection

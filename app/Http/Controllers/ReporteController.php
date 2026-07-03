@@ -64,6 +64,8 @@ class ReporteController extends Controller
 
     public function inventariosPdf(Request $request)
     {
+        $usuario = Auth::user();
+
         $productos = Producto::with([
             'categoria',
             'proveedor',
@@ -71,6 +73,12 @@ class ReporteController extends Controller
         ])
             ->where('estado', 1)
             ->get();
+        foreach ($productos as $producto) {
+            $producto->stock_actual = $this->obtenerStock(
+                $producto->id,
+                $usuario->sucursal_id
+            );
+        }
 
         $pdf = Pdf::loadView(
             'reporte.pdf.inventarios_pdf',
@@ -243,6 +251,30 @@ class ReporteController extends Controller
         );
 
         return $pdf->stream('pagos.pdf');
+    }
+
+    private function obtenerStock($productoId, $sucursalId)
+    {
+        $ingresos = Movimiento::where('producto_id', $productoId)
+            ->where('sucursal_id', $sucursalId)
+            ->whereIn('tipo', [
+                'INGRESO',
+                'DEVOLUCION',
+                'TRANSFERENCIA_INGRESO',
+                'ANULACION_VENTA'
+            ])
+            ->sum('cantidad');
+
+        $salidas = Movimiento::where('producto_id', $productoId)
+            ->where('sucursal_id', $sucursalId)
+            ->whereIn('tipo', [
+                'SALIDA',
+                'VENTA',
+                'TRANSFERENCIA_SALIDA'
+            ])
+            ->sum('cantidad');
+
+        return $ingresos - $salidas;
     }
 
 }

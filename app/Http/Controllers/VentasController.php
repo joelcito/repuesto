@@ -433,6 +433,10 @@ class VentasController extends Controller
     }
     public function anularVenta(Request $request)
     {
+
+        if (auth()->user()->esOperador()) {
+            abort(403, 'No tiene permisos para realizar esta acción.');
+        }
         DB::beginTransaction();
         try {
             $venta = Venta::with(['detalles.producto', 'pagos'])->find($request->venta_id);

@@ -4,7 +4,6 @@
         <thead>
             <tr class="text-start text-muted fw-bold fs-8 text-uppercase gs-0">
                 <th>Sucursal</th>
-                <th></th>
                 <th>Fecha</th>
                 <th>Descripcion</th>
                 <th>Tipo Pago</th>
@@ -31,9 +30,7 @@
             @endphp
             @forelse ($pagos as $pago)
                 <tr class="{{ $pago->estado == 'INGRESO' ? 'bg-light-success' : 'bg-light-danger' }}">
-
                     <td>{{ $pago?->sucursal?->nombre }}</td>
-                    <td></td>
                     <td>{{ $pago->fecha }}</td>
                     <td>{{ $pago->descripcion }}</td>
                     <td>{{ $pago->tipo_pago }}</td>
