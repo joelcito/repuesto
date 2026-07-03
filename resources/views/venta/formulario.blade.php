@@ -971,21 +971,36 @@
             let imagenes = JSON.parse($(this).attr('data-imagenes'));
             let items = '';
 
-            imagenes.forEach(function (img, index) {
+            console.log(imagenes.length);
+            if(imagenes.length > 0){
+                imagenes.forEach(function (img, index) {
 
-                let ruta = img.imagen
-                ? `/imagenes/productos/${img.imagen}`
-                : `/imagenes/productos/default.jpg`;
+                    let ruta = img.imagen
+                    ? `/imagenes/productos/${img.imagen}`
+                    : `/imagenes/productos/default.jpg`;
 
+                    items += `
+                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                        <div class="contenedor-imagen">
+                            <img src="${ruta}" class="imagen-carrusel">
+                        </div>
+                    </div>
+                    `;
+
+                });
+            }else{
+
+                let ruta = `/imagenes/productos/default.jpg`;
                 items += `
-                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                <div class="carousel-item active ">
                     <div class="contenedor-imagen">
                         <img src="${ruta}" class="imagen-carrusel">
                     </div>
                 </div>
                 `;
+                imagenes.push({imagen: ruta});
+            }
 
-            });
 
             Swal.fire({
                 html: `
