@@ -8,6 +8,7 @@ use App\Models\Incorporacion;
 use App\Models\Marca;
 use App\Models\Movimiento;
 use App\Models\Producto;
+use App\Models\ProductoImagen;
 use App\Models\Proveedor;
 use App\Models\Sucursal;
 use App\Models\Unidad;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
+use App\Models\IncorporacionImagen;
 class IncorporacionController extends Controller
 {
     public function listado()
@@ -52,10 +54,12 @@ class IncorporacionController extends Controller
     public function ajaxListado(Request $request)
     {
         if ($request->ajax()) {
-            $incorporaciones = Incorporacion::with('producto')
+            $incorporaciones = Incorporacion::with('producto', 'imagenes')
                 ->whereNull('deleted_at')
                 ->orderBy('id', 'desc')->get();
             $valores = ['listado' => view('incorporacion.ajaxListado')->with(compact('incorporaciones'))->render()];
+
+
             return response()->json(['estado' => true, 'data' => $valores]);
         }
     }
@@ -67,6 +71,7 @@ class IncorporacionController extends Controller
             $request->validate([
                 'nombre_producto' => 'required|string|max:255',
                 'descripcion_producto' => 'nullable|string',
+                'medidas' => 'nullable|string',
             ]);
             $usuario = Auth::user();
             $incorporacion = new Incorporacion();
@@ -75,10 +80,30 @@ class IncorporacionController extends Controller
                 strtoupper($request->nombre_producto);
             $incorporacion->descripcion_producto =
                 $request->descripcion_producto;
+
             $incorporacion->estado = 'ACTIVO';
+            $incorporacion->medidas = $request->medidas;
             $incorporacion->usuario_creador_id =
                 $usuario->id;
             $incorporacion->save();
+            if ($request->hasFile('imagenes')) {
+
+                foreach ($request->file('imagenes') as $imagen) {
+
+                    $nombre = uniqid() . '.' . $imagen->extension();
+
+                    $imagen->move(
+                        public_path('imagenes/incorporaciones'),
+                        $nombre
+                    );
+
+                    IncorporacionImagen::create([
+                        'incorporacion_id' => $incorporacion->id,
+                        'ruta' => 'imagenes/incorporaciones/' . $nombre
+                    ]);
+                }
+            }
+
             DB::commit();
             return response()->json([
                 'estado' => true,
@@ -127,7 +152,7 @@ class IncorporacionController extends Controller
 
     public function obtener(Request $request)
     {
-        $inc = Incorporacion::find($request->id);
+        $inc = Incorporacion::with('imagenes')->find($request->id);
 
         if (!$inc) {
             return response()->json([
@@ -158,8 +183,35 @@ class IncorporacionController extends Controller
             $producto->usuario_creador_id = $usuario->id;
             $producto->nombre = $incorporacion->nombre_producto;
             $producto->descripcion = $incorporacion->descripcion_producto;
+            $producto->medidas = $incorporacion->medidas;
             $producto->estado = 1;
             $producto->save();
+
+            $orden = 1;
+
+            foreach ($incorporacion->imagenes as $img) {
+
+                $origen = public_path($img->ruta);
+
+                if (file_exists($origen)) {
+
+                    $nuevoNombre = time() . '_' . uniqid() . '.' . pathinfo($origen, PATHINFO_EXTENSION);
+
+                    copy(
+                        $origen,
+                        public_path('imagenes/productos/' . $nuevoNombre)
+                    );
+
+                    ProductoImagen::create([
+                        'usuario_creador_id' => $usuario->id,
+                        'producto_id' => $producto->id,
+                        'imagen' => $nuevoNombre,
+                        'orden' => $orden++,
+                        'estado' => 1
+                    ]);
+                }
+            }
+
             $incorporacion->producto_id = $producto->id;
             $incorporacion->save();
             $incorporacion->delete();

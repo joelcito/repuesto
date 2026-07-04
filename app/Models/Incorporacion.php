@@ -26,6 +26,9 @@ class Incorporacion extends Model
         'motivo',
         'descripcion',
 
+        'nombre_producto',
+        'descripcion_producto',
+        'medidas',
         'estado',
         'usuario_creador_id'
     ];
@@ -38,6 +41,11 @@ class Incorporacion extends Model
     public function sucursal()
     {
         return $this->belongsTo(Sucursal::class);
+    }
+
+    public function imagenes()
+    {
+        return $this->hasMany(IncorporacionImagen::class);
     }
 
 

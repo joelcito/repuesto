@@ -6,6 +6,9 @@
                 <th>Producto</th>
                 <th>Descripcion</th>
                 <th>Fecha</th>
+                <th>Medidas</th>
+
+                <th>Imagen</th>
                 <th>Estado</th>
                 <th>Actions</th>
 
@@ -27,6 +30,19 @@
                     </td>
 
                     <td> {{ $incorporacion->created_at }} </td>
+
+                    <td>{{ $incorporacion->medidas }}</td>
+
+                    <td>
+
+                        @if($incorporacion->imagenes->count())
+
+                            <img src="{{ asset($incorporacion->imagenes->first()->ruta) }}" width="60" class="img-thumbnail">
+
+                        @endif
+
+                    </td>
+
                     <td>{{ $incorporacion->estado }}</td>
                     <td>
 

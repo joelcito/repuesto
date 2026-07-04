@@ -35,6 +35,11 @@
                             <input type="hidden" id="incorporacion_id" name="incorporacion_id">
                             <input type="text" class="form-control form-control-sm" name="nombre_producto">
                         </div>
+                        <div class="col-md-6">
+                            <label>Medidas</label>
+
+                            <input type="text" class="form-control" name="medidas" id="medidasinc">
+                        </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-md-12">
@@ -44,7 +49,28 @@
                             <textarea class="form-control form-control-sm" rows="3"
                                 name="descripcion_producto"></textarea>
                         </div>
+
+
                     </div>
+
+                    <div class="row mt-3">
+
+                        <div class="col-md-12">
+
+                            <label>Imágenes</label>
+                            <input type="file" class="form-control" id="imagenesIncorporacion" multiple>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mt-3">
+
+                        <div id="preview_imagenes_incorporacion"></div>
+
+                    </div>
+
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -182,7 +208,7 @@
                                         id="stock_minimo">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Ubicación</label>
+                                    <label class="form-label fw-bold">Sucursal</label>
                                     <select class="form-select form-select-sm" name="sucursal_id" id="sucursal_id">
                                         <option value="">Seleccione</option>
                                         @foreach($sucursales as $sucursal)
@@ -225,8 +251,20 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Medidas</label>
+                                    <label class="form-label fw-bold">Medida/Especificación</label>
                                     <input type="text" class="form-control form-control-sm" id="medidas" name="medidas">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Ubicación</label>
+                                    <input type="text" class="form-control form-control-sm" id="ubicacion"
+                                        name="ubicacion">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Tipo Producto</label>
+                                    <select class="form-select form-select-sm" name="tipo_producto" id="tipo_producto">
+                                        <option value="REPUESTO">REPUESTO</option>
+                                        <option value="LUBRICANTE">LUBRICANTE</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -322,34 +360,85 @@
 
 
         function guardarIncorporacion() {
-            let datos = $('#formularioIncorporacion')
-                .serialize();
+
+            let formData = new FormData();
+
+            formData.append(
+                'nombre_producto',
+                $('[name="nombre_producto"]').val()
+            );
+
+            formData.append(
+                'descripcion_producto',
+                $('[name="descripcion_producto"]').val()
+            );
+
+            formData.append(
+                'medidas',
+                $('#medidasinc').val()
+            );
+
+            // Agregar imágenes
+            listaImagenesIncorporacion.forEach(img => {
+                if (img.file instanceof File) {
+                    formData.append('imagenes[]', img.file);
+                }
+            });
+
             $.ajax({
                 url: "{{ route('incorporacion.guardarIncorporacion') }}",
                 method: "POST",
-                data: datos,
+                data: formData,
+                processData: false,
+                contentType: false,
+
                 success: function (resultado) {
+
                     if (resultado.estado) {
+
                         Swal.fire({
                             icon: 'success',
                             title: resultado.mensaje,
                             timer: 2000,
                             showConfirmButton: false
                         });
+
                         $('#modalIncorporacion').modal('hide');
+
+                        $('#formularioIncorporacion')[0].reset();
+
+                        listaImagenesIncorporacion = [];
+                        indiceActualIncorporacion = 0;
+
+                        $('#preview_imagenes_incorporacion').html('');
+
+                        $('#imagenesIncorporacion').val('');
+
                         ajaxListado();
+
                     } else {
+
                         Swal.fire({
                             icon: 'error',
                             title: resultado.mensaje
                         });
+
                     }
+
                 }
             });
+
         }
 
         function modalNuevaIncorporacion() {
             $('#formularioIncorporacion')[0].reset();
+
+            listaImagenesIncorporacion = [];
+            indiceActualIncorporacion = 0;
+
+            $('#preview_imagenes_incorporacion').html('');
+            $('#imagenesIncorporacion').val('');
+
             $('#modalIncorporacion').modal('show');
         }
 
@@ -413,6 +502,30 @@
                     $('#incorporacion_id').val(inc.id);
                     $('#nombre').val(inc.nombre_producto);
                     $('#descripcion').val(inc.descripcion_producto);
+                    $('#medidas').val(inc.medidas);
+                    listaImagenes = [];
+                    indiceActual = 0;
+
+                    // Cargar imágenes de la incorporación
+                    if (inc.imagenes) {
+
+                        inc.imagenes.forEach(function (img) {
+
+                            listaImagenes.push({
+                                id: img.id,
+                                file: null,
+                                url: '/' + img.ruta
+                            });
+
+                        });
+
+                    }
+
+                    renderPreview();
+
+                    if (listaImagenes.length > 0) {
+                        mostrarImagen(0);
+                    }
                 }
             });
         }
@@ -466,10 +579,10 @@
             formData.append('sucursal_id', $('#sucursal_id').val());
             formData.append('proveedor_id', $('#proveedor_id').val());
             formData.append('observaciones', $('#observaciones').val());
-
+            formData.append('ubicacion', $('#ubicacion').val());
             formData.append('medidas', $('#medidas').val());
 
-
+            formData.append('tipo_producto', $('#tipo_producto').val());
             formData.append('incorporacion_id', $('#incorporacion_id').val());
 
             listaImagenes.forEach(img => {
@@ -507,6 +620,9 @@
         let listaImagenes = [];
         let indiceActual = 0;
 
+        let listaImagenesIncorporacion = [];
+        let indiceActualIncorporacion = 0;
+
         $('#imagenes').on('change', function (e) {
             let archivos = Array.from(e.target.files);
             archivos.forEach(file => {
@@ -525,42 +641,91 @@
             $('#imagenes').val('');
         });
 
+
+        $('#imagenesIncorporacion').on('change', function (e) {
+
+            let archivos = Array.from(e.target.files);
+
+            archivos.forEach(file => {
+
+                let id = Math.random().toString(36).substr(2, 9);
+
+                listaImagenesIncorporacion.push({
+                    id: id,
+                    file: file,
+                    url: URL.createObjectURL(file)
+                });
+
+            });
+
+            renderPreviewIncorporacion();
+
+        });
         function renderPreview() {
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                                        <div class="position-relative d-inline-block">
+                                                                                            <div class="position-relative d-inline-block">
 
-                                            <img
-                                                src="${img.url}"
-                                                width="80"
-                                                height="80"
-                                                class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                                style="cursor:pointer;object-fit:cover"
-                                                onclick="mostrarImagen(${index})">
+                                                                                                <img
+                                                                                                    src="${img.url}"
+                                                                                                    width="80"
+                                                                                                    height="80"
+                                                                                                    class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                                                                                    style="cursor:pointer;object-fit:cover"
+                                                                                                    onclick="mostrarImagen(${index})">
 
-                                            <button
-                                                type="button"
-                                                class="btn btn-danger btn-sm position-absolute"
-                                                style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                                onclick="eliminarImagen('${img.id}')">
+                                                                                                <button
+                                                                                                    type="button"
+                                                                                                    class="btn btn-danger btn-sm position-absolute"
+                                                                                                    style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                                                                                    onclick="eliminarImagen('${img.id}')">
 
-                                                ×   
-                                            </button>
+                                                                                                    ×   
+                                                                                                </button>
 
-                                        </div>
-                                    `);
+                                                                                            </div>
+                                                                                        `);
             });
 
             if (listaImagenes.length > 0) {
-                if (indiceActual >= listaImagenes.length) {
+
+                if (indiceActual < 0 || indiceActual >= listaImagenes.length) {
                     indiceActual = 0;
                 }
+
                 $('#imagenPrincipal').attr('src', listaImagenes[indiceActual].url);
+
             } else {
-                $('#imagenPrincipal').attr('src', '/imagenes/productos/default.jpg');
+
+                indiceActual = 0;
+
+                $('#imagenPrincipal').attr(
+                    'src',
+                    '/imagenes/productos/default.jpg'
+                );
+
             }
         }
+
+        function renderPreviewIncorporacion() {
+
+            $('#preview_imagenes_incorporacion').html('');
+
+            listaImagenesIncorporacion.forEach((img, index) => {
+
+                $('#preview_imagenes_incorporacion').append(`
+                                                    <img
+                                                        src="${img.url}"
+                                                        width="80"
+                                                        class="img-thumbnail m-1">
+                                                `);
+
+            });
+
+        }
+
+
         function eliminarImagen(id) {
             let eliminado = listaImagenes.findIndex(x => x.id == id);
             if (eliminado == -1)
