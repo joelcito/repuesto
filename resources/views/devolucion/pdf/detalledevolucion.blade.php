@@ -77,75 +77,88 @@
             NOTA DE DEVOLUCIÓN N°
             {{ sprintf('%06d', $devolucion->id) }}
         </div>
-        <table id="tabla">
-            <tr>
-                <td><strong>Tipo:</strong></td>
-                <td>{{ $devolucion->tipo }}</td>
-
-                <td><strong>Fecha:</strong></td>
-                <td>
-                    {{ date(
-    'd/m/Y',
-    strtotime($devolucion->created_at)
-) }}
-                </td>
-            </tr>
-
-            <tr>
-                <td><strong>Motivo:</strong></td>
-                <td colspan="3">
-                    {{ $devolucion->motivo }}
-                </td>
-            </tr>
-        </table>
-        <hr>
         <table class="table">
             <thead>
                 <tr>
                     <th>PRODUCTO</th>
                     <th>CANTIDAD</th>
-                    <th>TIPO PRECIO</th>
+                    <th>PRECIO</th>
+                    <th>DESC.</th>
+                    <th>PRECIO FINAL</th>
                     <th>SUBTOTAL</th>
                 </tr>
             </thead>
-            <tbody> @php $total = 0; @endphp @foreach ($devolucion->detalles as $detalle)
-                @php $total += $detalle->subtotal; @endphp
-                <tr>
-                    <td>{{ $detalle->producto?->nombre }}</td>
-                    <td>{{ $detalle->cantidad }}</td>
-                    <td>{{ $detalle->precio_unitario }}</td>
-                    <td>{{ number_format($detalle->subtotal, 2) }}</td>
-                </tr>
-            @endforeach
+
+            <tbody>
+
+                @foreach ($devolucion->detalles as $detalle)
+
+                    @php
+                        $descuentoUnitario = ($detalle->descuento ?? 0) / $detalle->cantidad;
+                        $precioFinal = $detalle->precio_unitario - $descuentoUnitario;
+                    @endphp
+
+                    <tr>
+                        <td>{{ $detalle->producto?->nombre }}</td>
+
+                        <td class="text-center">
+                            {{ $detalle->cantidad }}
+                        </td>
+
+                        <td class="text-end">
+                            {{ number_format($detalle->precio_unitario, 2) }}
+                        </td>
+
+                        <td class="text-end">
+                            {{ number_format($descuentoUnitario, 2) }}
+                        </td>
+
+                        <td class="text-end">
+                            {{ number_format($precioFinal, 2) }}
+                        </td>
+
+                        <td class="text-end">
+                            {{ number_format($detalle->subtotal, 2) }}
+                        </td>
+
+                    </tr>
+
+                @endforeach
+
             </tbody>
+
             <tfoot>
+
                 <tr>
-                    <td colspan="3">
+                    <td colspan="5">
                         <strong>TOTAL DEVOLUCIÓN</strong>
                     </td>
+
                     <td>
-                        {{ number_format($devolucion->total, 2) }}
+                        <strong>
+                            {{ number_format($devolucion->total, 2) }}
+                        </strong>
                     </td>
                 </tr>
 
                 <tr>
-                    <td colspan="3">
+                    <td colspan="5">
                         <strong>TIPO</strong>
                     </td>
-                    <td>
-                        {{ $devolucion->tipo }}
-                    </td>
+
+                    <td>{{ $devolucion->tipo }}</td>
                 </tr>
 
                 <tr>
-                    <td colspan="3">
+                    <td colspan="5">
                         <strong>ESTADO</strong>
                     </td>
-                    <td>
-                        {{ $devolucion->estado }}
-                    </td>
+
+                    <td>{{ $devolucion->estado }}</td>
                 </tr>
+
             </tfoot>
+
         </table>
     </div>
 </body>

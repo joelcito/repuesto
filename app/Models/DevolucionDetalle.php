@@ -20,6 +20,7 @@ class DevolucionDetalle extends Model
         'cantidad',
         'precio_unitario',
         'subtotal',
+        'descuento',
         'estado'
     ];
 

@@ -138,19 +138,22 @@
                 <tr>
                     <th width="4%">N°</th>
                     <th width="10%">CÓDIGO</th>
-                    <th width="28%">DESCRIPCIÒN DEL PRODUCTO</th>
+                    <th width="25%">DESCRIPCIÓN DEL PRODUCTO</th>
                     <th width="12%">MARCA</th>
                     <th width="8%">CANT.</th>
                     <th width="8%">UNIDAD</th>
-                    <th width="10%">PRECIO UNITARIO</th>
+                    <th width="10%">P. UNIT.</th>
+                    <th width="8%">DESC.</th>
                     <th width="10%">SUBTOTAL</th>
                 </tr>
             </thead>
-            <tbody> @php
-                $total = 0;
-            @endphp
+            <tbody>
+                @php
+                    $total = 0;
+                @endphp
 
                 @foreach ($venta->detalles as $detalle)
+
                     @php
                         $total += $detalle->subtotal;
                     @endphp
@@ -162,9 +165,14 @@
                         <td>{{ $detalle->producto?->marca?->nombre ?? '-' }}</td>
                         <td>{{ $detalle->cantidad }}</td>
                         <td>{{ optional($detalle->producto->unidad)->nombre ?? '-' }}</td>
+
                         <td>{{ number_format($detalle->precio_unitario, 2) }}</td>
+
+                        <td>{{ number_format($detalle->descuento, 2) }}</td>
+
                         <td>{{ number_format($detalle->subtotal, 2) }}</td>
                     </tr>
+
                 @endforeach
             </tbody>
             <tfoot>
@@ -182,7 +190,7 @@
                     <td>{{ number_format($cambio, 2) }}</td>
                 </tr> -->
                 <tr>
-                    <td colspan="7" style="text-align:right"> <strong>TOTAL A PAGAR</strong> </td>
+                    <td colspan="8" style="text-align:right"> <strong>TOTAL A PAGAR</strong> </td>
                     <td> {{ number_format($venta->total, 2) }} </td>
                 </tr>
                 <!-- <tr>

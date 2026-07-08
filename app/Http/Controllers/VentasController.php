@@ -122,7 +122,8 @@ class VentasController extends Controller
             $venta->nit = $request->nit;
             $venta->razon_social = $request->razon_social;
             $venta->subtotal = 0;
-            $venta->descuento = $request->descuento ?? 0;
+            //$venta->descuento = $request->descuento ?? 0;
+            $venta->descuento = 0;
             $venta->total = 0;
 
             $venta->descripcion = $request->descripcion;
@@ -157,13 +158,17 @@ class VentasController extends Controller
                     ($precio * $item['cantidad'])
                     - ($item['descuento'] ?? 0);
 
+                $precioOriginal = $item['tipo_precio'] == 'MAYOR'
+                    ? $producto->precio_mayor
+                    : $producto->precio_venta;
+
                 VentaDetalle::create([
                     'venta_id' => $venta->id,
                     'producto_id' => $producto->id,
                     'cantidad' => $item['cantidad'],
                     'cantidad_devuelta' => 0,
                     'precio_compra' => $producto->precio_compra,
-                    'precio_original' => $producto->precio_venta,
+                    'precio_original' => $precioOriginal,
                     'precio_unitario' => $precio,
                     'descuento' => $item['descuento'] ?? 0,
                     'tipo_precio' => $item['tipo_precio'],
@@ -189,7 +194,8 @@ class VentasController extends Controller
                 $subtotalGeneral += $subtotal;
             }
 
-            $total = $subtotalGeneral - $venta->descuento;
+            //$total = $subtotalGeneral - $venta->descuento;
+            $total = $subtotalGeneral;
             $venta->subtotal = $subtotalGeneral;
             $venta->total = $total;
             $venta->save();
@@ -199,9 +205,17 @@ class VentasController extends Controller
             if (count($pagos) == 0) {
                 throw new \Exception("Debe registrar al menos un pago");
             }
+
+
+            // $totalPagado = collect($pagos)->sum(function ($p) {
+            //     return ($p['monto'] ?? 0) - ($p['descuento'] ?? 0);
+            // });
+
             $totalPagado = collect($pagos)->sum(function ($p) {
-                return ($p['monto'] ?? 0) - ($p['descuento'] ?? 0);
+                return $p['monto'] ?? 0;
             });
+
+
             $cambio = max(0, $totalPagado - $total);
             if ($totalPagado > $total) {
                 $cambio = $totalPagado - $total;
@@ -219,16 +233,20 @@ class VentasController extends Controller
                 if (!isset($pago['monto']) || $pago['monto'] <= 0) {
                     continue;
                 }
-                $monto = ($pago['monto'] ?? 0);
-                $descuento = ($pago['descuento'] ?? 0);
-                $montoNeto = $monto - $descuento;
+                // $monto = ($pago['monto'] ?? 0);
+                // $descuento = ($pago['descuento'] ?? 0);
+                // $montoNeto = $monto - $descuento;
+
+                $monto = (float) $pago['monto'];
                 Pago::create([
                     'usuario_creador_id' => $usuario->id,
                     'venta_id' => $venta->id,
                     'caja_id' => $caja->id,
                     'sucursal_id' => $caja->sucursal_id,
                     'monto' => $monto,
-                    'cambio' => max(0, $monto - $descuento - $total), // opcional o simplificado
+                    //'cambio' => max(0, $monto - $descuento - $total), // opcional o simplificado
+
+                    'cambio' => 0,
                     'fecha' => now(),
                     'descripcion' => 'PAGO VENTA #' . $venta->numero_factura,
                     'tipo_pago' => $pago['metodo'],
@@ -236,19 +254,23 @@ class VentasController extends Controller
                 ]);
 
 
+
                 MovimientoCaja::create([
                     'caja_id' => $venta->caja_id,
                     'venta_id' => $venta->id,
                     'tipo' => 'INGRESO',
                     'metodo_pago' => $pago['metodo'],
-                    'monto' => $montoNeto,
+                    // 'monto' => $montoNeto,
+                    'monto' => $monto,
                     'descripcion' => 'VENTA #' . $venta->id,
                     'fecha' => now(),
                     'estado' => 'INGRESO',
                     'usuario_creador_id' => $usuario->id
                 ]);
 
-                $caja->total_ingresos += $montoNeto;
+                //$caja->total_ingresos += $montoNeto;
+                $caja->total_ingresos += $monto;
+
             }
             $caja->save();
 

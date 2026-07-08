@@ -112,7 +112,13 @@ class DevolucionController extends Controller
                 }
 
 
-                $subtotal = $item['cantidad'] * $ventaDetalle->precio_unitario;
+                $descuentoUnitario =
+                    ($ventaDetalle->descuento ?? 0)
+                    / $ventaDetalle->cantidad;
+                //$subtotal = $item['cantidad'] * $ventaDetalle->precio_unitario;
+                $subtotal =
+                    ($item['cantidad'] * $ventaDetalle->precio_unitario)
+                    - ($descuentoUnitario * $item['cantidad']);
 
                 $totalGeneral += $subtotal;
             }
@@ -135,11 +141,19 @@ class DevolucionController extends Controller
                 $ventaDetalle = VentaDetalle::where('venta_id', $venta->id)
                     ->where('producto_id', $item['producto_id'])
                     ->first();
-
                 $producto = Producto::findOrFail($item['producto_id']);
+                // $subtotal = $item['cantidad'] * $ventaDetalle->precio_unitario;
 
+                $descuentoUnitario =
+                    ($ventaDetalle->descuento ?? 0)
+                    / $ventaDetalle->cantidad;
 
-                $subtotal = $item['cantidad'] * $ventaDetalle->precio_unitario;
+                $descuento =
+                    $descuentoUnitario * $item['cantidad'];
+
+                $subtotal =
+                    ($item['cantidad'] * $ventaDetalle->precio_unitario)
+                    - $descuento;
 
 
                 DevolucionDetalle::create([
@@ -147,6 +161,7 @@ class DevolucionController extends Controller
                     'producto_id' => $item['producto_id'],
                     'cantidad' => $item['cantidad'],
                     'precio_unitario' => $ventaDetalle->precio_unitario,
+                    'descuento' => $descuento,
                     'subtotal' => $subtotal,
                     'usuario_creador_id' => $usuario->id
                 ]);

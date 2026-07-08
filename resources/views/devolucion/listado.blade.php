@@ -64,12 +64,14 @@
                                             <th width="120"> Cantidad Vendida </th>
                                             <th width="120"> Devuelto </th>
                                             <th width="140"> Precio </th>
+                                            <th width="140"> Desc.</th>
+                                            <th width="120">Precio Final</th>
                                             <th width="170"> Devolver </th>
                                         </tr>
                                     </thead>
                                     <tbody id="detalle_devolucion">
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted py-5"> Seleccione una venta
+                                            <td colspan="7" class="text-center text-muted py-5"> Seleccione una venta
                                             </td>
                                         </tr>
                                     </tbody>
@@ -259,29 +261,107 @@
         }
 
         $('#venta_id').change(function () {
-            let venta_id = $(this).val(); if (venta_id == '') { return; }
+
+            let venta_id = $(this).val();
+
+            if (venta_id == '') {
+                return;
+            }
+
             $.ajax({
-                url: "{{ route('devolucion.obtenerDetalleVenta') }}", method: "POST",
-                data: { venta_id: venta_id }, success: function (resultado) {
-                    let html = ''; resultado.data.forEach(item => {
+                url: "{{ route('devolucion.obtenerDetalleVenta') }}",
+                method: "POST",
+                data: {
+                    venta_id: venta_id
+                },
+                success: function (resultado) {
+
+                    let html = '';
+
+                    resultado.data.forEach(item => {
+
                         let devuelto = item.cantidad_devuelta ?? 0;
-                        let disponible = item.cantidad - devuelto; html += ` <tr> <td> 
-                                                                                                        ${item.producto.nombre} </td> <td class="text-center"> ${item.cantidad} 
-                                                                                                        </td> <td class="text-center text-danger fw-bold"> ${devuelto} </td> <td class="text-center"> Bs. 
-                                                                                                        ${parseFloat(item.precio_unitario).toFixed(2)} </td> <td> <input type="number" min="0" max="${disponible}" 
-                                                                                                        value="0" class="form-control form-control-sm cantidad_devolucion" data-precio="${item.precio_unitario}" 
-                                                                                                        data-producto="${item.producto_id}"> <small class="text-danger"> Disponible: ${disponible} </small> </td> </tr> `;
+                        let disponible = item.cantidad - devuelto;
+
+                        let descuentoUnitario =
+                            (item.descuento ?? 0) / item.cantidad;
+
+                        let precioFinal =
+                            item.precio_unitario - descuentoUnitario;
+
+                        html += `
+                    <tr>
+
+                        <td>${item.producto.nombre}</td>
+
+                        <td class="text-center">
+                            ${item.cantidad}
+                        </td>
+
+                        <td class="text-center text-danger fw-bold">
+                            ${devuelto}
+                        </td>
+
+                        <td class="text-center">
+                            Bs. ${parseFloat(item.precio_unitario).toFixed(2)}
+                        </td>
+
+                        <td class="text-center text-warning">
+                            Bs. ${parseFloat(descuentoUnitario).toFixed(2)}
+                        </td>
+
+                        <td class="text-center text-success fw-bold">
+                            Bs. ${parseFloat(precioFinal).toFixed(2)}
+                        </td>
+
+                        <td>
+
+                            <input
+                                type="number"
+                                min="0"
+                                max="${disponible}"
+                                value="0"
+                                class="form-control form-control-sm cantidad_devolucion"
+                                data-precio="${item.precio_unitario}"
+                                data-descuento="${item.descuento}"
+                                data-cantidad="${item.cantidad}"
+                                data-producto="${item.producto_id}">
+
+                            <small class="text-danger">
+                                Disponible: ${disponible}
+                            </small>
+
+                        </td>
+
+                    </tr>`;
                     });
-                    $('#detalle_devolucion').html(html); calcularMonto();
+
+                    $('#detalle_devolucion').html(html);
+
+                    calcularMonto();
                 }
             });
+
         });
 
         function calcularMonto() {
             let total = 0;
             $('.cantidad_devolucion').each(function () {
                 let cantidad = parseFloat($(this).val()) || 0;
-                let precio = parseFloat($(this).data('precio')) || 0; total += cantidad * precio;
+                let precio = parseFloat($(this).data('precio')) || 0;
+                //total += cantidad * precio;
+                let descuento =
+                    parseFloat($(this).data('descuento')) || 0;
+
+                let cantidadVendida =
+                    parseFloat($(this).data('cantidad')) || 1;
+
+                let descuentoUnitario = descuento / cantidadVendida;
+
+                let subtotal =
+                    cantidad * (precio - descuentoUnitario);
+
+                total += subtotal;
             });
             $('#monto').val(total.toFixed(2));
         }
@@ -392,8 +472,10 @@
         }
 
         function seleccionarVenta(id) {
+
             $('#venta_id').val(id);
             $('#modalDevolucion').modal('show');
+
             $.ajax({
                 url: "{{ route('devolucion.obtenerDetalleVenta') }}",
                 method: "POST",
@@ -401,30 +483,69 @@
                     venta_id: id
                 },
                 success: function (resultado) {
+
                     let html = '';
+
                     resultado.data.forEach(item => {
+
                         let devuelto = item.cantidad_devuelta ?? 0;
                         let disponible = item.cantidad - devuelto;
+
+                        let descuentoUnitario =
+                            (item.descuento ?? 0) / item.cantidad;
+
+                        let precioFinal =
+                            item.precio_unitario - descuentoUnitario;
+
                         html += `
-                                                                                                    <tr>
-                                                                                                        <td>${item.producto.nombre}</td>
-                                                                                                        <td class="text-center">${item.cantidad}</td>
-                                                                                                        <td class="text-center">${devuelto}</td>
-                                                                                                        <td>Bs ${parseFloat(item.precio_unitario).toFixed(2)}</td>
-                                                                                                        <td>
-                                                                                                            <input
-                                                                                                                type="number"
-                                                                                                                min="0"
-                                                                                                                max="${disponible}"
-                                                                                                                value="0"
-                                                                                                                class="form-control cantidad_devolucion"
-                                                                                                                data-precio="${item.precio_unitario}"
-                                                                                                                data-producto="${item.producto_id}">
-                                                                                                        </td>
-                                                                                                    </tr>`;
+                            <tr>
+
+                                <td>${item.producto.nombre}</td>
+
+                                <td class="text-center">
+                                    ${item.cantidad}
+                                </td>
+
+                                <td class="text-center text-danger">
+                                    ${devuelto}
+                                </td>
+
+                                <td class="text-center">
+                                    Bs. ${parseFloat(item.precio_unitario).toFixed(2)}
+                                </td>
+
+                                <td class="text-center text-warning">
+                                    Bs. ${parseFloat(descuentoUnitario).toFixed(2)}
+                                </td>
+
+                                <td class="text-center text-success fw-bold">
+                                    Bs. ${parseFloat(precioFinal).toFixed(2)}
+                                </td>
+
+                                <td>
+
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="${disponible}"
+                                        value="0"
+                                        class="form-control cantidad_devolucion"
+                                        data-precio="${item.precio_unitario}"
+                                        data-descuento="${item.descuento}"
+                                        data-cantidad="${item.cantidad}"
+                                        data-producto="${item.producto_id}">
+
+                                    <small class="text-danger">
+                                        Disponible: ${disponible}
+                                    </small>
+
+                                </td>
+
+                            </tr>`;
                     });
 
                     $('#detalle_devolucion').html(html);
+
                     calcularMonto();
                 }
             });
