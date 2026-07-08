@@ -6,10 +6,12 @@
     <title>Tiquet</title>
     <style>
         @page {
-            margin: 5mm;
+            size: 80mm auto;
+            margin: 3mm;
         }
 
         body {
+            width: 74mm;
             font-family: monospace;
             font-size: 11px;
             margin: 0;
@@ -17,7 +19,7 @@
         }
 
         .tiquet {
-            width: 100%;
+            width: 74mm;
         }
 
         .titulo {

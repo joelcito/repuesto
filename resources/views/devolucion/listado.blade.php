@@ -238,14 +238,14 @@
 
                     $('#table_listado').html(resultado.data.listado);
                     iniciarTabla('#kt_table_devolucion');
-                    if ($.fn.DataTable.isDataTable('#kt_table_devolucion')) {
-                        $('#kt_table_devolucion').DataTable().destroy();
-                    }
+                    // if ($.fn.DataTable.isDataTable('#kt_table_devolucion')) {
+                    //     $('#kt_table_devolucion').DataTable().destroy();
+                    // }
 
-                    $('#kt_table_devolucion').DataTable({
-                        responsive: true,
-                        destroy: true
-                    });
+                    // $('#kt_table_devolucion').DataTable({
+                    //     responsive: true,
+                    //     destroy: true
+                    // });
 
                 }
             });
@@ -266,11 +266,11 @@
                     let html = ''; resultado.data.forEach(item => {
                         let devuelto = item.cantidad_devuelta ?? 0;
                         let disponible = item.cantidad - devuelto; html += ` <tr> <td> 
-                                                                                            ${item.producto.nombre} </td> <td class="text-center"> ${item.cantidad} 
-                                                                                            </td> <td class="text-center text-danger fw-bold"> ${devuelto} </td> <td class="text-center"> Bs. 
-                                                                                            ${parseFloat(item.precio_unitario).toFixed(2)} </td> <td> <input type="number" min="0" max="${disponible}" 
-                                                                                            value="0" class="form-control form-control-sm cantidad_devolucion" data-precio="${item.precio_unitario}" 
-                                                                                            data-producto="${item.producto_id}"> <small class="text-danger"> Disponible: ${disponible} </small> </td> </tr> `;
+                                                                                                        ${item.producto.nombre} </td> <td class="text-center"> ${item.cantidad} 
+                                                                                                        </td> <td class="text-center text-danger fw-bold"> ${devuelto} </td> <td class="text-center"> Bs. 
+                                                                                                        ${parseFloat(item.precio_unitario).toFixed(2)} </td> <td> <input type="number" min="0" max="${disponible}" 
+                                                                                                        value="0" class="form-control form-control-sm cantidad_devolucion" data-precio="${item.precio_unitario}" 
+                                                                                                        data-producto="${item.producto_id}"> <small class="text-danger"> Disponible: ${disponible} </small> </td> </tr> `;
                     });
                     $('#detalle_devolucion').html(html); calcularMonto();
                 }
@@ -383,7 +383,8 @@
 
                     $('#kt_table_ventas').DataTable({
                         responsive: true,
-                        destroy: true
+                        destroy: true,
+                        order: [[0, 'desc']]
                     });
 
                 }
@@ -405,22 +406,22 @@
                         let devuelto = item.cantidad_devuelta ?? 0;
                         let disponible = item.cantidad - devuelto;
                         html += `
-                                                                                        <tr>
-                                                                                            <td>${item.producto.nombre}</td>
-                                                                                            <td class="text-center">${item.cantidad}</td>
-                                                                                            <td class="text-center">${devuelto}</td>
-                                                                                            <td>Bs ${parseFloat(item.precio_unitario).toFixed(2)}</td>
-                                                                                            <td>
-                                                                                                <input
-                                                                                                    type="number"
-                                                                                                    min="0"
-                                                                                                    max="${disponible}"
-                                                                                                    value="0"
-                                                                                                    class="form-control cantidad_devolucion"
-                                                                                                    data-precio="${item.precio_unitario}"
-                                                                                                    data-producto="${item.producto_id}">
-                                                                                            </td>
-                                                                                        </tr>`;
+                                                                                                    <tr>
+                                                                                                        <td>${item.producto.nombre}</td>
+                                                                                                        <td class="text-center">${item.cantidad}</td>
+                                                                                                        <td class="text-center">${devuelto}</td>
+                                                                                                        <td>Bs ${parseFloat(item.precio_unitario).toFixed(2)}</td>
+                                                                                                        <td>
+                                                                                                            <input
+                                                                                                                type="number"
+                                                                                                                min="0"
+                                                                                                                max="${disponible}"
+                                                                                                                value="0"
+                                                                                                                class="form-control cantidad_devolucion"
+                                                                                                                data-precio="${item.precio_unitario}"
+                                                                                                                data-producto="${item.producto_id}">
+                                                                                                        </td>
+                                                                                                    </tr>`;
                     });
 
                     $('#detalle_devolucion').html(html);
@@ -440,7 +441,7 @@
                 destroy: true,
                 responsive: true,
                 lengthMenu: [10, 25, 50, 100],
-                order: [],
+                order: [[0, 'desc']],
                 dom: '<"dt-head row"<"col-md-6"l><"col-md-6"f>>t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>',
                 language: {
                     paginate: {

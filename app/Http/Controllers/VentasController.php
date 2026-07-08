@@ -106,7 +106,8 @@ class VentasController extends Controller
                 throw new \Exception('La caja no está abierta');
             }
 
-            $numeroFactura = Venta::max('numero_factura');
+            $numeroFactura = Venta::selectRaw('MAX(CAST(numero_factura AS UNSIGNED)) as numero')
+                ->value('numero');
             $numeroFactura = $numeroFactura ? $numeroFactura + 1 : 1;
 
             $pagos = $request->pagos ?? [];

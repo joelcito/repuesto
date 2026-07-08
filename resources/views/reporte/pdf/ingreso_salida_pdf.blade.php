@@ -59,6 +59,7 @@
                 <th>P. Compra</th>
                 <th>P. Venta</th>
                 <th>Motivo</th>
+                <th>Tipo producto</th>
             </tr>
         </thead>
         <tbody>
@@ -83,6 +84,9 @@
                     </td>
                     <td>
                         {{ $movimiento->motivo }}
+                    </td>
+                    <td>
+                        {{ $movimiento->producto->tipo_producto ?? '' }}
                     </td>
                 </tr>
             @endforeach
