@@ -234,6 +234,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="modalIngreso" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -379,7 +380,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="modal fade" id="modalTransferencia" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1006,7 +1006,7 @@
                                             style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
                                             onclick="eliminarImagen('${img.id}')">
 
-                                            ×   
+                                            ×
                                         </button>
 
                                     </div>
@@ -1152,5 +1152,136 @@
             $('#f_stock').val('');
             ajaxListado();
         }
+
+        function mostrarCodigoBarras(idProducto){
+
+    $.ajax({
+        url: "{{ url('producto/generarCodigoBarra') }}",
+        type: "POST",
+        data: {
+            idProducto: idProducto
+        },
+        success: function(res){
+
+            if(!res.estado){
+                Swal.fire({
+                    icon: 'error',
+                    title: res.mensaje
+                });
+                return;
+            }
+
+            let producto = res.data;
+
+            Swal.fire({
+                title: 'Código de Barras',
+                width: 500,
+                html: `
+                    <div id="codigoImprimir" style="text-align:center;padding:15px;">
+
+                        <h4 style="margin-bottom:10px;">
+                            ${producto.nombre}
+                        </h4>
+
+                        <img
+                            src="${producto.barcode}"
+                            style="width:100%;max-width:320px;height:auto;"
+                        >
+
+                        <div style="
+                            margin-top:10px;
+                            font-size:18px;
+                            font-weight:bold;
+                            letter-spacing:2px;
+                        ">
+                            ${producto.codigo}
+                        </div>
+
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa fa-print"></i> Imprimir',
+                cancelButtonText: 'Cerrar'
+            }).then((result)=>{
+
+                if(result.isConfirmed){
+                    imprimirCodigo();
+                }
+
+            });
+
+        },
+        error:function(xhr){
+
+            console.log(xhr.responseText);
+
+            Swal.fire({
+                icon:'error',
+                title:'Ocurrió un error'
+            });
+
+        }
+    });
+
+}
+
+        function imprimirCodigo(){
+
+    let contenido = document.getElementById('codigoImprimir').innerHTML;
+
+    let ventana = window.open('', '_blank', 'width=500,height=600');
+
+    ventana.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+
+            <title>Código de Barras</title>
+
+            <style>
+
+                body{
+                    margin:0;
+                    padding:20px;
+                    font-family:Arial, Helvetica, sans-serif;
+                    text-align:center;
+                }
+
+                img{
+                    width:320px;
+                    max-width:100%;
+                    margin-top:15px;
+                }
+
+                h4{
+                    margin:0;
+                    margin-bottom:15px;
+                }
+
+            </style>
+
+        </head>
+
+        <body>
+
+            ${contenido}
+
+        </body>
+
+        </html>
+    `);
+
+    ventana.document.close();
+
+    ventana.focus();
+
+    setTimeout(function(){
+
+        ventana.print();
+        ventana.close();
+
+    },500);
+
+}
     </script>
 @endsection

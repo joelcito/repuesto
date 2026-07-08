@@ -50,6 +50,7 @@
                         @endif
                     </td>
                     <td>
+                        <button class="btn btn-icon btn-sm btn-dark btn-circle" title="Imprimir Código de Barras" onclick="mostrarCodigoBarras({{ $producto->id }})"><i class="fa fa-barcode"></i></button>
                         <button class="btn btn-icon btn-sm btn-info btn-circle" title="Ver Stock"
                             onclick="abrirStock({{ $producto->id }}, '{{ $producto->nombre }}')"><i
                                 class="fa fa-boxes"></i></button>

@@ -31,7 +31,8 @@ class BackupService
 
         // $fecha = now()->format('Y-m-d_H-i-s');
 
-        // $carpeta = 'D:/Backups/Repuesto';
+        // // $carpeta = 'D:/Backups/Repuesto';
+        // $carpeta = 'C:/Backups/Repuesto';
 
         // if (!file_exists($carpeta)) {
         //     mkdir($carpeta, 0777, true);
@@ -54,7 +55,8 @@ class BackupService
 
         $fecha = now()->format('Y-m-d_H-i-s');
 
-        $carpeta = 'D:/Backups/Repuesto';
+        // $carpeta = 'D:/Backups/Repuesto';
+        $carpeta = 'C:/Backups/Repuesto';
 
         if (!file_exists($carpeta)) {
             mkdir($carpeta, 0777, true);
@@ -67,7 +69,8 @@ class BackupService
         $password = env('DB_PASSWORD');
         $host = env('DB_HOST');
 
-        $mysqldump = '"C:\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysqldump.exe"';
+        // $mysqldump = '"C:\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysqldump.exe"';
+        $mysqldump = '"C:\laragon\bin\mysql\mysql-8.4.3-winx64\bin\mysqldump.exe"';
 
         $paramPassword = !empty($password) ? "-p$password" : "";
 

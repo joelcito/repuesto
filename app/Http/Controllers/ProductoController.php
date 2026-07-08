@@ -14,6 +14,7 @@ use App\Models\Sucursal;
 use App\Models\Proveedor;
 use App\Models\Marca;
 use App\Models\Unidad;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class ProductoController extends Controller
 {
@@ -199,6 +200,37 @@ class ProductoController extends Controller
     public function obtenerProducto($id)
     {
         return Producto::find($id);
+    }
+
+    public function generarCodigoBarra(Request $request){
+
+        if($request->ajax()){
+
+            $idProducto = $request->input('idProducto');
+            $producto = Producto::find($idProducto);
+
+            $generator = new BarcodeGeneratorPNG();
+
+            $barcode = base64_encode(
+                $generator->getBarcode(
+                    $producto->codigo_barras,
+                    BarcodeGeneratorPNG::TYPE_CODE_128
+                )
+            );
+
+            $valores = [
+                'nombre' => $producto->nombre,
+                'codigo' => $producto->codigo_barras,
+                'barcode' => 'data:image/png;base64,' . $barcode
+            ];
+
+            $data = Respuesta::success($valores, "Producto generado con éxito");
+
+        }else{
+            $data = Respuesta::error(null, "Error al obtener los datos");
+        }
+        return $data;
+
     }
 
     private function obtenerStock($productoId, $sucursalId)
