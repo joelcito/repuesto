@@ -765,10 +765,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                    <div class="invalid-feedback">
-                                                                        ${mensaje}
-                                                                    </div>
-                                                                `);
+                                                                        <div class="invalid-feedback">
+                                                                            ${mensaje}
+                                                                        </div>
+                                                                    `);
                             }
                         } else {
                             Swal.fire({
@@ -786,7 +786,11 @@
         }
 
         function modalSalida(productoId, sucursalId, nombreSuc) {
-            let datos = $('#formularioIngreso').serializeArray();
+
+            $('#idProds').val(productoId);
+            $('#idSucs').val(sucursalId);
+            $('#sucursales').val(nombreSuc);
+
             $.ajax({
                 url: "{{ route('movimiento.sacarTipoIngreso') }}",
                 method: "POST",
@@ -795,30 +799,32 @@
                     sucursal: sucursalId
                 },
                 success: function (resultado) {
+
                     if (resultado.estado) {
-                        let datos = resultado.data.select
-                        let $select = $('#movimiento_id_ingreso');
-                        $select.empty();
-                        $select.append('<option value="">Seleccione una opción</option>');
-                        $.each(datos, function (index, element) {
-                            $select.append(
-                                $('<option>', {
-                                    value: element.id,
-                                    text: 'Compra: ' + element.compra_ingreso + ' | Cantidad: ' + element.cantidad
-                                })
-                            );
-                        });
+
+                        // Aquí si luego necesitas cargar ingresos disponibles
+                        // puedes hacerlo
+
+                        $('#modalSalida').modal('show');
 
                     } else {
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'No se puede realizar la salida',
+                            text: resultado.mensaje ?? 'No existe stock disponible'
+                        });
 
                     }
                 },
                 error: function (xhr) {
+
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Ocurrió un error inesperado.',
+                        text: 'Ocurrió un error inesperado.'
                     });
+
                 }
             });
         }
@@ -859,10 +865,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                    <div class="invalid-feedback">
-                                                                        ${mensaje}
-                                                                    </div>
-                                                                `);
+                                                                        <div class="invalid-feedback">
+                                                                            ${mensaje}
+                                                                        </div>
+                                                                    `);
                             }
                         } else {
                             Swal.fire({
@@ -980,27 +986,27 @@
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                                            <div class="position-relative d-inline-block">
+                                                <div class="position-relative d-inline-block">
 
-                                                <img
-                                                    src="${img.url}"
-                                                    width="80"
-                                                    height="80"
-                                                    class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                                    style="cursor:pointer;object-fit:cover"
-                                                    onclick="mostrarImagen(${index})">
+                                                    <img
+                                                        src="${img.url}"
+                                                        width="80"
+                                                        height="80"
+                                                        class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                                        style="cursor:pointer;object-fit:cover"
+                                                        onclick="mostrarImagen(${index})">
 
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-danger btn-sm position-absolute"
-                                                    style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                                    onclick="eliminarImagen('${img.id}')">
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-danger btn-sm position-absolute"
+                                                        style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                                        onclick="eliminarImagen('${img.id}')">
 
-                                            ×
-                                        </button>
+                                                ×
+                                            </button>
 
-                                            </div>
-                                        `);
+                                                </div>
+                                            `);
             });
 
             if (listaImagenes.length > 0) {
@@ -1139,135 +1145,135 @@
             ajaxListado();
         }
 
-        function mostrarCodigoBarras(idProducto){
+        function mostrarCodigoBarras(idProducto) {
 
-    $.ajax({
-        url: "{{ url('producto/generarCodigoBarra') }}",
-        type: "POST",
-        data: {
-            idProducto: idProducto
-        },
-        success: function(res){
+            $.ajax({
+                url: "{{ url('producto/generarCodigoBarra') }}",
+                type: "POST",
+                data: {
+                    idProducto: idProducto
+                },
+                success: function (res) {
 
-            if(!res.estado){
-                Swal.fire({
-                    icon: 'error',
-                    title: res.mensaje
-                });
-                return;
-            }
+                    if (!res.estado) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.mensaje
+                        });
+                        return;
+                    }
 
-            let producto = res.data;
+                    let producto = res.data;
 
-            Swal.fire({
-                title: 'Código de Barras',
-                width: 500,
-                html: `
-                    <div id="codigoImprimir" style="text-align:center;padding:15px;">
+                    Swal.fire({
+                        title: 'Código de Barras',
+                        width: 500,
+                        html: `
+                        <div id="codigoImprimir" style="text-align:center;padding:15px;">
 
-                        <h4 style="margin-bottom:10px;">
-                            ${producto.nombre}
-                        </h4>
+                            <h4 style="margin-bottom:10px;">
+                                ${producto.nombre}
+                            </h4>
 
-                        <img
-                            src="${producto.barcode}"
-                            style="width:100%;max-width:320px;height:auto;"
-                        >
+                            <img
+                                src="${producto.barcode}"
+                                style="width:100%;max-width:320px;height:auto;"
+                            >
 
-                        <div style="
-                            margin-top:10px;
-                            font-size:18px;
-                            font-weight:bold;
-                            letter-spacing:2px;
-                        ">
-                            ${producto.codigo}
+                            <div style="
+                                margin-top:10px;
+                                font-size:18px;
+                                font-weight:bold;
+                                letter-spacing:2px;
+                            ">
+                                ${producto.codigo}
+                            </div>
+
                         </div>
+                    `,
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="fa fa-print"></i> Imprimir',
+                        cancelButtonText: 'Cerrar'
+                    }).then((result) => {
 
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: '<i class="fa fa-print"></i> Imprimir',
-                cancelButtonText: 'Cerrar'
-            }).then((result)=>{
+                        if (result.isConfirmed) {
+                            imprimirCodigo();
+                        }
 
-                if(result.isConfirmed){
-                    imprimirCodigo();
+                    });
+
+                },
+                error: function (xhr) {
+
+                    console.log(xhr.responseText);
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Ocurrió un error'
+                    });
+
                 }
-
-            });
-
-        },
-        error:function(xhr){
-
-            console.log(xhr.responseText);
-
-            Swal.fire({
-                icon:'error',
-                title:'Ocurrió un error'
             });
 
         }
-    });
 
-}
+        function imprimirCodigo() {
 
-        function imprimirCodigo(){
+            let contenido = document.getElementById('codigoImprimir').innerHTML;
 
-    let contenido = document.getElementById('codigoImprimir').innerHTML;
+            let ventana = window.open('', '_blank', 'width=500,height=600');
 
-    let ventana = window.open('', '_blank', 'width=500,height=600');
+            ventana.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
 
-    ventana.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
+                <title>Código de Barras</title>
 
-            <title>Código de Barras</title>
+                <style>
 
-            <style>
+                    body{
+                        margin:0;
+                        padding:20px;
+                        font-family:Arial, Helvetica, sans-serif;
+                        text-align:center;
+                    }
 
-                body{
-                    margin:0;
-                    padding:20px;
-                    font-family:Arial, Helvetica, sans-serif;
-                    text-align:center;
-                }
+                    img{
+                        width:320px;
+                        max-width:100%;
+                        margin-top:15px;
+                    }
 
-                img{
-                    width:320px;
-                    max-width:100%;
-                    margin-top:15px;
-                }
+                    h4{
+                        margin:0;
+                        margin-bottom:15px;
+                    }
 
-                h4{
-                    margin:0;
-                    margin-bottom:15px;
-                }
+                </style>
 
-            </style>
+            </head>
 
-        </head>
+            <body>
 
-        <body>
+                ${contenido}
 
-            ${contenido}
+            </body>
 
-        </body>
+            </html>
+        `);
 
-        </html>
-    `);
+            ventana.document.close();
 
-    ventana.document.close();
+            ventana.focus();
 
-    ventana.focus();
+            setTimeout(function () {
 
-    setTimeout(function(){
+                ventana.print();
+                ventana.close();
 
-        ventana.print();
-        ventana.close();
+            }, 500);
 
-    },500);
-
-}
+        }
     </script>
 @endsection
