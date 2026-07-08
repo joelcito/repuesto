@@ -22,7 +22,7 @@
                     <td>{{ $producto->codigo_interno }}</td>
                     <td>{{ $producto->nombre }}</td>
                     <td>{{ $producto->categoria->nombre ?? '' }}</td>
-                    <td>{{ $producto->marca->nombre ?? '' }}</td>
+                    <td>{{ $producto->marca?->nombre }}</td>
                     <td>
                         {{ number_format($producto->precio_venta, 2) }}
                     </td>

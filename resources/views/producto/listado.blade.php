@@ -996,13 +996,8 @@
                                                     style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
                                                     onclick="eliminarImagen('${img.id}')">
 
-<<<<<<< HEAD
                                             ×
                                         </button>
-=======
-                                                    ×   
-                                                </button>
->>>>>>> c32e65fe50e631dd8dfaa916c76993d4063ca808
 
                                             </div>
                                         `);

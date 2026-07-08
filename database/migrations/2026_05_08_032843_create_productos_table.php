@@ -26,7 +26,7 @@ return new class extends Migration {
 
             // Clasificación
             $table->string('categoria')->nullable();
-            $table->string('marca')->nullable();
+            // $table->string('marca')->nullable();
             $table->string('numero_parte_vehiculo')->nullable();
 
             // Stock
