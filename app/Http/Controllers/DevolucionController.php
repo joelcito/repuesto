@@ -58,7 +58,7 @@ class DevolucionController extends Controller
     public function ajaxListado(Request $request)
     {
         $devoluciones = Devolucion::with('venta')
-            ->orderByDesc('id')
+            ->latest('created_at')
             ->get();
 
         return response()->json([

@@ -16,15 +16,12 @@
         </thead>
         <tbody class="text-gray-600 fw-semibold">
             @php
-
                 $totalIngresoEfectivo = 0;
                 $totalIngresoQR = 0;
                 $totalIngresoTransferencia = 0;
-
                 $totalSalidaEfectivo = 0;
                 $totalSalidaQR = 0;
                 $totalSalidaTransferencia = 0;
-
                 $totalVentas = 0;
                 $totalOtrosIngresos = 0;
             @endphp
@@ -34,22 +31,40 @@
                     <td>{{ $pago->fecha }}</td>
                     <td>{{ $pago->descripcion }}</td>
                     <td>{{ $pago->tipo_pago }}</td>
-
                     <td>
                         @if($pago->tipo_pago == 'EFECTIVO')
-                            {{ number_format($pago->monto, 2) }}
+                            @php
+                                $montoTipoProducto = 0;
+
+                                if ($pago->venta && $pago->venta->detalles) {
+                                    foreach ($pago->venta->detalles as $detalle) {
+                                        $montoTipoProducto += $detalle->subtotal;
+                                    }
+                                }
+                            @endphp
+
+                            {{ number_format($montoTipoProducto, 2) }}
                         @else
                             0.00
                         @endif
                     </td>
                     <td>
                         @if($pago->tipo_pago == 'QR' || $pago->tipo_pago == 'TRANSFERENCIA')
-                            {{ number_format($pago->monto, 2) }}
+                            @php
+                                $montoTipoProducto = 0;
+
+                                if ($pago->venta && $pago->venta->detalles) {
+                                    foreach ($pago->venta->detalles as $detalle) {
+                                        $montoTipoProducto += $detalle->subtotal;
+                                    }
+                                }
+                            @endphp
+
+                            {{ number_format($montoTipoProducto, 2) }}
                         @else
                             0.00
                         @endif
                     </td>
-
                     <td>
                         @if ($pago->estado === 'INGRESO')
                             <span class="badge badge-success">
@@ -61,9 +76,7 @@
                             </span>
                         @endif
                     </td>
-
                     <td>{{ $pago->usuario->name }}</td>
-
                     <td>
                         <a target="_blank" href="{{ url('pago/comprobantePago', [$pago->id]) }}"
                             class="btn btn-icon btn-info btn-sm" title="Imprimir Comprobante">
@@ -71,15 +84,12 @@
                         </a>
                     </td>
                 </tr>
-
                 @php
 
                     if ($pago->estado === 'INGRESO') {
-
                         if ($pago->tipo_pago === 'EFECTIVO') {
                             $totalIngresoEfectivo += $pago->monto;
                         }
-
                         if ($pago->tipo_pago === 'QR') {
                             $totalIngresoQR += $pago->monto;
                         }
@@ -96,7 +106,6 @@
                     }
 
                     if ($pago->estado === 'SALIDA') {
-
                         if ($pago->tipo_pago === 'EFECTIVO') {
                             $totalSalidaEfectivo += $pago->monto;
                         }
@@ -108,7 +117,6 @@
                             $totalSalidaTransferencia += $pago->monto;
                         }
                     }
-
                 @endphp
             @empty
                 <h4 class="text-danger">No hay datos</h4>
@@ -180,8 +188,6 @@
 </div>
 <script>
     $(document).ready(function () {
-
-        // Evita reinicialización
         if ($.fn.DataTable.isDataTable('#kt_table_pagos')) {
             $('#kt_table_pagos').DataTable().destroy();
         }

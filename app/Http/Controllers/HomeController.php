@@ -21,14 +21,9 @@ class HomeController extends Controller
         // $this->middleware('auth');
     }
 
-
     public function index()
     {
-
-
-
         $totalProductos = Producto::count();
-
         $ventasHoy = Venta::whereDate(
             'created_at',
             now()
@@ -43,15 +38,9 @@ class HomeController extends Controller
             '<=',
             'stock_minimo'
         )->count();
-
-
-
         $utilidades = Producto::sum(
             DB::raw('precio_venta - precio_compra')
         );
-
-
-
         $stockBajo = Producto::whereColumn(
             'stock_actual',
             '<=',
@@ -59,21 +48,12 @@ class HomeController extends Controller
         )
             ->take(10)
             ->get();
-
-
-
         $ultimosProductos = Producto::latest()
             ->take(10)
             ->get();
-
-
-
         $ultimasVentas = Venta::latest()
             ->take(10)
             ->get();
-
-
-
         $ventasMensuales = Venta::selectRaw('
                 MONTH(created_at) as mes_numero,
                 SUM(total) as total

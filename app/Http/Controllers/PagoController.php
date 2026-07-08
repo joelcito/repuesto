@@ -60,16 +60,45 @@ class PagoController extends Controller
         $todos = (clone $baseQuery)
             ->orderBy('id', 'desc')
             ->get();
+        // $repuestos = (clone $baseQuery)
+        //     ->whereHas('venta.detalles.producto', function ($q) {
+        //         $q->where('tipo_producto', 'REPUESTO');
+        //     })
+        //     ->orderBy('id', 'desc')
+        //     ->get();
         $repuestos = (clone $baseQuery)
             ->whereHas('venta.detalles.producto', function ($q) {
                 $q->where('tipo_producto', 'REPUESTO');
             })
+            ->with([
+                'venta.detalles' => function ($q) {
+                    $q->whereHas('producto', function ($p) {
+                        $p->where('tipo_producto', 'REPUESTO');
+                    });
+                    $q->with('producto');
+                }
+            ])
             ->orderBy('id', 'desc')
             ->get();
+        // $lubricantes = (clone $baseQuery)
+        //     ->whereHas('venta.detalles.producto', function ($q) {
+        //         $q->where('tipo_producto', 'LUBRICANTE');
+        //     })
+        //     ->orderBy('id', 'desc')
+        //     ->get();
+
         $lubricantes = (clone $baseQuery)
             ->whereHas('venta.detalles.producto', function ($q) {
                 $q->where('tipo_producto', 'LUBRICANTE');
             })
+            ->with([
+                'venta.detalles' => function ($q) {
+                    $q->whereHas('producto', function ($p) {
+                        $p->where('tipo_producto', 'LUBRICANTE');
+                    });
+                    $q->with('producto');
+                }
+            ])
             ->orderBy('id', 'desc')
             ->get();
 

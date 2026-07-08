@@ -602,13 +602,11 @@
             formData.append('categoria_id', $('#categoria_id').val());
             formData.append('marca_id', $('#marca_id').val());
             formData.append('numero_parte_vehiculo', $('#numero_parte_vehiculo').val());
-            // formData.append('stock_actual', $('#stock_actual').val());
             formData.append('stock_minimo', $('#stock_minimo').val());
             formData.append('unidad_id', $('#unidad_id').val());
             formData.append('precio_compra', $('#precio_compra').val());
             formData.append('precio_venta', $('#precio_venta').val());
             formData.append('precio_mayor', $('#precio_mayor').val());
-            //formData.append('compra_ingreso', $('#compra_ingreso').val());
             formData.append('sucursal_id', $('#sucursal_id').val());
             formData.append('proveedor_id', $('#proveedor_id').val());
             formData.append('observaciones', $('#observaciones').val());
@@ -616,14 +614,12 @@
             formData.append('ubicacion', $('#ubicacion').val());
             formData.append('tipo_producto', $('#tipo_producto').val());
 
-
             listaImagenes.forEach(img => {
                 if (img.file instanceof File) {
                     formData.append('imagenes[]', img.file);
                 }
             });
-            //console.log($('#imagenes')[0].files);
-            // console.log($('#imagenes')[0].files.length);
+
             $.ajax({
                 url: "{{ route('producto.guardarProducto') }}",
                 method: "POST",
@@ -718,21 +714,15 @@
                 url: '/producto/' + productoId,
                 method: 'GET',
                 success: function (prod) {
-
                     $('#modalIngreso').modal('show');
-
                     setTimeout(() => {
-
                         $('#sucursal').val(nombreSuc);
                         $('#idSuc').val(sucursalId);
                         $('#idProd').val(productoId);
-
                         $('#precio_compra_ingreso').val(prod.precio_compra || 0);
                         $('#precio_venta_ingreso').val(prod.precio_venta || 0);
-
                         $('#cantidad_ingreso').val('');
                         $('#descripcion_ingreso').val('');
-
                     }, 200);
 
                 }
@@ -775,10 +765,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                            <div class="invalid-feedback">
-                                                                ${mensaje}
-                                                            </div>
-                                                        `);
+                                                                    <div class="invalid-feedback">
+                                                                        ${mensaje}
+                                                                    </div>
+                                                                `);
                             }
                         } else {
                             Swal.fire({
@@ -869,10 +859,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                            <div class="invalid-feedback">
-                                                                ${mensaje}
-                                                            </div>
-                                                        `);
+                                                                    <div class="invalid-feedback">
+                                                                        ${mensaje}
+                                                                    </div>
+                                                                `);
                             }
                         } else {
                             Swal.fire({
@@ -990,27 +980,32 @@
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                                    <div class="position-relative d-inline-block">
+                                            <div class="position-relative d-inline-block">
 
-                                        <img
-                                            src="${img.url}"
-                                            width="80"
-                                            height="80"
-                                            class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                            style="cursor:pointer;object-fit:cover"
-                                            onclick="mostrarImagen(${index})">
+                                                <img
+                                                    src="${img.url}"
+                                                    width="80"
+                                                    height="80"
+                                                    class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                                    style="cursor:pointer;object-fit:cover"
+                                                    onclick="mostrarImagen(${index})">
 
-                                        <button
-                                            type="button"
-                                            class="btn btn-danger btn-sm position-absolute"
-                                            style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                            onclick="eliminarImagen('${img.id}')">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-danger btn-sm position-absolute"
+                                                    style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                                    onclick="eliminarImagen('${img.id}')">
 
+<<<<<<< HEAD
                                             ×
                                         </button>
+=======
+                                                    ×   
+                                                </button>
+>>>>>>> c32e65fe50e631dd8dfaa916c76993d4063ca808
 
-                                    </div>
-                                `);
+                                            </div>
+                                        `);
             });
 
             if (listaImagenes.length > 0) {
@@ -1090,12 +1085,8 @@
                 'marca_id',
                 'unidad_id',
                 'codigo_barras',
-                'codigo_interno',
-                'descripcion',
-                'vehiculos_compatibles',
                 'proveedor_id',
                 'sucursal_id',
-                'numero_parte_vehiculo',
                 'stock_minimo',
                 'precio_compra',
                 'precio_venta',
