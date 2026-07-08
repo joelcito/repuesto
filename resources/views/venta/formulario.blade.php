@@ -313,6 +313,8 @@
                 calcularCambioGlobal();
             });
 
+            $('#buscar_producto').focus();
+
         });
         $('#producto_id').change(function () {
             actualizarPrecio();

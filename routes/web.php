@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/generar-codigo', [ProductoController::class, 'generarCodigo']);
         Route::get('/{id}', [ProductoController::class, 'obtenerProducto']);
+        Route::post('/generarCodigoBarra', [ProductoController::class, 'generarCodigoBarra']);
 
     });
 
