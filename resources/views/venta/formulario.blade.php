@@ -112,13 +112,13 @@
                                         <input type="text" id="buscar_producto" class="form-control form-control-lg"
                                             placeholder="Ingrese Nombre, Marca, Código, Nro Parte,Vehículo...">
                                         <div id="resultado_productos" class="shadow bg-white border rounded mt-1" style="
-                                                            max-height:400px;
-                                                            overflow-y:auto;
-                                                            display:none;
-                                                            position:absolute;
-                                                            z-index:9999;
-                                                            width:100%;
-                                                        ">
+                                                                                        max-height:400px;
+                                                                                        overflow-y:auto;
+                                                                                        display:none;
+                                                                                        position:absolute;
+                                                                                        z-index:9999;
+                                                                                        width:100%;
+                                                                                    ">
                                         </div>
 
                                         <input type="hidden" id="producto_id" name="producto_id">
@@ -400,7 +400,15 @@
             let cantidad = parseFloat($('#cantidad').val());
             let tipo_precio = $('#tipo_precio').val();
             let precio = parseFloat($('#precio_venta').val());
-            let subtotal = cantidad * precio;
+            let descuento = parseFloat($('#descuento_producto').val()) || 0;
+
+            let subtotal = (cantidad * precio) - descuento;
+
+            if (subtotal < 0) {
+                subtotal = 0;
+            }
+
+
             if (producto_id == '') {
                 Swal.fire({
                     icon: 'warning',
@@ -424,16 +432,16 @@
             );
 
             if (existe) {
-                existe.cantidad = parseFloat(existe.cantidad) + cantidad;
-                existe.subtotal = existe.cantidad * existe.precio;
-                recargarTabla();
-                calcularTotal();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Producto ya agregado',
+                    text: 'Este producto ya fue agregado a la venta. Si desea cambiar la cantidad o el descuento, elimínelo y vuelva a agregarlo.'
+                });
                 return;
             }
             console.log(productoSeleccionado);
-            let descuento =
-                parseFloat($('#descuento_producto').val()) || 0;
 
+            console.log({ cantidad, precio, descuento, subtotal });
             productosVenta.push({
                 producto_id: producto_id,
                 nombre: productoSeleccionado.nombre,
@@ -470,21 +478,21 @@
                     : `/imagenes/productos/default.jpg`;
 
                 let img = `
-                                    <img src="${imagen}"
-                                    class="imagen-producto"
-                                            width="45"
-                                            height="45"
-                                            style="object-fit:cover;border-radius:6px;cursor:pointer;"
-                                            data-imagenes='${JSON.stringify(item.imagen)}'
-                                            >
-                                `;
+                                                                <img src="${imagen}"
+                                                                class="imagen-producto"
+                                                                        width="45"
+                                                                        height="45"
+                                                                        style="object-fit:cover;border-radius:6px;cursor:pointer;"
+                                                                        data-imagenes='${JSON.stringify(item.imagen)}'
+                                                                        >
+                                                            `;
 
                 let botonEliminar =
                     `<button
-                                class="btn btn-danger btn-sm"
-                                onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
-                                X
-                            </button>`;
+                                                            class="btn btn-danger btn-sm"
+                                                            onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
+                                                            X
+                                                        </button>`;
 
                 tabla.row.add([
                     img,
@@ -519,6 +527,7 @@
         // }
 
         function calcularTotal() {
+            console.log('calculartotal', productosVenta);
 
             let total = 0;
 
@@ -643,11 +652,10 @@
                 totalPagado += (monto - desc);
             });
 
-            if (totalPagado < totalFinal) {
+            if (totalPagado < 0) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Pago incompleto',
-                    text: 'El pago es menor al total de la venta'
+                    title: 'Monto inválido'
                 });
                 return;
             }
@@ -739,10 +747,10 @@
                     let html = '';
                     if (productos.length == 0) {
                         html = `
-                                        <div class="p-3 text-center text-danger">
-                                            No se encontraron productos
-                                        </div>
-                                    `;
+                                                                    <div class="p-3 text-center text-danger">
+                                                                        No se encontraron productos
+                                                                    </div>
+                                                                `;
                     } else {
                         productos.forEach(producto => {
                             console.log(producto.imagenes);
@@ -750,173 +758,173 @@
                                 ? `/imagenes/productos/${producto.imagenes[0].imagen}`
                                 : `/imagenes/productos/default.jpg`;
                             html += `
-                                                                                            <div class="producto-item p-3 border-bottom"
-                                                                                                style="cursor:pointer; transition:0.2s;"
-                                                                                                data-id="${producto.id}"
-                                                                                                data-nombre="${producto.nombre}"
-                                                                                                data-precio="${producto.precio_venta}"
-                                                                                                data-precio-mayor="${producto.precio_mayor}"
-                                                                                                data-codigo-interno="${producto.codigo_interno ?? ''}"
-                                                                                                data-marca="${producto.marca ? producto.marca.nombre : ''}"
-                                                                                                data-vehiculo="${producto.vehiculos_compatibles ?? ''}"
-                                                                                                data-ubicacion="${producto.ubicacion ?? ''}"
-                                                                                                data-medida="${producto.medidas ?? ''}"
-                                                                                                data-imagen='${JSON.stringify(producto.imagenes?.length ? producto.imagenes : [])}'>
+                                                                <div class="producto-item p-3 border-bottom"
+                                                                    style="cursor:pointer; transition:0.2s;"
+                                                                    data-id="${producto.id}"
+                                                                    data-nombre="${producto.nombre}"
+                                                                    data-precio="${producto.precio_venta}"
+                                                                    data-precio-mayor="${producto.precio_mayor}"
+                                                                    data-codigo-interno="${producto.codigo_interno ?? ''}"
+                                                                    data-marca="${producto.marca ? producto.marca.nombre : ''}"
+                                                                    data-vehiculo="${producto.vehiculos_compatibles ?? ''}"
+                                                                    data-ubicacion="${producto.ubicacion ?? ''}"
+                                                                    data-medida="${producto.medidas ?? ''}"
+                                                                    data-imagen='${JSON.stringify(producto.imagenes?.length ? producto.imagenes : [])}'>
 
-                                                                                                <div class="row align-items-center">
+                                                                    <div class="row align-items-center">
 
-                                                                                                    <!-- Imagen -->
-                                                                                                    <div class="col-md-2 text-center">
+                                                                        <!-- Imagen -->
+                                                                        <div class="col-md-2 text-center">
 
-                                                                                                ${producto.imagenes && producto.imagenes.length > 0
+                                                                        ${producto.imagenes && producto.imagenes.length > 0
                                     ? `
-                                                                                                        <div id="carouselProducto${producto.id}" class="carousel slide position-relative" data-bs-ride="false">
-                                                                                                            <div class="carousel-inner">
+                                                                        <div id="carouselProducto${producto.id}" class="carousel slide position-relative" data-bs-ride="false">
+                                                                            <div class="carousel-inner">
 
-                                                                                                                ${producto.imagenes.map((img, index) => `
-                                                                                                                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                                                                                                                        <img src="/imagenes/productos/${img.imagen}"
-                                                                                                                            class="d-block w-100"
-                                                                                                                            style="width:90px;height:90px;object-fit:cover;border-radius:8px;"
-                                                                                                                            alt="producto">
-                                                                                                                    </div>
-                                                                                                                `).join('')}
-
-                                                                                                            </div>
-
-                                                                                                            ${producto.imagenes.length > 1
-                                        ? `
-                                                                                                                   <button
-                                class="carousel-control-prev"
-                                type="button"
-                                data-bs-target="#carouselProducto${producto.id}"
-                                data-bs-slide="prev"
-                                style="left:-10px;width:25px;opacity:1;">
-
-                                <span
-                                    style="
-                                        width:24px;
-                                        height:24px;
-                                        background:#000;
-                                        color:#fff;
-                                        border-radius:50%;
-                                        display:flex;
-                                        align-items:center;
-                                        justify-content:center;
-                                        font-size:18px;
-                                        font-weight:bold;">
-                                    ‹
-                                </span>
-
-                            </button>
-
-                            <button
-                                class="carousel-control-next"
-                                type="button"
-                                data-bs-target="#carouselProducto${producto.id}"
-                                data-bs-slide="next"
-                                style="right:-10px;width:25px;opacity:1;">
-
-                                <span
-                                    style="
-                                        width:24px;
-                                        height:24px;
-                                        background:#000;
-                                        color:#fff;
-                                        border-radius:50%;
-                                        display:flex;
-                                        align-items:center;
-                                        justify-content:center;
-                                        font-size:18px;
-                                        font-weight:bold;">
-                                    ›
-                                </span>
-
-                            </button>
-                                                                                                    `
-                                        : ''
-                                    }
-
-                                                                                        </div>
-                                                                                        `
-                                    : `
-                                                                                        <img src="/imagenes/productos/default.jpg"
+                                                                                ${producto.imagenes.map((img, index) => `
+                                                                                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                                                                        <img src="/imagenes/productos/${img.imagen}"
+                                                                                            class="d-block w-100"
                                                                                             style="width:90px;height:90px;object-fit:cover;border-radius:8px;"
                                                                                             alt="producto">
-                                                                                        `
-                                }
+                                                                                    </div>
+                                                                                `).join('')}
 
                                                                             </div>
 
-                                                                                                    <!-- Información -->
-                                                                                                    <div class="col-md-8">
+                                                                    ${producto.imagenes.length > 1
+                                        ? `
+                                                            <button
+                                                            class="carousel-control-prev"
+                                                            type="button"
+                                                            data-bs-target="#carouselProducto${producto.id}"
+                                                            data-bs-slide="prev"
+                                                            style="left:-10px;width:25px;opacity:1;">
 
-                                                                                                        <h6 class="mb-2 fw-bold text-primary">
-                                                                                                            ${producto.nombre}
-                                                                                                        </h6>
+                                                            <span
+                                                                style="
+                                                                    width:24px;
+                                                                    height:24px;
+                                                                    background:#000;
+                                                                    color:#fff;
+                                                                    border-radius:50%;
+                                                                    display:flex;
+                                                                    align-items:center;
+                                                                    justify-content:center;
+                                                                    font-size:18px;
+                                                                    font-weight:bold;">
+                                                                ‹
+                                                            </span>
 
-                                                                                                        <div class="row">
+                                                        </button>
 
-                                                                                                            <!-- Izquierda -->
-                                                                                                            <div class="col-md-6">
+                                                        <button
+                                                            class="carousel-control-next"
+                                                            type="button"
+                                                            data-bs-target="#carouselProducto${producto.id}"
+                                                            data-bs-slide="next"
+                                                            style="right:-10px;width:25px;opacity:1;">
 
-                                                                                                                <div class="small text-dark">
-                                                                                                                    <strong>Marca:</strong>
-                                                                                                                    ${producto.marca ? producto.marca.nombre : 'SIN MARCA'}
-                                                                                                                </div>
+                                                            <span
+                                                                style="
+                                                                    width:24px;
+                                                                    height:24px;
+                                                                    background:#000;
+                                                                    color:#fff;
+                                                                    border-radius:50%;
+                                                                    display:flex;
+                                                                    align-items:center;
+                                                                    justify-content:center;
+                                                                    font-size:18px;
+                                                                    font-weight:bold;">
+                                                                ›
+                                                            </span>
 
-                                                                                                                <div class="small text-dark">
-                                                                                                                    <strong>Cód. Interno:</strong>
-                                                                                                                    ${producto.codigo_interno ?? '-'}
-                                                                                                                </div>
+                                                        </button>
+                                                                `
+                                        : ''
+                                    }
 
-                                                                                                                <div class="small text-dark">
-                                                                                                                    <strong>Nro. Parte:</strong>
-                                                                                                                    ${producto.numero_parte_vehiculo ?? '-'}
-                                                                                                                </div>
+                                                                </div>
+                                                                `
+                                    : `
+                                                                <img src="/imagenes/productos/default.jpg"
+                                                                    style="width:90px;height:90px;object-fit:cover;border-radius:8px;"
+                                                                    alt="producto">
+                                                                `
+                                }
 
-                                                                                                            </div>
+                                                            </div>
 
-                                                                                                            <!-- Derecha -->
-                                                                                                            <div class="col-md-6">
+                                                            <!-- Información -->
+                                                            <div class="col-md-8">
 
-                                                                                                                <div class="small text-dark">
-                                                                                                                    <strong>Vehículo:</strong>
-                                                                                                                    ${producto.vehiculos_compatibles ?? '-'}
-                                                                                                                </div>
+                                                                <h6 class="mb-2 fw-bold text-primary">
+                                                                    ${producto.nombre}
+                                                                </h6>
 
-                                                                                                               <div class="small text-dark">
-                                                                                                                    <strong>Ubicación:</strong>
-                                                                                                                    ${producto.ubicacion ?? '-'}
-                                                                                                                </div>
+                                                                <div class="row">
 
-                                                                                                                <div class="small text-dark">
-                                                                                                                    <strong>Medida:</strong>
-                                                                                                                    ${producto.medidas ?? '-'}
-                                                                                                                </div>
 
-                                                                                                            </div>
+                                                                    <div class="col-md-6">
 
-                                                                                                        </div>
+                                                                        <div class="small text-dark">
+                                                                            <strong>Marca:</strong>
+                                                                            ${producto.marca ? producto.marca.nombre : 'SIN MARCA'}
+                                                                        </div>
 
-                                                                                                    </div>
+                                                                        <div class="small text-dark">
+                                                                            <strong>Cód. Interno:</strong>
+                                                                            ${producto.codigo_interno ?? '-'}
+                                                                        </div>
 
-                                                                                                    <!-- Stock y precio -->
-                                                                                                    <div class="col-md-2 text-end">
+                                                                        <div class="small text-dark">
+                                                                            <strong>Nro. Parte:</strong>
+                                                                            ${producto.numero_parte_vehiculo ?? '-'}
+                                                                        </div>
 
-                                                                                                        <span class="badge bg-success">
-                                                                                                            Stock: ${producto.stock_actual}
-                                                                                                        </span>
+                                                                    </div>
 
-                                                                                                        <h5 class="text-success mt-2 mb-0">
-                                                                                                            Bs. ${producto.precio_venta}
-                                                                                                        </h5>
 
-                                                                                                    </div>
+                                                                    <div class="col-md-6">
 
-                                                                                                </div>
-                                                                                            </div>
-                                                                                            `;
+                                                                        <div class="small text-dark">
+                                                                            <strong>Vehículo:</strong>
+                                                                            ${producto.vehiculos_compatibles ?? '-'}
+                                                                        </div>
+
+                                                                        <div class="small text-dark">
+                                                                            <strong>Ubicación:</strong>
+                                                                            ${producto.ubicacion ?? '-'}
+                                                                        </div>
+
+                                                                        <div class="small text-dark">
+                                                                            <strong>Medida:</strong>
+                                                                            ${producto.medidas ?? '-'}
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
+
+                                                            <!-- Stock y precio -->
+                                                            <div class="col-md-2 text-end">
+
+                                                                <span class="badge bg-success">
+                                                                    Stock: ${producto.stock_actual}
+                                                                </span>
+
+                                                                <h5 class="text-success mt-2 mb-0">
+                                                                    Bs. ${producto.precio_venta}
+                                                                </h5>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    `;
                         });
                     }
                     $('#resultado_productos').html(html);
@@ -1029,52 +1037,52 @@
                         : `/imagenes/productos/default.jpg`;
 
                     items += `
-                            <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                                <div class="contenedor-imagen">
-                                    <img src="${ruta}" class="imagen-carrusel">
-                                </div>
-                            </div>
-                            `;
+                                                        <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                                            <div class="contenedor-imagen">
+                                                                <img src="${ruta}" class="imagen-carrusel">
+                                                            </div>
+                                                        </div>
+                                                        `;
 
                 });
             } else {
 
                 let ruta = `/imagenes/productos/default.jpg`;
                 items += `
-                        <div class="carousel-item active ">
-                            <div class="contenedor-imagen">
-                                <img src="${ruta}" class="imagen-carrusel">
-                            </div>
-                        </div>
-                        `;
+                                                    <div class="carousel-item active ">
+                                                        <div class="contenedor-imagen">
+                                                            <img src="${ruta}" class="imagen-carrusel">
+                                                        </div>
+                                                    </div>
+                                                    `;
                 imagenes.push({ imagen: ruta });
             }
 
 
             Swal.fire({
                 html: `
-                        <div id="carouselProducto" class="carousel slide" data-bs-ride="false">
+                                                    <div id="carouselProducto" class="carousel slide" data-bs-ride="false">
 
-                            <div class="carousel-inner">
-                                ${items}
-                            </div>
+                                                        <div class="carousel-inner">
+                                                            ${items}
+                                                        </div>
 
-                            ${imagenes.length > 1 ? `
-                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselProducto" data-bs-slide="prev">
-                                <span class="btn-carrusel">
-                                    ❮
-                                </span>
-                            </button>
+                                                        ${imagenes.length > 1 ? `
+                                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselProducto" data-bs-slide="prev">
+                                                            <span class="btn-carrusel">
+                                                                ❮
+                                                            </span>
+                                                        </button>
 
-                            <button class="carousel-control-next" type="button" data-bs-target="#carouselProducto" data-bs-slide="next">
-                                <span class="btn-carrusel">
-                                    ❯
-                                </span>
-                            </button>
-                            ` : ''}
+                                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselProducto" data-bs-slide="next">
+                                                            <span class="btn-carrusel">
+                                                                ❯
+                                                            </span>
+                                                        </button>
+                                                        ` : ''}
 
-                        </div>
-                        `,
+                                                    </div>
+                                                    `,
                 width: '90%',
                 padding: 10,
                 showConfirmButton: false,
@@ -1090,23 +1098,23 @@
 
         function agregarPago() {
             let html = `
-                        <div class="row pago-item mt-2">
+                                                    <div class="row pago-item mt-2">
 
-                            <div class="col-md-8">
-                                <select class="form-control form-control-sm metodo_pago">
-                                    <option value="EFECTIVO">EFECTIVO</option>
-                                    <option value="QR">QR</option>
-                                    <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                                </select>
-                            </div>
+                                                        <div class="col-md-8">
+                                                            <select class="form-control form-control-sm metodo_pago">
+                                                                <option value="EFECTIVO">EFECTIVO</option>
+                                                                <option value="QR">QR</option>
+                                                                <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                                                            </select>
+                                                        </div>
 
-                            <div class="col-md-4">
-                                <input type="number" class="form-control form-control-sm monto_pago" placeholder="Monto">
-                            </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control form-control-sm monto_pago" placeholder="Monto">
+                                                        </div>
 
 
 
-                        </div>`;
+                                                    </div>`;
 
             $('#lista_pagos').append(html);
         }
@@ -1133,10 +1141,6 @@
         #imagenGrande:hover {
             transform: scale(1.8);
         }
-
-
-
-
 
         .swal-imagen-popup {
             width: 50% !important;

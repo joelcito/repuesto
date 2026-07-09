@@ -227,15 +227,15 @@
 
                                                         <div class="tab-pane fade show active"
                                                             id="tab_repuestos_{{ $keyPri }}">
-                                                            fdgfdgfdgfdg
+
                                                         </div>
 
                                                         <div class="tab-pane fade" id="tab_lubricantes_{{ $keyPri }}">
-                                                            dfgfdfgdfdgfgd
+
                                                         </div>
 
                                                         <div class="tab-pane fade" id="tab_total_{{ $keyPri }}">
-                                                            dfdgfdgfdg
+
                                                         </div>
                                                         <div class="tab-pane fade show active"
                                                             id="kt_tab_pane_7_ots_{{ $keyPri }}" role="tabpanel">

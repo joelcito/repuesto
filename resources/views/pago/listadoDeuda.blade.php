@@ -135,19 +135,41 @@
         }
 
         //FORMULARIO DEUDAS
-        function registrarPago(venta) {
+        // function registrarPago(venta) {
+        //     $('#formulario_deuda').html('');
+        //     limpiarErorres();
+
+        //     datos = { venta_id: venta.id }
+        //     $.ajax({
+        //         url: "{{ route('pago.ajaxFormPagoDeuda') }}",
+        //         method: "POST",
+        //         data: datos,
+        //         success: function (resultado) {
+        //             if (resultado.estado) {
+        //                 $('#formulario_deuda').html(resultado.data.formulario)
+        //                 $('#modalDeuda').modal('show')
+        //             }
+        //         }
+        //     });
+        // }
+
+        function registrarPago(ventaId) {
+
             $('#formulario_deuda').html('');
             limpiarErorres();
 
-            datos = { venta_id: venta.id }
+            let datos = {
+                venta_id: ventaId
+            };
+
             $.ajax({
                 url: "{{ route('pago.ajaxFormPagoDeuda') }}",
                 method: "POST",
                 data: datos,
                 success: function (resultado) {
                     if (resultado.estado) {
-                        $('#formulario_deuda').html(resultado.data.formulario)
-                        $('#modalDeuda').modal('show')
+                        $('#formulario_deuda').html(resultado.data.formulario);
+                        $('#modalDeuda').modal('show');
                     }
                 }
             });

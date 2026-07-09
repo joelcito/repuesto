@@ -5,7 +5,7 @@
             <div class="fv-row mb-7">
                 <label class="fs-6 fw-semibold form-label mb-2 ">Sucursal</label>
                 <input type="text" class="form-control form-control-sm" id="sucursal" name="sucursal"
-                    value="{{ optional($venta->sucursal)->nombre }}" @readonly(true) disabled>
+                    value="{{ optional($venta->caja?->sucursal)->nombre }}" @readonly(true) disabled>
                 <div class="text-danger error-message" id="error-sucursal"></div>
             </div>
         </div>

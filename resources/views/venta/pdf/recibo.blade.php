@@ -189,10 +189,52 @@
                     <td colspan="8"><strong>CAMBIO</strong></td>
                     <td>{{ number_format($cambio, 2) }}</td>
                 </tr> -->
-                <tr>
+
+
+
+
+
+                <!-- <tr>
                     <td colspan="8" style="text-align:right"> <strong>TOTAL A PAGAR</strong> </td>
                     <td> {{ number_format($venta->total, 2) }} </td>
+                </tr> -->
+
+
+
+                <tr>
+                    <td colspan="8" style="text-align:right">
+                        <strong>TOTAL DE LA VENTA</strong>
+                    </td>
+                    <td>{{ number_format($venta->total, 2) }}</td>
                 </tr>
+
+                <tr>
+                    <td colspan="8" style="text-align:right">
+                        <strong>MONTO PAGADO</strong>
+                    </td>
+                    <td>{{ number_format($totalPagado, 2) }}</td>
+                </tr>
+
+                @if($saldo > 0)
+                    <tr>
+                        <td colspan="8" style="text-align:right">
+                            <strong>SALDO PENDIENTE</strong>
+                        </td>
+                        <td>{{ number_format($saldo, 2) }}</td>
+                    </tr>
+                @endif
+
+                @if($cambio > 0)
+                    <tr>
+                        <td colspan="8" style="text-align:right">
+                            <strong>CAMBIO</strong>
+                        </td>
+                        <td>{{ number_format($cambio, 2) }}</td>
+                    </tr>
+                @endif
+
+
+
                 <!-- <tr>
                     <td colspan="8"> <strong>PAGADO</strong> </td>
                     <td> {{ number_format($totalPagado, 2) }} </td>

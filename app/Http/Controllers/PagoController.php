@@ -122,7 +122,15 @@ class PagoController extends Controller
     public function ajaxListadoDeuda(Request $request)
     {
         if ($request->ajax()) {
-            $ventas = Venta::with(['cliente', 'sucursal'])->where('estado_pago', 'DEUDA')->orderBy('id', 'desc')->get();
+            //$ventas = Venta::with(['cliente', 'sucursal'])->where('estado_pago', 'DEUDA')->orderBy('id', 'desc')->get();
+            $ventas = Venta::with([
+                'cliente',
+                'caja.sucursal',
+                'pagos'
+            ])
+                ->whereIn('estado_pago', ['DEUDA', 'PARCIAL'])
+                ->orderBy('id', 'desc')
+                ->get();
             $valores = [
                 'listado' => view('pago.ajaxListadoDeuda')->with(compact('ventas'))->render()
             ];
@@ -133,27 +141,65 @@ class PagoController extends Controller
         return $data;
     }
 
+    // public function ajaxFormPagoDeuda(Request $request)
+    // {
+    //     if ($request->ajax()) {
+    //         $venta_id = $request->input('venta_id');
+
+    //         $venta = Venta::with(['cliente', 'sucursal'])->where('id', $venta_id)->first();
+    //         $pagos = pago::where('venta_id', $venta_id)
+    //             ->where('estado', 'INGRESO')
+    //             ->get();
+    //         $pagado = pago::where('venta_id', $venta_id)
+    //             ->where('estado', 'INGRESO')
+    //             ->sum('monto');
+
+    //         $valores = [
+    //             'formulario' => view('pago.ajaxFormPagoDeuda')->with(compact('venta', 'pagos', 'pagado'))->render()
+    //         ];
+    //         $data = Respuesta::success($valores, "Datos obtenidos correctamente");
+    //     } else {
+    //         $data = Respuesta::error(null, "Error al obtener los datos");
+    //     }
+    //     return $data;
+    // }
+
     public function ajaxFormPagoDeuda(Request $request)
     {
         if ($request->ajax()) {
-            $venta_id = $request->input('venta_id');
 
-            $venta = Venta::with(['cliente', 'sucursal'])->where('id', $venta_id)->first();
-            $pagos = pago::where('venta_id', $venta_id)
-                ->where('estado', 'INGRESO')
-                ->get();
-            $pagado = pago::where('venta_id', $venta_id)
+            $venta = Venta::with([
+                'cliente',
+                'caja.sucursal',
+                'pagos'
+            ])->find($request->venta_id);
+
+
+            if (!$venta) {
+                return Respuesta::error(null, "Venta no encontrada");
+            }
+
+            $pagos = $venta->pagos;
+            $pagado = $venta->pagos()
                 ->where('estado', 'INGRESO')
                 ->sum('monto');
 
+
             $valores = [
-                'formulario' => view('pago.ajaxFormPagoDeuda')->with(compact('venta', 'pagos', 'pagado'))->render()
+                'formulario' => view('pago.ajaxFormaPagoDeuda')
+                    ->with(compact('venta', 'pagado', 'pagos'))
+                    ->render()
             ];
-            $data = Respuesta::success($valores, "Datos obtenidos correctamente");
-        } else {
-            $data = Respuesta::error(null, "Error al obtener los datos");
+
+
+            return Respuesta::success(
+                $valores,
+                "Formulario cargado correctamente"
+            );
+
         }
-        return $data;
+
+        return Respuesta::error(null, "Error");
     }
 
     public function guardarPagoDeuda(Request $request)
@@ -426,25 +472,48 @@ class PagoController extends Controller
         return $data;
     }
 
+    // public function comprobantePago(Request $request, $pago_id)
+    // {
+
+    //     $pago = Pago::with([
+    //         'usuario',
+    //         'sucursal',
+    //         'venta.pagos',
+    //         'categoria.parent'
+    //     ])->findOrFail($pago_id);
+
+    //     $html = View::make('pago.pdf.comprobantePago', compact(['pago']))->render();
+    //     $dompdf = new Dompdf();
+    //     $dompdf->setPaper(array(0, 0, 300.00, 504.00), 'landscape');//cambio orientacion de la hoja
+    //     $dompdf->loadHtml($html);
+    //     $dompdf->render();
+
+    //     return response($dompdf->output())
+    //         ->header('Content-Type', 'application/pdf')
+    //         ->header('Content-Disposition', 'inline; filename=Cotizacion.pdf');
+
+    // }
+
     public function comprobantePago(Request $request, $pago_id)
     {
-
         $pago = Pago::with([
             'usuario',
             'sucursal',
             'venta.pagos',
+            'venta.devoluciones',
             'categoria.parent'
         ])->findOrFail($pago_id);
 
-        $html = View::make('pago.pdf.comprobantePago', compact(['pago']))->render();
+        $html = View::make('pago.pdf.comprobantePago', compact('pago'))->render();
+
         $dompdf = new Dompdf();
-        $dompdf->setPaper(array(0, 0, 300.00, 504.00), 'landscape');//cambio orientacion de la hoja
+        $dompdf->setPaper([0, 0, 300.00, 504.00], 'landscape');
+
         $dompdf->loadHtml($html);
         $dompdf->render();
 
         return response($dompdf->output())
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'inline; filename=Cotizacion.pdf');
-
+            ->header('Content-Disposition', 'inline; filename=ComprobantePago.pdf');
     }
 }

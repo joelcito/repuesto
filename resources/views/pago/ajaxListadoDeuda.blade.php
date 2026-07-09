@@ -19,21 +19,21 @@
         <tbody class="text-gray-600 fw-semibold">
             @forelse ($ventas as $venta)
                 <tr>
-                    <td>{{ optional($venta->sucursal)->nombre }}</td>
+                    <td>{{ optional($venta->caja?->sucursal)->nombre }}</td>
                     <td>{{ date('d/m/Y H:i:s', strtotime($venta->fecha)) }}</td>
                     <td>{{ $venta->usuarioCreador->nombres . ' ' . $venta->usuarioCreador->ap_paterno }}</td>
                     <td>{{ optional($venta->cliente)->nombres . ' ' . optional($venta->cliente)->ap_paterno . ' ' . optional($venta->cliente)->ap_materno }}
                     </td>
                     <td>
                         <span class="text-info">
-                            {{ sprintf('%06d', $venta->numero_venta) }}
+                            {{ sprintf('%06d', $venta->numero_factura) }}
                         </span>
                     </td>
                     <td>
                         {{ number_format($venta->total, 2) }}
                     </td>
                     <td>
-                        {{ number_format($venta->descuento_adicional, 2) }}
+                        {{ number_format($venta->descuento, 2) }}
                     </td>
                     <td>
                         <span class="text-warning">
@@ -52,11 +52,11 @@
                     </td>
                     <td>
                         <button class="btn btn-icon btn-sm btn-info btn-circle" title="Registrar Pago"
-                            onclick="registrarPago({{ json_encode($venta) }})"><i class="fa fa-dollar"></i></button>
-                        <button onclick="formularioDecuentoAdicional({{ $venta->id }})"
-                            class="btn btn-icon btn-warning btn-circle btn-sm" title="Registrar Descuento">
-                            <i class="fa fa-minus-square"></i>
-                        </button>
+                            onclick="registrarPago({{ $venta->id }})"><i class="fa fa-dollar"></i></button>
+                        <!-- <button onclick="formularioDecuentoAdicional({{ $venta->id }})"
+                                        class="btn btn-icon btn-warning btn-circle btn-sm" title="Registrar Descuento">
+                                        <i class="fa fa-minus-square"></i>
+                                    </button> -->
                     </td>
                 </tr>
             @empty

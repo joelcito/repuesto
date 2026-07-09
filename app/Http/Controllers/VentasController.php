@@ -228,6 +228,8 @@ class VentasController extends Controller
             } else {
                 $venta->estado_pago = 'DEUDA';
             }
+
+            $venta->save();
             foreach ($pagos as $pago) {
 
                 if (!isset($pago['monto']) || $pago['monto'] <= 0) {

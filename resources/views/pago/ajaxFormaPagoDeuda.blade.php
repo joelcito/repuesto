@@ -5,7 +5,7 @@
             <div class="fv-row mb-7">
                 <label class="fs-6 fw-semibold form-label mb-2 ">Sucursal</label>
                 <input type="text" class="form-control form-control-sm" id="sucursal" name="sucursal"
-                    value="{{ optional($venta->sucursal)->nombre }}" @readonly(true) disabled>
+                    value="{{ optional($venta->caja?->sucursal)->nombre }}" @readonly(true) disabled>
                 <div class="text-danger error-message" id="error-sucursal"></div>
             </div>
         </div>
@@ -21,9 +21,8 @@
         <div class="col-md-4">
             <div class="fv-row mb-7">
                 <label class="fw-semibold fs-6 mb-2">N° Fac/Rec</label>
-                <input type="number" class="form-control form-control-sm" id="numero" name="numero"
-                    value="{{ $venta->facturado == 'Si' ? $venta->numero_venta : $venta->numero_recibo }}"
-                    @readonly(true) disabled>
+                <input type="text" class="form-control form-control-sm" id="numero" name="numero"
+                    value="{{ sprintf('%06d', $venta->numero_factura) }}" readonly disabled>
                 <div class="text-info" id="mensaje-numero"></div>
             </div>
         </div>

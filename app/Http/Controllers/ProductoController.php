@@ -147,7 +147,7 @@ class ProductoController extends Controller
             $producto->ubicacion = $request->input('ubicacion');
             $producto->tipo_producto = $request->input('tipo_producto');
 
-            $producto->estado = 1;
+            $producto->estado = $request->input('estado', 1);
             $producto->save();
 
             if ($request->input('incorporacion_id')) {
@@ -202,9 +202,10 @@ class ProductoController extends Controller
         return Producto::find($id);
     }
 
-    public function generarCodigoBarra(Request $request){
+    public function generarCodigoBarra(Request $request)
+    {
 
-        if($request->ajax()){
+        if ($request->ajax()) {
 
             $idProducto = $request->input('idProducto');
             $producto = Producto::find($idProducto);
@@ -226,7 +227,7 @@ class ProductoController extends Controller
 
             $data = Respuesta::success($valores, "Producto generado con éxito");
 
-        }else{
+        } else {
             $data = Respuesta::error(null, "Error al obtener los datos");
         }
         return $data;
