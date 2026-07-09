@@ -46,7 +46,7 @@
 <body>
 
     <div class="titulo">
-        REPORTE INGRESOS Y SALIDAS
+        REPORTE INGRESOS Y SALIDAS INVENTARIOS
     </div>
     <table>
         <thead>

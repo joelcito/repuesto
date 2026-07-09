@@ -37,8 +37,28 @@
                                     id="subcategoria_id"></select>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                Origen del dinero
+                            </label>
+
+                            <select class="form-select" id="origen_dinero" name="origen_dinero">
+
+                                <option value="">
+                                    Seleccione
+                                </option>
+
+                                <option value="REPUESTOS">
+                                    REPUESTOS
+                                </option>
+
+                                <option value="LUBRICANTES">
+                                    LUBRICANTES
+                                </option>
+
+                            </select>
+                        </div>
                         <div class="col-md-4">
                             <div class="fv-row mb-7">
                                 <label class="required fw-semibold fs-6 mb-2">Monto</label>
@@ -48,7 +68,10 @@
                                 <input type="hidden" id="tipo" name="tipo" required>
                             </div>
                         </div>
-                        <div class="col-md-8">
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-12">
                             <div class="fv-row mb-7">
                                 <label class="required fw-semibold fs-6 mb-2">Descripcion</label>
                                 <input type="text" id="descripcion" name="descripcion"
@@ -243,6 +266,7 @@
             $('#text_tipoo_modal').text(tipo)
             $('#monto').val(0)
             $('#descripcion').val('')
+            $('#origen_dinero').val('');
             let categoriasIngreso = (tipo === "INGRESO") ? @json($categoriasIngreso) : @json($categoriasSalida);
             $('#categoria_id').empty();
             $('#categoria_id').append('<option value="">Seleccione</option>');

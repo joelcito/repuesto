@@ -105,12 +105,25 @@
                 <td>{{ $pago->tipo_pago }}</td>
                 <td>{{ number_format($pago->monto, 2) }}</td>
                 <td>{{ number_format($pago->venta?->descuento ?? 0, 2) }}</td>
-                <td> {{ number_format(
-    ($pago->venta->total ?? 0) - $pago->venta->pagos->where('estado', 'INGRESO')
-        ->where('id', '<=', $pago->id)
-        ->sum('monto'),
-    2
-) }}</td>
+                <td>
+                    @if($pago->venta)
+
+                                        {{ number_format(
+                            ($pago->venta->total ?? 0)
+                            -
+                            $pago->venta->pagos
+                                ->where('estado', 'INGRESO')
+                                ->where('id', '<=', $pago->id)
+                                ->sum('monto'),
+                            2
+                        ) }}
+
+                    @else
+
+                        -
+
+                    @endif
+                </td>
             </tr>
         </tbody>
     </table>

@@ -23,6 +23,7 @@ class MovimientoCaja extends Model
         'tipo',
         'metodo_pago',
         'monto',
+        'origen_dinero',
 
         'descripcion',
         'fecha',

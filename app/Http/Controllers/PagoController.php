@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Caja;
 use App\Models\Categoria;
 use App\Models\Factura;
+use App\Models\MovimientoCaja;
 use App\Models\Pago;
 use App\Models\SubCategoria;
 use App\Models\Sucursal;
@@ -247,32 +249,87 @@ class PagoController extends Controller
         return $data;
     }
 
+    // public function guardarTipoIngresoSalida(Request $request)
+    // {
+    //     if ($request->ajax()) {
+    //         $usuario = Auth::user();
+    //         $monto = $request->input('monto');
+    //         $descripcion = $request->input('descripcion');
+    //         $tipo = $request->input('tipo');
+    //         $subcategoria_id = $request->input('subcategoria_id');
+    //         $sucursal = $usuario->sucursal;
+
+
+    //         $pago = new pago();
+    //         $pago->usuario_creador_id = $usuario->id;
+    //         $pago->sucursal_id = $sucursal->id;
+    //         $pago->monto = $monto;
+    //         $pago->fecha = date('Y-m-d H:i:s');
+    //         $pago->descripcion = $descripcion;
+    //         $pago->tipo_pago = 'EFECTIVO';
+    //         $pago->estado = $tipo;
+    //         $pago->sub_categoria_id = $subcategoria_id;
+    //         $pago->save();
+
+    //         $data = Respuesta::success(null, "Datos registrados correctamente");
+
+    //     } else {
+    //         $data = Respuesta::error(null, "Error al obtener los datos");
+    //     }
+    //     return $data;
+    // }
+
     public function guardarTipoIngresoSalida(Request $request)
     {
         if ($request->ajax()) {
             $usuario = Auth::user();
-            $monto = $request->input('monto');
-            $descripcion = $request->input('descripcion');
-            $tipo = $request->input('tipo');
-            $subcategoria_id = $request->input('subcategoria_id');
             $sucursal = $usuario->sucursal;
-            $pago = new pago();
+            $caja = Caja::where('sucursal_id', $sucursal->id)
+                ->where('estado', 'ABIERTA')
+                ->first();
+            if (!$caja) {
+                return Respuesta::error(
+                    null,
+                    "No existe caja abierta"
+                );
+            }
+            $monto = $request->monto;
+            $tipo = $request->tipo;
+            // Guardas pago (si lo necesitas)
+            $pago = new Pago();
             $pago->usuario_creador_id = $usuario->id;
             $pago->sucursal_id = $sucursal->id;
             $pago->monto = $monto;
-            $pago->fecha = date('Y-m-d H:i:s');
-            $pago->descripcion = $descripcion;
+            $pago->fecha = now();
+            $pago->descripcion = $request->descripcion;
             $pago->tipo_pago = 'EFECTIVO';
             $pago->estado = $tipo;
-            $pago->sub_categoria_id = $subcategoria_id;
+            $pago->sub_categoria_id = $request->subcategoria_id;
             $pago->save();
-
-            $data = Respuesta::success(null, "Datos registrados correctamente");
-
-        } else {
-            $data = Respuesta::error(null, "Error al obtener los datos");
+            // NUEVO: movimiento real de caja
+            MovimientoCaja::create([
+                'usuario_creador_id' => $usuario->id,
+                'caja_id' => $caja->id,
+                'venta_id' => null,
+                'tipo' => $tipo == 'INGRESO'
+                    ? 'INGRESO'
+                    : 'EGRESO',
+                'metodo_pago' => 'EFECTIVO',
+                'monto' => $monto,
+                'origen_dinero' => $request->origen_dinero,
+                'descripcion' => $request->descripcion,
+                'fecha' => now(),
+                'estado' => 'ACTIVO'
+            ]);
+            return Respuesta::success(
+                null,
+                "Datos registrados correctamente"
+            );
         }
-        return $data;
+        return Respuesta::error(
+            null,
+            "Error al obtener los datos"
+        );
     }
 
     public function formularioDecuentoAdicional(Request $request)
