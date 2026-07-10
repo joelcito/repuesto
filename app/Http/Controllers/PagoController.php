@@ -45,7 +45,7 @@ class PagoController extends Controller
         $fecha_fin = $request->input('fecha_fin');
         $usuario_id = $request->input('usuario_busqueda_id');
         $baseQuery = Pago::query()
-            ->with(['venta.detalles.producto']); // IMPORTANTE
+            ->with(['venta.detalles.producto', 'movimientoCaja']); // IMPORTANTE
 
         if ($sucursal_id) {
             $baseQuery->where('sucursal_id', $sucursal_id);
@@ -62,15 +62,33 @@ class PagoController extends Controller
         $todos = (clone $baseQuery)
             ->orderBy('id', 'desc')
             ->get();
+
         // $repuestos = (clone $baseQuery)
         //     ->whereHas('venta.detalles.producto', function ($q) {
         //         $q->where('tipo_producto', 'REPUESTO');
         //     })
+        //     ->with([
+        //         'venta.detalles' => function ($q) {
+        //             $q->whereHas('producto', function ($p) {
+        //                 $p->where('tipo_producto', 'REPUESTO');
+        //             });
+        //             $q->with('producto');
+        //         }
+        //     ])
         //     ->orderBy('id', 'desc')
         //     ->get();
+
         $repuestos = (clone $baseQuery)
-            ->whereHas('venta.detalles.producto', function ($q) {
-                $q->where('tipo_producto', 'REPUESTO');
+            ->where(function ($q) {
+
+                $q->whereHas('venta.detalles.producto', function ($p) {
+                    $p->where('tipo_producto', 'REPUESTO');
+                })
+
+                    ->orWhereHas('movimientoCaja', function ($m) {
+                        $m->where('origen_dinero', 'REPUESTOS');
+                    });
+
             })
             ->with([
                 'venta.detalles' => function ($q) {
@@ -82,16 +100,23 @@ class PagoController extends Controller
             ])
             ->orderBy('id', 'desc')
             ->get();
+
+
         // $lubricantes = (clone $baseQuery)
         //     ->whereHas('venta.detalles.producto', function ($q) {
         //         $q->where('tipo_producto', 'LUBRICANTE');
         //     })
-        //     ->orderBy('id', 'desc')
-        //     ->get();
-
         $lubricantes = (clone $baseQuery)
-            ->whereHas('venta.detalles.producto', function ($q) {
-                $q->where('tipo_producto', 'LUBRICANTE');
+            ->where(function ($q) {
+
+                $q->whereHas('venta.detalles.producto', function ($p) {
+                    $p->where('tipo_producto', 'LUBRICANTE');
+                })
+
+                    ->orWhereHas('movimientoCaja', function ($m) {
+                        $m->where('origen_dinero', 'LUBRICANTES');
+                    });
+
             })
             ->with([
                 'venta.detalles' => function ($q) {
@@ -130,6 +155,7 @@ class PagoController extends Controller
                 'caja.sucursal',
                 'pagos'
             ])
+                ->withSum('detalles', 'descuento')
                 ->whereIn('estado_pago', ['DEUDA', 'PARCIAL'])
                 ->orderBy('id', 'desc')
                 ->get();
@@ -302,7 +328,7 @@ class PagoController extends Controller
             $pago->monto = $monto;
             $pago->fecha = now();
             $pago->descripcion = $request->descripcion;
-            $pago->tipo_pago = 'EFECTIVO';
+            $pago->tipo_pago = $request->tipo_pago;
             $pago->estado = $tipo;
             $pago->sub_categoria_id = $request->subcategoria_id;
             $pago->save();
@@ -311,10 +337,11 @@ class PagoController extends Controller
                 'usuario_creador_id' => $usuario->id,
                 'caja_id' => $caja->id,
                 'venta_id' => null,
+                'pago_id' => $pago->id, // <-- agregar esto
                 'tipo' => $tipo == 'INGRESO'
                     ? 'INGRESO'
                     : 'EGRESO',
-                'metodo_pago' => 'EFECTIVO',
+                'metodo_pago' => $request->tipo_pago,
                 'monto' => $monto,
                 'origen_dinero' => $request->origen_dinero,
                 'descripcion' => $request->descripcion,

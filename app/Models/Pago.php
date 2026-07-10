@@ -60,8 +60,11 @@ class Pago extends Model
             'sub_categoria_id'
         );
     }
-
-
-
-
+    public function movimientoCaja()
+    {
+        return $this->hasOne(
+            MovimientoCaja::class,
+            'pago_id'
+        );
+    }
 }

@@ -135,6 +135,7 @@ class VentasController extends Controller
             $venta->estado = 'SALIDA';
             $venta->save();
             $subtotalGeneral = 0;
+            $descuentoGeneral = 0;
             foreach ($request->productos as $item) {
                 $producto = Producto::find($item['producto_id']);
                 if (!$producto) {
@@ -154,13 +155,18 @@ class VentasController extends Controller
                 }
 
                 $precio = $item['precio'];
-                $subtotal =
-                    ($precio * $item['cantidad'])
-                    - ($item['descuento'] ?? 0);
+
+                $descuentoItem = $item['descuento'] ?? 0;
+                // $subtotal =
+                //     ($precio * $item['cantidad'])
+                //     - ($item['descuento'] ?? 0);
+                $subtotal = $precio * $item['cantidad'];
 
                 $precioOriginal = $item['tipo_precio'] == 'MAYOR'
                     ? $producto->precio_mayor
                     : $producto->precio_venta;
+
+                $descuentoGeneral += $descuentoItem;
 
                 VentaDetalle::create([
                     'venta_id' => $venta->id,
@@ -195,8 +201,10 @@ class VentasController extends Controller
             }
 
             //$total = $subtotalGeneral - $venta->descuento;
-            $total = $subtotalGeneral;
+            $total = $subtotalGeneral - $descuentoGeneral;
+
             $venta->subtotal = $subtotalGeneral;
+            $venta->descuento = $descuentoGeneral;
             $venta->total = $total;
             $venta->save();
             // $montoPagado = $request->monto_pagado ?? $total;
@@ -235,20 +243,23 @@ class VentasController extends Controller
                 if (!isset($pago['monto']) || $pago['monto'] <= 0) {
                     continue;
                 }
-                // $monto = ($pago['monto'] ?? 0);
-                // $descuento = ($pago['descuento'] ?? 0);
-                // $montoNeto = $monto - $descuento;
 
-                $monto = (float) $pago['monto'];
+
+                //  $monto = (float) $pago['monto'];
+
+                $montoRecibido = (float) $pago['monto'];
+                $cambio = max(0, $montoRecibido - $total);
+                $montoReal = min($montoRecibido, $total);
+
                 Pago::create([
                     'usuario_creador_id' => $usuario->id,
                     'venta_id' => $venta->id,
                     'caja_id' => $caja->id,
                     'sucursal_id' => $caja->sucursal_id,
-                    'monto' => $monto,
+                    'monto' => $montoReal,
                     //'cambio' => max(0, $monto - $descuento - $total), // opcional o simplificado
 
-                    'cambio' => 0,
+                    'cambio' => $cambio,
                     'fecha' => now(),
                     'descripcion' => 'PAGO VENTA #' . $venta->numero_factura,
                     'tipo_pago' => $pago['metodo'],
@@ -263,7 +274,7 @@ class VentasController extends Controller
                     'tipo' => 'INGRESO',
                     'metodo_pago' => $pago['metodo'],
                     // 'monto' => $montoNeto,
-                    'monto' => $monto,
+                    'monto' => $montoReal,
                     'descripcion' => 'VENTA #' . $venta->id,
                     'fecha' => now(),
                     'estado' => 'INGRESO',
@@ -271,7 +282,7 @@ class VentasController extends Controller
                 ]);
 
                 //$caja->total_ingresos += $montoNeto;
-                $caja->total_ingresos += $monto;
+                $caja->total_ingresos += $montoReal;
 
             }
             $caja->save();
@@ -588,6 +599,7 @@ class VentasController extends Controller
                     ->orWhere('descripcion', 'LIKE', "%{$buscar}%")
                     ->orWhere('vehiculos_compatibles', 'LIKE', "%{$buscar}%")
                     ->orWhere('numero_parte_vehiculo', 'LIKE', "%{$buscar}%")
+                    ->orWhere('medidas', 'LIKE', "%{$buscar}%")
                     ->orWhereHas('marca', function ($q) use ($buscar) {
                         $q->where('nombre', 'LIKE', "%{$buscar}%");
                     });

@@ -19,6 +19,7 @@ class MovimientoCaja extends Model
 
         'caja_id',
         'venta_id',
+        'pago_id',
 
         'tipo',
         'metodo_pago',
@@ -41,4 +42,11 @@ class MovimientoCaja extends Model
     {
         return $this->belongsTo(Venta::class, 'venta_id');
     }
+
+    public function pago()
+    {
+        return $this->belongsTo(Pago::class);
+    }
+
+
 }

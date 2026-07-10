@@ -68,6 +68,18 @@
                                 <input type="hidden" id="tipo" name="tipo" required>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                Método de pago
+                            </label>
+
+                            <select class="form-select" name="tipo_pago" id="tipo_pago" required>
+                                <option value="">Seleccione</option>
+                                <option value="EFECTIVO">EFECTIVO</option>
+                                <option value="QR">QR</option>
+                                <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="row">
 

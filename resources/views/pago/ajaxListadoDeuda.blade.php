@@ -5,12 +5,12 @@
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                 <th>Sucursal</th>
                 <th>Fecha Venta</th>
-                <th>Asesor</th>
+                <th>Vendedor</th>
                 <th>Cliente</th>
                 <th>Fac / Or</th>
-                <th>Total</th>
-                <th>Descuento</th>
                 <th>Sub Total</th>
+                <th>Descuento</th>
+                <th>Total</th>
                 <th>A Cuenta</th>
                 <th>Saldo</th>
                 <th>Acciones</th>
@@ -30,15 +30,14 @@
                         </span>
                     </td>
                     <td>
-                        {{ number_format($venta->total, 2) }}
-                    </td>
-                    <td>
-                        {{ number_format($venta->descuento, 2) }}
-                    </td>
-                    <td>
                         <span class="text-warning">
-                            {{ number_format($venta->total - $venta->descuento_adicional, 2) }}
+                            {{ number_format($venta->subtotal, 2) }}
                         </span>
+                    </td>
+
+                    <td>{{ number_format($venta->detalles_sum_descuento ?? 0, 2) }}</td>
+                    <td>
+                        {{ number_format($venta->total, 2) }}
                     </td>
                     <td>
                         <span class="text-success">
@@ -54,9 +53,9 @@
                         <button class="btn btn-icon btn-sm btn-info btn-circle" title="Registrar Pago"
                             onclick="registrarPago({{ $venta->id }})"><i class="fa fa-dollar"></i></button>
                         <!-- <button onclick="formularioDecuentoAdicional({{ $venta->id }})"
-                                        class="btn btn-icon btn-warning btn-circle btn-sm" title="Registrar Descuento">
-                                        <i class="fa fa-minus-square"></i>
-                                    </button> -->
+                                                                    class="btn btn-icon btn-warning btn-circle btn-sm" title="Registrar Descuento">
+                                                                    <i class="fa fa-minus-square"></i>
+                                                                </button> -->
                     </td>
                 </tr>
             @empty

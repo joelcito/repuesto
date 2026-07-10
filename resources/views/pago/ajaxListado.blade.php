@@ -33,34 +33,26 @@
                     <td>{{ $pago->tipo_pago }}</td>
                     <td>
                         @if($pago->tipo_pago == 'EFECTIVO')
-                            @php
-                                $montoTipoProducto = 0;
 
-                                if ($pago->venta && $pago->venta->detalles) {
-                                    foreach ($pago->venta->detalles as $detalle) {
-                                        $montoTipoProducto += $detalle->subtotal;
-                                    }
-                                }
-                            @endphp
+                            @if($pago->movimientoCaja)
+                                {{ number_format($pago->movimientoCaja->monto, 2) }}
+                            @else
+                                {{ number_format($pago->monto, 2) }}
+                            @endif
 
-                            {{ number_format($montoTipoProducto, 2) }}
                         @else
                             0.00
                         @endif
                     </td>
                     <td>
                         @if($pago->tipo_pago == 'QR' || $pago->tipo_pago == 'TRANSFERENCIA')
-                            @php
-                                $montoTipoProducto = 0;
 
-                                if ($pago->venta && $pago->venta->detalles) {
-                                    foreach ($pago->venta->detalles as $detalle) {
-                                        $montoTipoProducto += $detalle->subtotal;
-                                    }
-                                }
-                            @endphp
+                            @if($pago->movimientoCaja)
+                                {{ number_format($pago->movimientoCaja->monto, 2) }}
+                            @else
+                                {{ number_format($pago->monto, 2) }}
+                            @endif
 
-                            {{ number_format($montoTipoProducto, 2) }}
                         @else
                             0.00
                         @endif
@@ -106,15 +98,22 @@
                     }
 
                     if ($pago->estado === 'SALIDA') {
+
+                        $montoSalida = $pago->movimientoCaja
+                            ? $pago->movimientoCaja->monto
+                            : $pago->monto;
+
+
                         if ($pago->tipo_pago === 'EFECTIVO') {
-                            $totalSalidaEfectivo += $pago->monto;
+                            $totalSalidaEfectivo += $montoSalida;
                         }
+
                         if ($pago->tipo_pago === 'QR') {
-                            $totalSalidaQR += $pago->monto;
+                            $totalSalidaQR += $montoSalida;
                         }
 
                         if ($pago->tipo_pago === 'TRANSFERENCIA') {
-                            $totalSalidaTransferencia += $pago->monto;
+                            $totalSalidaTransferencia += $montoSalida;
                         }
                     }
                 @endphp

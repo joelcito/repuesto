@@ -22,7 +22,7 @@
             @endphp
             @forelse($ventas as $venta)
                 @php
-                    $pagado = $venta->pagos->where('estado', 'ACTIVO')->sum('monto');
+                    $pagado = $venta->pagos->where('estado', 'INGRESO')->sum('monto');
                     $totalGeneral += $venta->total;
                     $totalPagado += $pagado;
                 @endphp
@@ -73,7 +73,7 @@
                             {{ $venta->estado }}
                         </span>
                     </td>
-                    </td>
+
                     <td>
                         {{ $venta->usuarioCreador?->nombres }}
                     </td>
