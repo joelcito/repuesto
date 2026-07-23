@@ -3,7 +3,7 @@
 <!--begin::Head-->
 
 <head>
-    <title>SISTEMA DE CONTROL DE SALUD</title>
+    <title>SISTEMA DE CONTROL DE REPUESTO</title>
     <meta charset="utf-8" />
     @yield('metadatos')
     <meta name="description"
@@ -17,7 +17,6 @@
     <meta property="og:url" content="https://cmedicos.com/" />
     <meta property="og:site_name" content="Sistema de Salud en Línea" />
     <link rel="canonical" href="https://cmedicos.com/" />
-    <link rel="shortcut icon" href="{{ asset('assets/img/lop.jpg') }}" />
     <!--begin::Fonts(mandatory for all pages)-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
     <!--end::Fonts-->

@@ -290,6 +290,9 @@
 @section('js')
     <script src="{{ asset('assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
     <script>
+        const BASE_URL = "{{ url('/') }}";
+    </script>
+    <script>
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -474,8 +477,8 @@
             productosVenta.forEach(function (item) {
 
                 let imagen = item.imagen.length > 0
-                    ? `/imagenes/productos/${item.imagen[0].imagen}`
-                    : `/imagenes/productos/default.jpg`;
+                    ? `${BASE_URL}/imagenes/productos/${item.imagen[0].imagen}`
+                    : `${BASE_URL}/imagenes/productos/default.jpg`;
 
                 let img = `
                                                                 <img src="${imagen}"
@@ -754,9 +757,12 @@
                     } else {
                         productos.forEach(producto => {
                             console.log(producto.imagenes);
+                            // let imagen = producto.imagenes?.length > 0
+                            //     ? `/imagenes/productos/${producto.imagenes[0].imagen}`
+                            //     : `/imagenes/productos/default.jpg`;
                             let imagen = producto.imagenes?.length > 0
-                                ? `/imagenes/productos/${producto.imagenes[0].imagen}`
-                                : `/imagenes/productos/default.jpg`;
+                            ? `${BASE_URL}/imagenes/productos/${producto.imagenes[0].imagen}`
+                            : `${BASE_URL}/imagenes/productos/default.jpg`;
                             html += `
                                                                 <div class="producto-item p-3 border-bottom"
                                                                     style="cursor:pointer; transition:0.2s;"
@@ -783,7 +789,7 @@
 
                                                                                 ${producto.imagenes.map((img, index) => `
                                                                                     <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                                                                                        <img src="/imagenes/productos/${img.imagen}"
+                                                                                        <img src="${BASE_URL}/imagenes/productos/${img.imagen}""
                                                                                             class="d-block w-100"
                                                                                             style="width:90px;height:90px;object-fit:cover;border-radius:8px;"
                                                                                             alt="producto">
@@ -848,7 +854,7 @@
                                                                 </div>
                                                                 `
                                     : `
-                                                                <img src="/imagenes/productos/default.jpg"
+                                                                <img src="${BASE_URL}/imagenes/productos/default.jpg""
                                                                     style="width:90px;height:90px;object-fit:cover;border-radius:8px;"
                                                                     alt="producto">
                                                                 `
@@ -1033,8 +1039,8 @@
                 imagenes.forEach(function (img, index) {
 
                     let ruta = img.imagen
-                        ? `/imagenes/productos/${img.imagen}`
-                        : `/imagenes/productos/default.jpg`;
+                        ? `${BASE_URL}/imagenes/productos/${img.imagen}`
+                        : `${BASE_URL}/imagenes/productos/default.jpg`;
 
                     items += `
                                                         <div class="carousel-item ${index === 0 ? 'active' : ''}">
@@ -1047,7 +1053,7 @@
                 });
             } else {
 
-                let ruta = `/imagenes/productos/default.jpg`;
+                let ruta = `${BASE_URL}/imagenes/productos/default.jpg`;
                 items += `
                                                     <div class="carousel-item active ">
                                                         <div class="contenedor-imagen">

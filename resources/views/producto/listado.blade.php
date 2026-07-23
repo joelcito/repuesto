@@ -189,7 +189,7 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="border rounded p-2 mb-3 text-center">
-                                            <img id="imagenPrincipal" src="/imagenes/productos/default.jpg"
+                                            <img id="imagenPrincipal" src="{{ url('imagenes/productos/default.jpg') }}"
                                                 class="img-fluid rounded"
                                                 style="max-height:320px; object-fit:contain; cursor:pointer;">
                                         </div>
@@ -521,6 +521,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
     <script>
+        const BASE_URL = "{{ url('/') }}";
+    </script>
+    <script>
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -567,7 +570,7 @@
             $('#preview_imagenes').html('');
             $('#imagenPrincipal').attr(
                 'src',
-                '/imagenes/productos/default.jpg'
+                BASE_URL+'/imagenes/productos/default.jpg'
             );
             $('#estado').val(1);
             $('#modalProducto').modal('show');
@@ -684,7 +687,7 @@
                         id: img.id,
                         file: null,
                         existente: true,
-                        url: '/imagenes/productos/' + img.imagen
+                        url: BASE_URL+'/imagenes/productos/' + img.imagen
                     });
                 });
             }
@@ -721,7 +724,8 @@
         function modalIngreso(productoId, sucursalId, nombreSuc) {
 
             $.ajax({
-                url: '/producto/' + productoId,
+                // url: '/producto/' + productoId,
+                url: "{{ url('producto/') }}/" + productoId,
                 method: 'GET',
                 success: function (prod) {
                     $('#modalIngreso').modal('show');
@@ -1025,7 +1029,7 @@
                 }
                 $('#imagenPrincipal').attr('src', listaImagenes[indiceActual].url);
             } else {
-                $('#imagenPrincipal').attr('src', '/imagenes/productos/default.jpg');
+                $('#imagenPrincipal').attr('src', BASE_URL+'/imagenes/productos/default.jpg');
             }
         }
         function eliminarImagen(id) {
@@ -1045,7 +1049,7 @@
             } else {
                 $('#imagenPrincipal').attr(
                     'src',
-                    '/imagenes/productos/default.jpg'
+                    BASE_URL+'/imagenes/productos/default.jpg'
                 );
             }
             renderPreview();
@@ -1084,7 +1088,7 @@
             listaImagenes = [];
             indiceActual = 0;
             $('#preview_imagenes').html('');
-            $('#imagenPrincipal').attr('src', '/imagenes/productos/default.jpg');
+            $('#imagenPrincipal').attr('src', BASE_URL+'/imagenes/productos/default.jpg');
             $('#imagenes').val('');
         }
 
