@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Movimiento;
 use Illuminate\Http\Request;
 
 use App\Models\Producto;
@@ -19,6 +20,26 @@ class HomeController extends Controller
     public function __construct()
     {
         // $this->middleware('auth');
+    }
+
+    private function obtenerStock($productoId, $sucursalId = null)
+    {
+        $query = Movimiento::where('producto_id', $productoId);
+
+        if ($sucursalId) {
+            $query->where('sucursal_id', $sucursalId);
+        }
+
+        return $query->selectRaw("
+        COALESCE(SUM(
+            CASE
+                WHEN tipo = 'INGRESO' THEN cantidad
+                WHEN tipo = 'VENTA' THEN -cantidad
+                WHEN tipo = 'DEVOLUCION' THEN cantidad
+                ELSE 0
+            END
+        ), 0) as stock
+    ")->value('stock');
     }
 
     public function index()
@@ -51,7 +72,17 @@ class HomeController extends Controller
         $ultimosProductos = Producto::latest()
             ->take(10)
             ->get();
-        $ultimasVentas = Venta::latest()
+
+        foreach ($ultimosProductos as $producto) {
+            $producto->stock_actual = $this->obtenerStock(
+                $producto->id,
+                $producto->sucursal_id
+            );
+        }
+
+
+        $ultimasVentas = Venta::with('cliente')
+            ->latest()
             ->take(10)
             ->get();
         $ventasMensuales = Venta::selectRaw('

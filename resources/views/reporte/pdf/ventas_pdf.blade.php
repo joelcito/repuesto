@@ -92,7 +92,7 @@
                         {{ $venta->metodo_pago }}
                     </td>
                     <td>
-                        {{ $venta->fecha }}
+                        {{ $venta->created_at->format('Y-m-d H:i') }}
                     </td>
                 </tr>
             @endforeach

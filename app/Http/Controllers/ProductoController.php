@@ -150,6 +150,27 @@ class ProductoController extends Controller
             $producto->estado = $request->input('estado', 1);
             $producto->save();
 
+            if ($producto_id != '0') {
+                $imagenesExistentes = json_decode(
+                    $request->input('imagenes_existentes', '[]'),
+                    true
+                );
+                $imagenesAEliminar = ProductoImagen::where('producto_id', $producto->id)
+                    ->whereNotIn('id', $imagenesExistentes)
+                    ->get();
+
+                foreach ($imagenesAEliminar as $imagen) {
+
+                    $ruta = public_path('imagenes/productos/' . $imagen->imagen);
+
+                    if (file_exists($ruta)) {
+                        unlink($ruta);
+                    }
+
+                    $imagen->delete();
+                }
+            }
+
             if ($request->input('incorporacion_id')) {
                 $inc = Incorporacion::find($request->input('incorporacion_id'));
                 if ($inc) {

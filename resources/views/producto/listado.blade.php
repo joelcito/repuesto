@@ -570,7 +570,7 @@
             $('#preview_imagenes').html('');
             $('#imagenPrincipal').attr(
                 'src',
-                BASE_URL+'/imagenes/productos/default.jpg'
+                BASE_URL + '/imagenes/productos/default.jpg'
             );
             $('#estado').val(1);
             $('#modalProducto').modal('show');
@@ -625,6 +625,13 @@
             formData.append('ubicacion', $('#ubicacion').val());
             formData.append('tipo_producto', $('#tipo_producto').val());
             formData.append('estado', $('#estado').val());
+
+
+            const imagenesExistentes = listaImagenes
+                .filter(img => img.existente)
+                .map(img => img.id);
+
+            formData.append('imagenes_existentes', JSON.stringify(imagenesExistentes));
 
             listaImagenes.forEach(img => {
                 if (img.file instanceof File) {
@@ -687,7 +694,7 @@
                         id: img.id,
                         file: null,
                         existente: true,
-                        url: BASE_URL+'/imagenes/productos/' + img.imagen
+                        url: BASE_URL + '/imagenes/productos/' + img.imagen
                     });
                 });
             }
@@ -779,10 +786,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                            <div class="invalid-feedback">
-                                                                                ${mensaje}
-                                                                            </div>
-                                                                        `);
+                                                                                <div class="invalid-feedback">
+                                                                                    ${mensaje}
+                                                                                </div>
+                                                                            `);
                             }
                         } else {
                             Swal.fire({
@@ -879,10 +886,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                            <div class="invalid-feedback">
-                                                                                ${mensaje}
-                                                                            </div>
-                                                                        `);
+                                                                                <div class="invalid-feedback">
+                                                                                    ${mensaje}
+                                                                                </div>
+                                                                            `);
                             }
                         } else {
                             Swal.fire({
@@ -1000,27 +1007,27 @@
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                                                    <div class="position-relative d-inline-block">
+                                                        <div class="position-relative d-inline-block">
 
-                                                        <img
-                                                            src="${img.url}"
-                                                            width="80"
-                                                            height="80"
-                                                            class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                                            style="cursor:pointer;object-fit:cover"
-                                                            onclick="mostrarImagen(${index})">
+                                                            <img
+                                                                src="${img.url}"
+                                                                width="80"
+                                                                height="80"
+                                                                class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                                                style="cursor:pointer;object-fit:cover"
+                                                                onclick="mostrarImagen(${index})">
 
-                                                        <button
-                                                            type="button"
-                                                            class="btn btn-danger btn-sm position-absolute"
-                                                            style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                                            onclick="eliminarImagen('${img.id}')">
+                                                            <button
+                                                                type="button"
+                                                                class="btn btn-danger btn-sm position-absolute"
+                                                                style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                                                onclick="eliminarImagen('${img.id}')">
 
-                                                    ×
-                                                </button>
+                                                        ×
+                                                    </button>
 
-                                                    </div>
-                                                `);
+                                                        </div>
+                                                    `);
             });
 
             if (listaImagenes.length > 0) {
@@ -1029,7 +1036,7 @@
                 }
                 $('#imagenPrincipal').attr('src', listaImagenes[indiceActual].url);
             } else {
-                $('#imagenPrincipal').attr('src', BASE_URL+'/imagenes/productos/default.jpg');
+                $('#imagenPrincipal').attr('src', BASE_URL + '/imagenes/productos/default.jpg');
             }
         }
         function eliminarImagen(id) {
@@ -1049,7 +1056,7 @@
             } else {
                 $('#imagenPrincipal').attr(
                     'src',
-                    BASE_URL+'/imagenes/productos/default.jpg'
+                    BASE_URL + '/imagenes/productos/default.jpg'
                 );
             }
             renderPreview();
@@ -1088,7 +1095,7 @@
             listaImagenes = [];
             indiceActual = 0;
             $('#preview_imagenes').html('');
-            $('#imagenPrincipal').attr('src', BASE_URL+'/imagenes/productos/default.jpg');
+            $('#imagenPrincipal').attr('src', BASE_URL + '/imagenes/productos/default.jpg');
             $('#imagenes').val('');
         }
 
@@ -1183,28 +1190,28 @@
                         title: 'Código de Barras',
                         width: 500,
                         html: `
-                            <div id="codigoImprimir" style="text-align:center;padding:15px;">
+                                <div id="codigoImprimir" style="text-align:center;padding:15px;">
 
-                                <h4 style="margin-bottom:10px;">
-                                    ${producto.nombre}
-                                </h4>
+                                    <h4 style="margin-bottom:10px;">
+                                        ${producto.nombre}
+                                    </h4>
 
-                                <img
-                                    src="${producto.barcode}"
-                                    style="width:100%;max-width:320px;height:auto;"
-                                >
+                                    <img
+                                        src="${producto.barcode}"
+                                        style="width:100%;max-width:320px;height:auto;"
+                                    >
 
-                                <div style="
-                                    margin-top:10px;
-                                    font-size:18px;
-                                    font-weight:bold;
-                                    letter-spacing:2px;
-                                ">
-                                    ${producto.codigo}
+                                    <div style="
+                                        margin-top:10px;
+                                        font-size:18px;
+                                        font-weight:bold;
+                                        letter-spacing:2px;
+                                    ">
+                                        ${producto.codigo}
+                                    </div>
+
                                 </div>
-
-                            </div>
-                        `,
+                            `,
                         showCancelButton: true,
                         confirmButtonText: '<i class="fa fa-print"></i> Imprimir',
                         cancelButtonText: 'Cerrar'
@@ -1238,44 +1245,44 @@
             let ventana = window.open('', '_blank', 'width=500,height=600');
 
             ventana.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
 
-                    <title>Código de Barras</title>
+                        <title>Código de Barras</title>
 
-                    <style>
+                        <style>
 
-                        body{
-                            margin:0;
-                            padding:20px;
-                            font-family:Arial, Helvetica, sans-serif;
-                            text-align:center;
-                        }
+                            body{
+                                margin:0;
+                                padding:20px;
+                                font-family:Arial, Helvetica, sans-serif;
+                                text-align:center;
+                            }
 
-                        img{
-                            width:320px;
-                            max-width:100%;
-                            margin-top:15px;
-                        }
+                            img{
+                                width:320px;
+                                max-width:100%;
+                                margin-top:15px;
+                            }
 
-                        h4{
-                            margin:0;
-                            margin-bottom:15px;
-                        }
+                            h4{
+                                margin:0;
+                                margin-bottom:15px;
+                            }
 
-                    </style>
+                        </style>
 
-                </head>
+                    </head>
 
-                <body>
+                    <body>
 
-                    ${contenido}
+                        ${contenido}
 
-                </body>
+                    </body>
 
-                </html>
-            `);
+                    </html>
+                `);
 
             ventana.document.close();
 
