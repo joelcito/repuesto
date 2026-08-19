@@ -117,25 +117,26 @@ class IncorporacionController extends Controller
             ]);
         }
     }
+
     public function eliminarIncorporacion(Request $request)
     {
         DB::beginTransaction();
+
         try {
             $incorporacion = Incorporacion::find($request->id);
+
             if (!$incorporacion) {
                 throw new \Exception('Registro no encontrado');
             }
-            $producto = Producto::find($incorporacion->producto_id);
-            $producto->stock_actual =
-                $producto->stock_actual -
-                $incorporacion->cantidad;
 
-            if ($producto->stock_actual < 0) {
-                $producto->stock_actual = 0;
+            if ($incorporacion->estado === 'PROCESADO') {
+                throw new \Exception('Una incorporación procesada no puede eliminarse');
             }
-            $producto->save();
+
             $incorporacion->delete();
+
             DB::commit();
+
             return response()->json([
                 'estado' => true,
                 'mensaje' => 'Registro eliminado'
@@ -143,6 +144,7 @@ class IncorporacionController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'estado' => false,
                 'mensaje' => $e->getMessage()
@@ -213,8 +215,8 @@ class IncorporacionController extends Controller
             }
 
             $incorporacion->producto_id = $producto->id;
+            $incorporacion->estado = 'PROCESADO';
             $incorporacion->save();
-            $incorporacion->delete();
             DB::commit();
             return response()->json([
                 'estado' => true,

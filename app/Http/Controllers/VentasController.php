@@ -586,10 +586,53 @@ class VentasController extends Controller
     }
 
 
+    // public function buscarProductos(Request $request)
+    // {
+    //     $buscar = $request->buscar;
+
+    //     $productos = Producto::with('marca', 'imagenes')
+    //         ->where('estado', 1)
+    //         ->where(function ($query) use ($buscar) {
+    //             $query->where('nombre', 'LIKE', "%{$buscar}%")
+    //                 ->orWhere('codigo_barras', 'LIKE', "%{$buscar}%")
+    //                 ->orWhere('codigo_interno', 'LIKE', "%{$buscar}%")
+    //                 ->orWhere('descripcion', 'LIKE', "%{$buscar}%")
+    //                 ->orWhere('vehiculos_compatibles', 'LIKE', "%{$buscar}%")
+    //                 ->orWhere('numero_parte_vehiculo', 'LIKE', "%{$buscar}%")
+    //                 ->orWhere('medidas', 'LIKE', "%{$buscar}%")
+    //                 ->orWhereHas('marca', function ($q) use ($buscar) {
+    //                     $q->where('nombre', 'LIKE', "%{$buscar}%");
+    //                 });
+    //         })
+    //         ->limit(30)
+    //         ->get();
+    //         $usuario = Auth::user();
+    //         foreach ($productos as $producto) {
+    //             $producto->stock_actual = $this->obtenerStock(
+    //                 $producto->id,
+    //                 $usuario->sucursal_id
+    //             );
+    //         }
+    //     return response()->json($productos);
+    // }
+
     public function buscarProductos(Request $request)
     {
-        $buscar = $request->buscar;
+        $buscar = trim($request->buscar);
+        $usuario = Auth::user();
+        $productoExacto = Producto::with('marca', 'imagenes')
+            ->where('estado', 1)
+            ->where('codigo_barras', $buscar)
+            ->first();
 
+        if ($productoExacto) {
+            $productoExacto->stock_actual = $this->obtenerStock(
+                $productoExacto->id,
+                $usuario->sucursal_id
+            );
+
+            return response()->json([$productoExacto]);
+        }
         $productos = Producto::with('marca', 'imagenes')
             ->where('estado', 1)
             ->where(function ($query) use ($buscar) {
@@ -606,7 +649,7 @@ class VentasController extends Controller
             })
             ->limit(30)
             ->get();
-        $usuario = Auth::user();
+
         foreach ($productos as $producto) {
             $producto->stock_actual = $this->obtenerStock(
                 $producto->id,

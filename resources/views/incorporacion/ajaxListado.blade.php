@@ -28,34 +28,26 @@
                     <td>
                         {{ $incorporacion->descripcion_producto }}
                     </td>
-
                     <td> {{ $incorporacion->created_at }} </td>
-
                     <td>{{ $incorporacion->medidas }}</td>
-
                     <td>
-
                         @if($incorporacion->imagenes->count())
-
                             <img src="{{ asset($incorporacion->imagenes->first()->ruta) }}" width="60" class="img-thumbnail">
-
                         @endif
-
                     </td>
-
                     <td>{{ $incorporacion->estado }}</td>
                     <td>
-
                         @if(!$incorporacion->producto_id)
                             <button class="btn btn-success" onclick="convertirAProducto({{ $incorporacion->id }})">
                                 <i class="fa fa-box"></i>
                             </button>
                         @endif
-
-                        <button class="btn btn-icon btn-sm btn-danger btn-circle"
-                            onclick="eliminarIncorporacion({{ $incorporacion->id }})">
-                            <i class="fa fa-trash"></i>
-                        </button>
+                        @if($incorporacion->estado === 'ACTIVO')
+                            <button class="btn btn-icon btn-sm btn-danger btn-circle"
+                                onclick="eliminarIncorporacion({{ $incorporacion->id }})">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        @endif
                     </td>
             </tr> @empty
                 <h4 class="text-danger">No hay datos</h4>
