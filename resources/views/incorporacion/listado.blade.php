@@ -137,7 +137,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Código Interno</label>
+                                    <label class="form-label fw-bold">Código</label>
                                     <input type="text" class="form-control form-control-sm" name="codigo_interno"
                                         id="codigo_interno">
                                 </div>
@@ -665,27 +665,27 @@
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                                                                                            <div class="position-relative d-inline-block">
+                                                                                                <div class="position-relative d-inline-block">
 
-                                                                                                <img
-                                                                                                    src="${img.url}"
-                                                                                                    width="80"
-                                                                                                    height="80"
-                                                                                                    class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                                                                                    style="cursor:pointer;object-fit:cover"
-                                                                                                    onclick="mostrarImagen(${index})">
+                                                                                                    <img
+                                                                                                        src="${img.url}"
+                                                                                                        width="80"
+                                                                                                        height="80"
+                                                                                                        class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                                                                                        style="cursor:pointer;object-fit:cover"
+                                                                                                        onclick="mostrarImagen(${index})">
 
-                                                                                                <button
-                                                                                                    type="button"
-                                                                                                    class="btn btn-danger btn-sm position-absolute"
-                                                                                                    style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                                                                                    onclick="eliminarImagen('${img.id}')">
+                                                                                                    <button
+                                                                                                        type="button"
+                                                                                                        class="btn btn-danger btn-sm position-absolute"
+                                                                                                        style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                                                                                        onclick="eliminarImagen('${img.id}')">
 
-                                                                                                    ×   
-                                                                                                </button>
+                                                                                                        ×   
+                                                                                                    </button>
 
-                                                                                            </div>
-                                                                                        `);
+                                                                                                </div>
+                                                                                            `);
             });
 
             if (listaImagenes.length > 0) {
@@ -715,11 +715,11 @@
             listaImagenesIncorporacion.forEach((img, index) => {
 
                 $('#preview_imagenes_incorporacion').append(`
-                                                    <img
-                                                        src="${img.url}"
-                                                        width="80"
-                                                        class="img-thumbnail m-1">
-                                                `);
+                                                        <img
+                                                            src="${img.url}"
+                                                            width="80"
+                                                            class="img-thumbnail m-1">
+                                                    `);
 
             });
 

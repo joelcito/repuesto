@@ -1,4 +1,3 @@
-```blade
 @extends('layouts.app')
 
 @section('css')
@@ -71,32 +70,53 @@
 
 
     <div class="row mb-5">
+
         <div class="col-md-4">
-            <div class="card">
+            <div class="card h-100">
                 <div class="card-header">
                     <h3 class="card-title">
-                        Ultimos Productos
+                        Productos con stock mínimo
                     </h3>
                 </div>
-                <div class="card-body">
-                    @forelse($ultimosProductos ?? [] as $producto)
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>
-                                {{ $producto->nombre }}
-                            </span>
-                            <span class="badge badge-primary">
-                                {{ $producto->stock_actual }}
-                            </span>
-                        </div>
-                    @empty
-                        <div class="alert alert-warning">
-                            Sin productos
-                        </div>
-                    @endforelse
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-row-bordered table-row-gray-300 align-middle gs-0 gy-3 mb-0">
+                            <thead>
+                                <tr class="fw-bold text-muted">
+                                    <th class="ps-5">Producto</th>
+                                    <th class="text-center pe-5">Mínimo</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @forelse($productos ?? [] as $producto)
+                                    <tr>
+                                        <td class="ps-5">
+                                            <span class="fw-bold text-gray-800">
+                                                {{ $producto->nombre }}
+                                            </span>
+                                        </td>
+
+                                        <td class="text-center pe-5">
+                                            <span class="badge badge-light-warning fs-7">
+                                                {{ $producto->stock_minimo }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="2" class="text-center py-10 text-muted">
+                                            No hay productos registrados
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-
         {{-- ULTIMAS VENTAS --}}
         <div class="col-md-8">
             <div class="card">
@@ -206,45 +226,55 @@
         @endif
 
         {{-- STOCK BAJO --}}
-        <div class="col-md-4">
-            <div class="card card-flush" style="background-color:#f18241;">
-                <div class="card-body text-center py-10">
-                    <i class="fa fa-exclamation-triangle fs-2x text-white mb-5"></i>
-                    <div class="fs-2hx fw-bold text-white">
-                        {{ $productosStockBajo ?? 0 }}
-                    </div>
-                    <div class="text-white fw-semibold">
-                        Stock Bajo
-                    </div>
-                </div>
-            </div>
-        </div>
+
+
+
     </div>
 
 
     <div class="row">
         <div class="col-md-6">
-            <div class="card">
+            <div class="card h-100">
                 <div class="card-header">
                     <h3 class="card-title">
-                        Últimos Productos
+                        Productos con stock bajo
                     </h3>
                 </div>
-                <div class="card-body">
-                    @forelse($ultimosProductos ?? [] as $producto)
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>
-                                {{ $producto->nombre }}
-                            </span>
-                            <span class="badge badge-primary">
-                                {{ $producto->stock_actual }}
-                            </span>
-                        </div>
-                    @empty
-                        <div class="alert alert-warning">
-                            Sin productos
-                        </div>
-                    @endforelse
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-row-bordered table-row-gray-300 align-middle gs-0 gy-3 mb-0">
+                            <thead>
+                                <tr class="fw-bold text-muted">
+                                    <th class="ps-5">Producto</th>
+                                    <th class="text-center pe-5">Mínimo</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @forelse($productos ?? [] as $producto)
+                                    <tr>
+                                        <td class="ps-5">
+                                            <span class="fw-bold text-gray-800">
+                                                {{ $producto->nombre }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center pe-5">
+                                            <span class="badge badge-light-warning fs-7">
+                                                {{ $producto->stock_minimo }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center py-10 text-muted">
+                                            No hay productos registrados
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -272,7 +302,7 @@
                 @foreach($ventasMensuales ?? [] as $venta)
                     ['{{ $venta->mes }}', {{ $venta->total }}],
                 @endforeach
-                                    ]);
+                                                                    ]);
 
             var options = {
                 title: 'Ventas Mensuales',

@@ -3,7 +3,7 @@
         <thead>
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                 <th>Código Barras</th>
-                <th>Código Interno</th>
+                <th>Código</th>
                 <th>Nombre</th>
                 <th>Categoría</th>
                 <th>Marca</th>
@@ -50,7 +50,8 @@
                         @endif
                     </td>
                     <td>
-                        <button class="btn btn-icon btn-sm btn-dark btn-circle" title="Imprimir Código de Barras" onclick="mostrarCodigoBarras({{ $producto->id }})"><i class="fa fa-barcode"></i></button>
+                        <button class="btn btn-icon btn-sm btn-dark btn-circle" title="Imprimir Código de Barras"
+                            onclick="mostrarCodigoBarras({{ $producto->id }})"><i class="fa fa-barcode"></i></button>
                         <button class="btn btn-icon btn-sm btn-info btn-circle" title="Ver Stock"
                             onclick="abrirStock({{ $producto->id }}, '{{ $producto->nombre }}')"><i
                                 class="fa fa-boxes"></i></button>
@@ -65,11 +66,7 @@
 
                 </tr>
             @empty
-                <tr>
-                    <td colspan="9" class="text-center text-danger">
-                        No hay productos registrados
-                    </td>
-                </tr>
+                No hay productos registrados
             @endforelse
         </tbody>
     </table>

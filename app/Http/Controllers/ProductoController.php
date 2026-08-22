@@ -14,6 +14,7 @@ use App\Models\Sucursal;
 use App\Models\Proveedor;
 use App\Models\Marca;
 use App\Models\Unidad;
+use Illuminate\Validation\Rule;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class ProductoController extends Controller
@@ -102,15 +103,34 @@ class ProductoController extends Controller
 
     public function guardarProducto(Request $request)
     {
+
+
+
         if ($request->ajax()) {
-            $request->validate([
-                'nombre' => 'required',
-                'categoria_id' => 'required',
-                'marca_id' => 'required',
-                'unidad_id' => 'required',
-                'precio_venta' => 'required|numeric',
-                'imagenes.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
-            ]);
+            $request->validate(
+                [
+                    'codigo_barras' => [
+                        'required',
+                        'string',
+                        Rule::unique('productos', 'codigo_barras')
+                            ->ignore($request->id)
+                    ],
+
+
+                    'nombre' => 'required',
+                    'categoria_id' => 'required',
+                    'marca_id' => 'required',
+                    'unidad_id' => 'required',
+                    'precio_venta' => 'required|numeric',
+                    'imagenes.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+                ],
+                [
+                    'codigo_barras.required' => 'El código de barras es obligatorio.',
+                    'codigo_barras.unique' => 'Este código de barras ya se encuentra registrado actualmente.',
+                ]
+
+
+            );
             $producto_id = $request->input('id');
             $usuario = Auth::user();
 
@@ -277,6 +297,27 @@ class ProductoController extends Controller
             ->sum('cantidad');
 
         return $ingresos - $salidas;
+    }
+
+
+    public function verificarCodigoBarras(Request $request)
+    {
+        $codigo = trim($request->codigo_barras);
+        $id = $request->id ?? 0;
+
+        if ($codigo === '') {
+            return response()->json([
+                'existe' => false
+            ]);
+        }
+
+        $existe = Producto::where('codigo_barras', $codigo)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        return response()->json([
+            'existe' => $existe
+        ]);
     }
 
 

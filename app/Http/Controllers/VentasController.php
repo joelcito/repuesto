@@ -122,7 +122,6 @@ class VentasController extends Controller
             $venta->nit = $request->nit;
             $venta->razon_social = $request->razon_social;
             $venta->subtotal = 0;
-            //$venta->descuento = $request->descuento ?? 0;
             $venta->descuento = 0;
             $venta->total = 0;
 
@@ -154,29 +153,32 @@ class VentasController extends Controller
                     );
                 }
 
-                $precio = $item['precio'];
+                $precio = (float) $item['precio'];
+                $cantidad = (float) $item['cantidad'];
+                $descuentoUnitario = (float) ($item['descuento'] ?? 0);
+                $subtotalBruto = $precio * $cantidad;
+                $descuentoTotalItem = $descuentoUnitario * $cantidad;
+                $subtotal = $subtotalBruto - $descuentoTotalItem;
 
-                $descuentoItem = $item['descuento'] ?? 0;
-                // $subtotal =
-                //     ($precio * $item['cantidad'])
-                //     - ($item['descuento'] ?? 0);
-                $subtotal = $precio * $item['cantidad'];
+                if ($subtotal < 0) {
+                    $subtotal = 0;
+                }
 
                 $precioOriginal = $item['tipo_precio'] == 'MAYOR'
                     ? $producto->precio_mayor
                     : $producto->precio_venta;
 
-                $descuentoGeneral += $descuentoItem;
-
+                $subtotalGeneral += $subtotalBruto;
+                $descuentoGeneral += $descuentoTotalItem;
                 VentaDetalle::create([
                     'venta_id' => $venta->id,
                     'producto_id' => $producto->id,
-                    'cantidad' => $item['cantidad'],
+                    'cantidad' => $cantidad,
                     'cantidad_devuelta' => 0,
                     'precio_compra' => $producto->precio_compra,
                     'precio_original' => $precioOriginal,
                     'precio_unitario' => $precio,
-                    'descuento' => $item['descuento'] ?? 0,
+                    'descuento' => $descuentoUnitario,
                     'tipo_precio' => $item['tipo_precio'],
                     'subtotal' => $subtotal,
                     'descripcion' => $item['descripcion'] ?? null,
@@ -187,7 +189,7 @@ class VentasController extends Controller
                     'producto_id' => $producto->id,
                     'sucursal_id' => $caja->sucursal_id,
                     'tipo' => 'VENTA',
-                    'cantidad' => $item['cantidad'],
+                    'cantidad' => $cantidad,
                     'precio_compra' => $producto->precio_compra,
                     'precio_venta' => $precio,
                     'compra_ingreso' => null,
@@ -197,33 +199,21 @@ class VentasController extends Controller
                     'estado' => 'SALIDA',
                     'usuario_creador_id' => $usuario->id
                 ]);
-                $subtotalGeneral += $subtotal;
+
             }
 
-            //$total = $subtotalGeneral - $venta->descuento;
             $total = $subtotalGeneral - $descuentoGeneral;
-
             $venta->subtotal = $subtotalGeneral;
             $venta->descuento = $descuentoGeneral;
             $venta->total = $total;
             $venta->save();
-            // $montoPagado = $request->monto_pagado ?? $total;
-
             $pagos = $request->pagos ?? [];
             if (count($pagos) == 0) {
                 throw new \Exception("Debe registrar al menos un pago");
             }
-
-
-            // $totalPagado = collect($pagos)->sum(function ($p) {
-            //     return ($p['monto'] ?? 0) - ($p['descuento'] ?? 0);
-            // });
-
             $totalPagado = collect($pagos)->sum(function ($p) {
                 return $p['monto'] ?? 0;
             });
-
-
             $cambio = max(0, $totalPagado - $total);
             if ($totalPagado > $total) {
                 $cambio = $totalPagado - $total;
@@ -243,22 +233,15 @@ class VentasController extends Controller
                 if (!isset($pago['monto']) || $pago['monto'] <= 0) {
                     continue;
                 }
-
-
-                //  $monto = (float) $pago['monto'];
-
                 $montoRecibido = (float) $pago['monto'];
                 $cambio = max(0, $montoRecibido - $total);
                 $montoReal = min($montoRecibido, $total);
-
                 Pago::create([
                     'usuario_creador_id' => $usuario->id,
                     'venta_id' => $venta->id,
                     'caja_id' => $caja->id,
                     'sucursal_id' => $caja->sucursal_id,
                     'monto' => $montoReal,
-                    //'cambio' => max(0, $monto - $descuento - $total), // opcional o simplificado
-
                     'cambio' => $cambio,
                     'fecha' => now(),
                     'descripcion' => 'PAGO VENTA #' . $venta->numero_factura,
@@ -266,27 +249,21 @@ class VentasController extends Controller
                     'estado' => 'INGRESO'
                 ]);
 
-
-
                 MovimientoCaja::create([
                     'caja_id' => $venta->caja_id,
                     'venta_id' => $venta->id,
                     'tipo' => 'INGRESO',
                     'metodo_pago' => $pago['metodo'],
-                    // 'monto' => $montoNeto,
                     'monto' => $montoReal,
                     'descripcion' => 'VENTA #' . $venta->id,
                     'fecha' => now(),
                     'estado' => 'INGRESO',
                     'usuario_creador_id' => $usuario->id
                 ]);
-
-                //$caja->total_ingresos += $montoNeto;
                 $caja->total_ingresos += $montoReal;
 
             }
             $caja->save();
-
             DB::commit();
 
             return response()->json([
@@ -298,7 +275,6 @@ class VentasController extends Controller
         } catch (\Exception $e) {
 
             DB::rollBack();
-
             return response()->json([
                 'estado' => false,
                 'mensaje' => $e->getMessage()
@@ -584,37 +560,6 @@ class VentasController extends Controller
             ]
         ]);
     }
-
-
-    // public function buscarProductos(Request $request)
-    // {
-    //     $buscar = $request->buscar;
-
-    //     $productos = Producto::with('marca', 'imagenes')
-    //         ->where('estado', 1)
-    //         ->where(function ($query) use ($buscar) {
-    //             $query->where('nombre', 'LIKE', "%{$buscar}%")
-    //                 ->orWhere('codigo_barras', 'LIKE', "%{$buscar}%")
-    //                 ->orWhere('codigo_interno', 'LIKE', "%{$buscar}%")
-    //                 ->orWhere('descripcion', 'LIKE', "%{$buscar}%")
-    //                 ->orWhere('vehiculos_compatibles', 'LIKE', "%{$buscar}%")
-    //                 ->orWhere('numero_parte_vehiculo', 'LIKE', "%{$buscar}%")
-    //                 ->orWhere('medidas', 'LIKE', "%{$buscar}%")
-    //                 ->orWhereHas('marca', function ($q) use ($buscar) {
-    //                     $q->where('nombre', 'LIKE', "%{$buscar}%");
-    //                 });
-    //         })
-    //         ->limit(30)
-    //         ->get();
-    //         $usuario = Auth::user();
-    //         foreach ($productos as $producto) {
-    //             $producto->stock_actual = $this->obtenerStock(
-    //                 $producto->id,
-    //                 $usuario->sucursal_id
-    //             );
-    //         }
-    //     return response()->json($productos);
-    // }
 
     public function buscarProductos(Request $request)
     {

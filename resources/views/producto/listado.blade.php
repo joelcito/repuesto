@@ -28,17 +28,22 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Código Barras</label>
+
                                     <div class="input-group">
                                         <input type="text" class="form-control form-control-sm" name="codigo_barras"
                                             id="codigo_barras">
+
                                         <button type="button" class="btn btn-primary btn-sm"
                                             onclick="generarCodigoBarras()">
                                             Generar
                                         </button>
                                     </div>
+
+                                    <div id="mensaje_codigo_barras" class="invalid-feedback" style="display:none;">
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Código Interno</label>
+                                    <label class="form-label fw-bold">Código</label>
                                     <input type="text" class="form-control form-control-sm" name="codigo_interno"
                                         id="codigo_interno">
                                 </div>
@@ -121,14 +126,12 @@
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Precio Compra</label>
                                     <input type="number" step="0.01" class="form-control form-control-sm"
-                                        name="precio_compra" id="precio_compra" @if(auth()->user()->esOperador())
-                                        readonly @endif>
+                                        name="precio_compra" id="precio_compra">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Precio Venta</label>
                                     <input type="number" step="0.01" class="form-control form-control-sm"
-                                        name="precio_venta" id="precio_venta" @if(auth()->user()->esOperador()) readonly
-                                        @endif>
+                                        name="precio_venta" id="precio_venta">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Precio Mayor</label>
@@ -596,6 +599,7 @@
         }
 
         function guardarProducto() {
+
             if (!validarProducto()) {
                 Swal.fire({
                     icon: "warning",
@@ -603,7 +607,82 @@
                 });
                 return;
             }
+
+            const codigo = $('#codigo_barras').val().trim();
+            const id = $('#id').val() || 0;
+
+            if (codigo === '') {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Código de barras requerido"
+                });
+
+                $('#codigo_barras').focus();
+
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('producto.verificarCodigoBarras') }}",
+                method: "POST",
+                data: {
+                    codigo_barras: codigo,
+                    id: id
+                },
+
+                success: function (res) {
+
+                    if (res.existe) {
+
+                        codigoBarrasValido = false;
+
+                        $('#codigo_barras')
+                            .removeClass('is-valid')
+                            .addClass('is-invalid');
+
+                        $('#mensaje_codigo_barras')
+                            .text('Este código de barras ya se encuentra registrado.')
+                            .show();
+
+                        Swal.fire({
+                            icon: "error",
+                            title: "Código de barras duplicado",
+                            text: "Ya existe un producto registrado con este código de barras."
+                        });
+
+                        return;
+                    }
+
+                    codigoBarrasValido = true;
+
+                    $('#codigo_barras')
+                        .removeClass('is-invalid')
+                        .addClass('is-valid');
+
+                    $('#mensaje_codigo_barras')
+                        .hide()
+                        .text('');
+
+                    guardarProductoReal();
+                },
+                error: function (xhr) {
+
+                    console.log('Error verificando código:', xhr.status);
+                    console.log(xhr.responseText);
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "No se pudo verificar el código",
+                        text: "Ocurrió un error al verificar el código de barras."
+                    });
+                }
+
+            });
+        }
+        function guardarProductoReal() {
+
             let formData = new FormData();
+
             formData.append('id', $('#id').val());
             formData.append('codigo_barras', $('#codigo_barras').val());
             formData.append('codigo_interno', $('#codigo_interno').val());
@@ -626,12 +705,14 @@
             formData.append('tipo_producto', $('#tipo_producto').val());
             formData.append('estado', $('#estado').val());
 
-
             const imagenesExistentes = listaImagenes
                 .filter(img => img.existente)
                 .map(img => img.id);
 
-            formData.append('imagenes_existentes', JSON.stringify(imagenesExistentes));
+            formData.append(
+                'imagenes_existentes',
+                JSON.stringify(imagenesExistentes)
+            );
 
             listaImagenes.forEach(img => {
                 if (img.file instanceof File) {
@@ -645,20 +726,51 @@
                 data: formData,
                 processData: false,
                 contentType: false,
+
                 success: function (resultado) {
+
                     if (resultado.estado) {
+
                         Swal.fire({
                             icon: "success",
                             title: "Producto guardado",
                             timer: 2000,
                             showConfirmButton: false
                         });
+
                         ajaxListado();
+
                         $('#modalProducto').modal('hide');
                     }
                 },
+
                 error: function (xhr) {
+
                     console.log(xhr.responseText);
+
+                    if (xhr.status === 422) {
+
+                        const errores = xhr.responseJSON.errors;
+
+                        if (errores.codigo_barras) {
+
+                            $('#codigo_barras')
+                                .removeClass('is-valid')
+                                .addClass('is-invalid');
+
+                            $('#mensaje_codigo_barras')
+                                .text(errores.codigo_barras[0])
+                                .show();
+
+                            return;
+                        }
+                    }
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Ocurrió un error al guardar el producto."
+                    });
                 }
             });
         }
@@ -786,10 +898,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                                <div class="invalid-feedback">
-                                                                                    ${mensaje}
-                                                                                </div>
-                                                                            `);
+                                                                                            <div class="invalid-feedback">
+                                                                                                ${mensaje}
+                                                                                            </div>
+                                                                                        `);
                             }
                         } else {
                             Swal.fire({
@@ -886,10 +998,10 @@
                                 let input = $(`[name="${campo}"]`);
                                 input.addClass("is-invalid");
                                 input.after(`
-                                                                                <div class="invalid-feedback">
-                                                                                    ${mensaje}
-                                                                                </div>
-                                                                            `);
+                                                                                            <div class="invalid-feedback">
+                                                                                                ${mensaje}
+                                                                                            </div>
+                                                                                        `);
                             }
                         } else {
                             Swal.fire({
@@ -1007,27 +1119,27 @@
             $('#preview_imagenes').html('');
             listaImagenes.forEach((img, index) => {
                 $('#preview_imagenes').append(`
-                                                        <div class="position-relative d-inline-block">
+                                                                    <div class="position-relative d-inline-block">
 
-                                                            <img
-                                                                src="${img.url}"
-                                                                width="80"
-                                                                height="80"
-                                                                class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
-                                                                style="cursor:pointer;object-fit:cover"
-                                                                onclick="mostrarImagen(${index})">
+                                                                        <img
+                                                                            src="${img.url}"
+                                                                            width="80"
+                                                                            height="80"
+                                                                            class="img-thumbnail ${index == indiceActual ? 'border border-primary border-3' : ''}"
+                                                                            style="cursor:pointer;object-fit:cover"
+                                                                            onclick="mostrarImagen(${index})">
 
-                                                            <button
-                                                                type="button"
-                                                                class="btn btn-danger btn-sm position-absolute"
-                                                                style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
-                                                                onclick="eliminarImagen('${img.id}')">
+                                                                        <button
+                                                                            type="button"
+                                                                            class="btn btn-danger btn-sm position-absolute"
+                                                                            style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;"
+                                                                            onclick="eliminarImagen('${img.id}')">
 
-                                                        ×
-                                                    </button>
+                                                                    ×
+                                                                </button>
 
-                                                        </div>
-                                                    `);
+                                                                    </div>
+                                                                `);
             });
 
             if (listaImagenes.length > 0) {
@@ -1131,6 +1243,98 @@
             return ok;
         }
 
+        let codigoBarrasValido = true;
+        let timerCodigoBarras = null;
+
+
+        $(document).on('input', '#codigo_barras', function () {
+
+
+            const codigo = $(this).val().trim();
+            const id = $('#id').val() || 0;
+
+
+            clearTimeout(timerCodigoBarras);
+
+
+            if (codigo === '') {
+
+
+                codigoBarrasValido = false;
+
+
+                $('#codigo_barras')
+                    .removeClass('is-valid is-invalid');
+
+
+                $('#mensaje_codigo_barras')
+                    .hide()
+                    .text('');
+
+
+                return;
+            }
+
+
+            timerCodigoBarras = setTimeout(function () {
+
+
+                $.ajax({
+                    url: "{{ route('producto.verificarCodigoBarras') }}",
+                    method: "POST",
+                    data: {
+                        codigo_barras: codigo,
+                        id: id
+                    },
+
+
+                    success: function (res) {
+
+
+                        if (res.existe) {
+
+
+                            codigoBarrasValido = false;
+
+
+                            $('#codigo_barras')
+                                .removeClass('is-valid')
+                                .addClass('is-invalid');
+
+
+                            $('#mensaje_codigo_barras')
+                                .text('Este código de barras ya se encuentra registrado actualmente.')
+                                .show();
+
+
+                        } else {
+
+
+                            codigoBarrasValido = true;
+
+
+                            $('#codigo_barras')
+                                .removeClass('is-invalid')
+                                .addClass('is-valid');
+
+
+                            $('#mensaje_codigo_barras')
+                                .hide()
+                                .text('');
+                        }
+                    },
+
+
+                    error: function (xhr) {
+                        console.log(xhr.responseText);
+                        codigoBarrasValido = false;
+                    }
+                });
+
+
+            }, 400);
+        });
+
 
         function cargarProductos() {
             $.ajax({
@@ -1190,28 +1394,28 @@
                         title: 'Código de Barras',
                         width: 500,
                         html: `
-                                <div id="codigoImprimir" style="text-align:center;padding:15px;">
+                                            <div id="codigoImprimir" style="text-align:center;padding:15px;">
 
-                                    <h4 style="margin-bottom:10px;">
-                                        ${producto.nombre}
-                                    </h4>
+                                                <h4 style="margin-bottom:10px;">
+                                                    ${producto.nombre}
+                                                </h4>
 
-                                    <img
-                                        src="${producto.barcode}"
-                                        style="width:100%;max-width:320px;height:auto;"
-                                    >
+                                                <img
+                                                    src="${producto.barcode}"
+                                                    style="width:100%;max-width:320px;height:auto;"
+                                                >
 
-                                    <div style="
-                                        margin-top:10px;
-                                        font-size:18px;
-                                        font-weight:bold;
-                                        letter-spacing:2px;
-                                    ">
-                                        ${producto.codigo}
-                                    </div>
+                                                <div style="
+                                                    margin-top:10px;
+                                                    font-size:18px;
+                                                    font-weight:bold;
+                                                    letter-spacing:2px;
+                                                ">
+                                                    ${producto.codigo}
+                                                </div>
 
-                                </div>
-                            `,
+                                            </div>
+                                        `,
                         showCancelButton: true,
                         confirmButtonText: '<i class="fa fa-print"></i> Imprimir',
                         cancelButtonText: 'Cerrar'
@@ -1245,44 +1449,44 @@
             let ventana = window.open('', '_blank', 'width=500,height=600');
 
             ventana.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
 
-                        <title>Código de Barras</title>
+                                    <title>Código de Barras</title>
 
-                        <style>
+                                    <style>
 
-                            body{
-                                margin:0;
-                                padding:20px;
-                                font-family:Arial, Helvetica, sans-serif;
-                                text-align:center;
-                            }
+                                        body{
+                                            margin:0;
+                                            padding:20px;
+                                            font-family:Arial, Helvetica, sans-serif;
+                                            text-align:center;
+                                        }
 
-                            img{
-                                width:320px;
-                                max-width:100%;
-                                margin-top:15px;
-                            }
+                                        img{
+                                            width:320px;
+                                            max-width:100%;
+                                            margin-top:15px;
+                                        }
 
-                            h4{
-                                margin:0;
-                                margin-bottom:15px;
-                            }
+                                        h4{
+                                            margin:0;
+                                            margin-bottom:15px;
+                                        }
 
-                        </style>
+                                    </style>
 
-                    </head>
+                                </head>
 
-                    <body>
+                                <body>
 
-                        ${contenido}
+                                    ${contenido}
 
-                    </body>
+                                </body>
 
-                    </html>
-                `);
+                                </html>
+                            `);
 
             ventana.document.close();
 

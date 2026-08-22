@@ -59,9 +59,31 @@ class HomeController extends Controller
             '<=',
             'stock_minimo'
         )->count();
-        $utilidades = Producto::sum(
-            DB::raw('precio_venta - precio_compra')
-        );
+        // $utilidades = Producto::sum(
+        //     DB::raw('precio_venta - precio_compra')
+        // );
+
+        $utilidades = DB::table('venta_detalle')
+            ->join('ventas', 'ventas.id', '=', 'venta_detalle.venta_id')
+            ->whereDate('ventas.created_at', now())
+            ->selectRaw('
+                COALESCE(
+                    SUM(
+                        venta_detalle.subtotal
+                        -
+                        (
+                            venta_detalle.precio_compra *
+                            (
+                                venta_detalle.cantidad
+                                - COALESCE(venta_detalle.cantidad_devuelta, 0)
+                            )
+                        )
+                    ),
+                    0
+                ) as utilidad
+            ')
+            ->value('utilidad');
+
         $stockBajo = Producto::whereColumn(
             'stock_actual',
             '<=',
@@ -69,16 +91,31 @@ class HomeController extends Controller
         )
             ->take(10)
             ->get();
-        $ultimosProductos = Producto::latest()
+
+        // $ultimosProductos = Producto::get();
+
+        // $ultimosProductos = $ultimosProductos->map(function ($producto) {
+
+        //     $stock = $this->obtenerStock(
+        //         $producto->id,
+        //         $producto->sucursal_id
+        //     );
+
+        //     $producto->stock_actual = max(0, $stock);
+
+        //     return $producto;
+
+        // })->filter(function ($producto) {
+
+        //     return $producto->stock_actual <= $producto->stock_minimo;
+
+        // })->sortBy('stock_actual')
+        // ->take(10)
+        // ->values();
+
+        $productos = Producto::orderBy('stock_minimo', 'asc')
             ->take(10)
             ->get();
-
-        foreach ($ultimosProductos as $producto) {
-            $producto->stock_actual = $this->obtenerStock(
-                $producto->id,
-                $producto->sucursal_id
-            );
-        }
 
 
         $ultimasVentas = Venta::with('cliente')
@@ -125,7 +162,7 @@ class HomeController extends Controller
             'productosStockBajo',
             'utilidades',
             'stockBajo',
-            'ultimosProductos',
+            'productos',
             'ultimasVentas',
             'ventasMensuales'
         ));

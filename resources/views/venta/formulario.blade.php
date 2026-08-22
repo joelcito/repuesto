@@ -112,13 +112,13 @@
                                         <input type="text" id="buscar_producto" class="form-control form-control-lg"
                                             placeholder="Ingrese Nombre, Marca, Código, Nro Parte,Vehículo...">
                                         <div id="resultado_productos" class="shadow bg-white border rounded mt-1" style="
-                                                                                                max-height:400px;
-                                                                                                overflow-y:auto;
-                                                                                                display:none;
-                                                                                                position:absolute;
-                                                                                                z-index:9999;
-                                                                                                width:100%;
-                                                                                            ">
+                                                                            max-height:400px;
+                                                                            overflow-y:auto;
+                                                                            display:none;
+                                                                            position:absolute;
+                                                                            z-index:9999;
+                                                                            width:100%;
+                                                                        ">
                                         </div>
 
                                         <input type="hidden" id="producto_id" name="producto_id">
@@ -201,7 +201,7 @@
                                                     <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                                                         <th>Imagen</th>
                                                         <th>Producto</th>
-                                                        <th>Código Interno</th>
+                                                        <th>Código</th>
                                                         <th>Marca</th>
                                                         <th>Vehiculo</th>
                                                         <th>Cantidad</th>
@@ -328,10 +328,6 @@
         $('#realizo_pago_recibo').change(function () {
             validarCamposRecibo();
         });
-        // $('#cantidad, #precio_venta').on('keyup change', function () {
-        //     calcularSubtotalPreview();
-
-        // });
 
         $('#cantidad, #precio_venta, #descuento_producto')
             .on('keyup change', function () {
@@ -343,75 +339,51 @@
         let precioNormalSeleccionado = 0;
         let precioMayorSeleccionado = 0;
 
-        // function calcularSubtotalPreview() {
-        //     let cantidad =
-        //         parseFloat($('#cantidad').val()) || 0;
-        //     let precio =
-        //         parseFloat($('#precio_venta').val()) || 0;
-        //     let subtotal = cantidad * precio;
-        //     $('#subtotal_preview').val(
-        //         subtotal.toFixed(2)
-        //     );
-        // }
-
         function calcularSubtotalPreview() {
 
-            let cantidad =
-                parseFloat($('#cantidad').val()) || 0;
+            let cantidad = parseFloat($('#cantidad').val()) || 0;
+            let precio = parseFloat($('#precio_venta').val()) || 0;
+            let descuento = parseFloat($('#descuento_producto').val()) || 0;
+            let precioConDescuento = precio - descuento;
 
-            let precio =
-                parseFloat($('#precio_venta').val()) || 0;
-
-            let descuento =
-                parseFloat($('#descuento_producto').val()) || 0;
-
-            let subtotal = (cantidad * precio) - descuento;
-
-            if (subtotal < 0) {
-                subtotal = 0;
+            if (precioConDescuento < 0) {
+                precioConDescuento = 0;
             }
+
+            let subtotal = cantidad * precioConDescuento;
 
             $('#subtotal_preview').val(
                 subtotal.toFixed(2)
             );
-
         }
 
         function actualizarPrecio() {
-
             let tipoPrecio = $('#tipo_precio').val();
-
             let precio = 0;
-
             if (tipoPrecio == 'MAYOR') {
                 precio = precioMayorSeleccionado;
             } else {
                 precio = precioNormalSeleccionado;
             }
-
             $('#precio_venta').val(parseFloat(precio).toFixed(2));
             calcularSubtotalPreview();
         }
 
 
         function agregarProducto() {
-
             $('#tabla_detalles').show();
             let producto_id = $('#producto_id').val();
             let nombre = $('#buscar_producto').val();
-
             let cantidad = parseFloat($('#cantidad').val());
             let tipo_precio = $('#tipo_precio').val();
             let precio = parseFloat($('#precio_venta').val());
+
             let descuento = parseFloat($('#descuento_producto').val()) || 0;
-
-            let subtotal = (cantidad * precio) - descuento;
-
-            if (subtotal < 0) {
-                subtotal = 0;
+            let precioConDescuento = precio - descuento;
+            if (precioConDescuento < 0) {
+                precioConDescuento = 0;
             }
-
-
+            let subtotal = cantidad * precioConDescuento;
             if (producto_id == '') {
                 Swal.fire({
                     icon: 'warning',
@@ -442,9 +414,7 @@
                 });
                 return;
             }
-            console.log(productoSeleccionado);
 
-            console.log({ cantidad, precio, descuento, subtotal });
             productosVenta.push({
                 producto_id: producto_id,
                 nombre: productoSeleccionado.nombre,
@@ -481,21 +451,22 @@
                     : `${BASE_URL}/imagenes/productos/default.jpg`;
 
                 let img = `
-                                                                        <img src="${imagen}"
-                                                                        class="imagen-producto"
-                                                                                width="45"
-                                                                                height="45"
-                                                                                style="object-fit:cover;border-radius:6px;cursor:pointer;"
-                                                                                data-imagenes='${JSON.stringify(item.imagen)}'
-                                                                                >
-                                                                    `;
+                                                                                                                <div class="imagen-tabla-producto">
+                                                                                                                    <img
+                                                                                                                        src="${imagen}"
+                                                                                                                        class="imagen-producto"
+                                                                                                                        data-imagenes='${JSON.stringify(item.imagen)}'
+                                                                                                                        alt="Producto"
+                                                                                                                    >
+                                                                                                                </div>
+                                                                                                            `;
 
                 let botonEliminar =
                     `<button
-                                                                    class="btn btn-danger btn-sm"
-                                                                    onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
-                                                                    X
-                                                                </button>`;
+                                                                                                            class="btn btn-danger btn-sm"
+                                                                                                            onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
+                                                                                                            X
+                                                                                                        </button>`;
 
                 tabla.row.add([
                     img,
@@ -515,29 +486,11 @@
             });
         }
 
-
-        // function calcularTotal() {
-        //     let total = 0;
-        //     productosVenta.forEach(function (item) {
-        //         total += item.cantidad * item.precio;
-        //     });
-        //     $('#total_general').text(
-        //         total.toFixed(2)
-        //     );
-        //     $('#monto_total_pagado_recibo').val(
-        //         total.toFixed(2)
-        //     );
-        // }
-
         function calcularTotal() {
             console.log('calculartotal', productosVenta);
-
             let total = 0;
-
             productosVenta.forEach(function (item) {
-
                 total += parseFloat(item.subtotal);
-
             });
 
             $('#total_general').text(
@@ -553,7 +506,6 @@
 
         function validarCamposRecibo() {
             let realizoPago = $('#realizo_pago_recibo').is(':checked');
-
             if (realizoPago) {
                 $('#monto_pagado_recibo')
                     .prop('readonly', false);
@@ -594,19 +546,12 @@
         }
 
         function calcularCambioGlobal() {
-
             let totalVenta = parseFloat($('#total_general').text()) || 0;
-
-            //let descuentoGlobal = parseFloat($('#descuento').val()) || 0;
-            //let totalFinal = totalVenta - descuentoGlobal;
             let totalFinal = totalVenta;
-
             let totalPagado = 0;
-
             $('.pago-item').each(function () {
                 let monto = parseFloat($(this).find('.monto_pago').val()) || 0;
-                let descuento = parseFloat($(this).find('.descuento_pago').val()) || 0;
-                totalPagado += (monto - descuento);
+                totalPagado += monto;
             });
 
             let cambio = totalPagado - totalFinal;
@@ -631,8 +576,7 @@
                 if (monto > 0) {
                     pagos.push({
                         metodo: metodo,
-                        monto: monto,
-                        descuento: parseFloat($(this).find('.descuento_pago').val()) || 0
+                        monto: monto
                     });
                 }
             });
@@ -645,14 +589,12 @@
             }
 
             let totalVenta = parseFloat($('#total_general').text()) || 0;
-            let descuentoGlobal = parseFloat($('#descuento').val()) || 0;
-            let totalFinal = totalVenta - descuentoGlobal;
             let totalPagado = 0;
+
             pagos.forEach(p => {
                 let monto = parseFloat(p.monto) || 0;
-                let desc = parseFloat(p.descuento) || 0;
 
-                totalPagado += (monto - desc);
+                totalPagado += monto;
             });
 
             if (totalPagado < 0) {
@@ -688,7 +630,6 @@
                 monto_pagado: montoPagado,
                 cambio: $('#cambio_pagado_recibo').val(),
                 observacion: $('#observacion').val(),
-                // descuento: parseFloat($('#descuento').val()) || 0,
                 realizo_pago: realizoPago,
                 productos: productosVenta,
                 pagos: pagos
@@ -749,65 +690,58 @@
                     buscar: buscar
                 },
                 success: function (productos) {
-
                     let busquedaActual = $('#buscar_producto').val().trim();
-
                     if (busquedaActual !== buscar) {
                         return;
                     }
-
                     let html = '';
                     if (productos.length == 0) {
                         html = `
-                                        <div class="p-3 text-center text-danger">
-                                            No se encontraron productos
-                                        </div>
-                                    `;
+                                                    <div class="p-3 text-center text-danger">
+                                                        No se encontraron productos
+                                                    </div>
+                                                `;
                     } else {
                         productos.forEach(producto => {
-                            console.log(producto.imagenes);
-                            // let imagen = producto.imagenes?.length > 0
-                            //     ? `/imagenes/productos/${producto.imagenes[0].imagen}`
-                            //     : `/imagenes/productos/default.jpg`;
                             let imagen = producto.imagenes?.length > 0
                                 ? `${BASE_URL}/imagenes/productos/${producto.imagenes[0].imagen}`
                                 : `${BASE_URL}/imagenes/productos/default.jpg`;
                             html += `
-                                                                        <div class="producto-item p-3 border-bottom"
-                                                                            style="cursor:pointer; transition:0.2s;"
-                                                                            data-id="${producto.id}"
-                                                                            data-nombre="${producto.nombre}"
-                                                                            data-precio="${producto.precio_venta}"
-                                                                            data-precio-mayor="${producto.precio_mayor}"
-                                                                            data-codigo-interno="${producto.codigo_interno ?? ''}"
-                                                                            data-marca="${producto.marca ? producto.marca.nombre : ''}"
-                                                                            data-vehiculo="${producto.vehiculos_compatibles ?? ''}"
-                                                                            data-ubicacion="${producto.ubicacion ?? ''}"
-                                                                            data-medida="${producto.medidas ?? ''}"
-                                                                            data-imagen='${JSON.stringify(producto.imagenes?.length ? producto.imagenes : [])}'>
+                                                                <div class="producto-item p-3 border-bottom"
+                                                                    style="cursor:pointer; transition:0.2s;"
+                                                                    data-id="${producto.id}"
+                                                                    data-nombre="${producto.nombre}"
+                                                                    data-precio="${producto.precio_venta}"
+                                                                    data-precio-mayor="${producto.precio_mayor}"
+                                                                    data-codigo-interno="${producto.codigo_interno ?? ''}"
+                                                                    data-marca="${producto.marca ? producto.marca.nombre : ''}"
+                                                                    data-vehiculo="${producto.vehiculos_compatibles ?? ''}"
+                                                                    data-ubicacion="${producto.ubicacion ?? ''}"
+                                                                    data-medida="${producto.medidas ?? ''}"
+                                                                    data-imagen='${JSON.stringify(producto.imagenes?.length ? producto.imagenes : [])}'>
 
-                                                                            <div class="row align-items-center">
+                                                                    <div class="row align-items-center">
 
-                                                                                <!-- Imagen -->
-                                                                                <div class="col-md-2 text-center">
+                                                                        <!-- Imagen -->
+                                                                        <div class="col-md-2 text-center">
 
-                                                                                ${producto.imagenes && producto.imagenes.length > 0
+                                                                        ${producto.imagenes && producto.imagenes.length > 0
                                     ? `
-                                                                                <div id="carouselProducto${producto.id}" class="carousel slide position-relative" data-bs-ride="false">
-                                                                                    <div class="carousel-inner">
+                                                                        <div id="carouselProducto${producto.id}" class="carousel slide position-relative" data-bs-ride="false">
+                                                                            <div class="carousel-inner">
 
-                                                                                        ${producto.imagenes.map((img, index) => `
-                                                                                            <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                                                                                                <img src="${BASE_URL}/imagenes/productos/${img.imagen}""
-                                                                                                    class="d-block w-100"
-                                                                                                    style="width:90px;height:90px;object-fit:cover;border-radius:8px;"
-                                                                                                    alt="producto">
-                                                                                            </div>
-                                                                                        `).join('')}
-
+                                                                                ${producto.imagenes.map((img, index) => `
+                                                                                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                                                                        <img src="${BASE_URL}/imagenes/productos/${img.imagen}"
+                                                                                            class="d-block w-100"
+                                                                                            style="width:50px;height:50px;object-fit:cover;border-radius:8px;"
+                                                                                            alt="producto">
                                                                                     </div>
+                                                                                `).join('')}
 
-                                                                            ${producto.imagenes.length > 1
+                                                                            </div>
+
+                                                                    ${producto.imagenes.length > 1
                                         ? `
                                                                     <button
                                                                     class="carousel-control-prev"
@@ -830,16 +764,13 @@
                                                                             font-weight:bold;">
                                                                         ‹
                                                                     </span>
-
                                                                 </button>
-
                                                                 <button
                                                                     class="carousel-control-next"
                                                                     type="button"
                                                                     data-bs-target="#carouselProducto${producto.id}"
                                                                     data-bs-slide="next"
                                                                     style="right:-10px;width:25px;opacity:1;">
-
                                                                     <span
                                                                         style="
                                                                             width:24px;
@@ -854,92 +785,91 @@
                                                                             font-weight:bold;">
                                                                         ›
                                                                     </span>
-
                                                                 </button>
                                                                         `
                                         : ''
                                     }
 
-                                                                        </div>
-                                                                        `
+                                                                </div>
+                                                                `
                                     : `
-                                                                        <img src="${BASE_URL}/imagenes/productos/default.jpg""
-                                                                            style="width:90px;height:90px;object-fit:cover;border-radius:8px;"
-                                                                            alt="producto">
-                                                                        `
+                                                            <img src="${BASE_URL}/imagenes/productos/default.jpg"
+                                                                style="width:50px;height:50px;object-fit:cover;border-radius:8px;"
+                                                                alt="producto">
+                                                            `
                                 }
 
-                                                                    </div>
+                                                            </div>
 
-                                                                    <!-- Información -->
-                                                                    <div class="col-md-8">
+                                                            <!-- Información -->
+                                                            <div class="col-md-8">
 
-                                                                        <h6 class="mb-2 fw-bold text-primary">
-                                                                            ${producto.nombre}
-                                                                        </h6>
+                                                                <h6 class="mb-2 fw-bold text-primary">
+                                                                    ${producto.nombre}
+                                                                </h6>
 
-                                                                        <div class="row">
-
-
-                                                                            <div class="col-md-6">
-
-                                                                                <div class="small text-dark">
-                                                                                    <strong>Marca:</strong>
-                                                                                    ${producto.marca ? producto.marca.nombre : 'SIN MARCA'}
-                                                                                </div>
-
-                                                                                <div class="small text-dark">
-                                                                                    <strong>Cód. Interno:</strong>
-                                                                                    ${producto.codigo_interno ?? '-'}
-                                                                                </div>
-
-                                                                                <div class="small text-dark">
-                                                                                    <strong>Nro. Parte:</strong>
-                                                                                    ${producto.numero_parte_vehiculo ?? '-'}
-                                                                                </div>
-
-                                                                            </div>
+                                                                <div class="row">
 
 
-                                                                            <div class="col-md-6">
+                                                                    <div class="col-md-6">
 
-                                                                                <div class="small text-dark">
-                                                                                    <strong>Vehículo:</strong>
-                                                                                    ${producto.vehiculos_compatibles ?? '-'}
-                                                                                </div>
+                                                                        <div class="small text-dark">
+                                                                            <strong>Marca:</strong>
+                                                                            ${producto.marca ? producto.marca.nombre : 'SIN MARCA'}
+                                                                        </div>
 
-                                                                                <div class="small text-dark">
-                                                                                    <strong>Ubicación:</strong>
-                                                                                    ${producto.ubicacion ?? '-'}
-                                                                                </div>
+                                                                        <div class="small text-dark">
+                                                                            <strong>Código:</strong>
+                                                                            ${producto.codigo_interno ?? '-'}
+                                                                        </div>
 
-                                                                                <div class="small text-dark">
-                                                                                    <strong>Medida:</strong>
-                                                                                    ${producto.medidas ?? '-'}
-                                                                                </div>
-
-                                                                            </div>
-
+                                                                        <div class="small text-dark">
+                                                                            <strong>Nro. Parte:</strong>
+                                                                            ${producto.numero_parte_vehiculo ?? '-'}
                                                                         </div>
 
                                                                     </div>
 
-                                                                    <!-- Stock y precio -->
-                                                                    <div class="col-md-2 text-end">
 
-                                                                        <span class="badge bg-success">
-                                                                            Stock: ${producto.stock_actual}
-                                                                        </span>
+                                                                    <div class="col-md-6">
 
-                                                                        <h5 class="text-success mt-2 mb-0">
-                                                                            Bs. ${producto.precio_venta}
-                                                                        </h5>
+                                                                        <div class="small text-dark">
+                                                                            <strong>Vehículo:</strong>
+                                                                            ${producto.vehiculos_compatibles ?? '-'}
+                                                                        </div>
+
+                                                                        <div class="small text-dark">
+                                                                            <strong>Ubicación:</strong>
+                                                                            ${producto.ubicacion ?? '-'}
+                                                                        </div>
+
+                                                                        <div class="small text-dark">
+                                                                            <strong>Medida:</strong>
+                                                                            ${producto.medidas ?? '-'}
+                                                                        </div>
 
                                                                     </div>
 
                                                                 </div>
+
                                                             </div>
-                                                            `;
+
+                                                            <!-- Stock y precio -->
+                                                            <div class="col-md-2 text-end">
+
+                                                                <span class="badge bg-success">
+                                                                    Stock: ${producto.stock_actual}
+                                                                </span>
+
+                                                                <h5 class="text-success mt-2 mb-0">
+                                                                    Bs. ${producto.precio_venta}
+                                                                </h5>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    `;
                         });
                     }
                     $('#resultado_productos').html(html);
@@ -966,13 +896,11 @@
                 medida: $(this).data('medida'),
                 imagen: $(this).data('imagen')
             };
-            console.log('res', productoSeleccionado);
+
             $('#producto_id').val(productoSeleccionado.id);
             $('#buscar_producto').val(productoSeleccionado.nombre);
-
             precioNormalSeleccionado = productoSeleccionado.precio_venta;
             precioMayorSeleccionado = productoSeleccionado.precio_mayor;
-
             actualizarPrecio();
             calcularSubtotalPreview();
             $('#resultado_productos').hide();
@@ -1022,114 +950,155 @@
             $('#imagen_cliente').attr('src', src);
         });
 
+        $(document).on('click', '.producto-item img, .imagen-tabla-producto .imagen-producto', function (e) {
 
-        // $(document).on('click', '.imagen-producto', function () {
+            e.preventDefault();
+            e.stopPropagation();
 
-        //     let src = $(this).attr('src');
+            let imagenes = [];
+            const productoItem = $(this).closest('.producto-item');
 
-        //     Swal.fire({
-        //         imageUrl: src,
-        //         imageWidth: 600,
-        //         imageAlt: 'Producto',
-        //         showConfirmButton: false,
-        //         showCloseButton: true,
-        //         width: '700px'
-        //     });
+            if (productoItem.length) {
 
-        // });
+                let dataImagen = productoItem.attr('data-imagen');
 
-        $(document).on('click', '.imagen-producto', function () {
+                try {
+                    imagenes = JSON.parse(dataImagen);
+                } catch (error) {
+                    imagenes = [];
+                }
 
-            let imagenes = JSON.parse($(this).attr('data-imagenes'));
-            let items = '';
-
-            console.log(imagenes.length);
-            if (imagenes.length > 0) {
-                imagenes.forEach(function (img, index) {
-
-                    let ruta = img.imagen
-                        ? `${BASE_URL}/imagenes/productos/${img.imagen}`
-                        : `${BASE_URL}/imagenes/productos/default.jpg`;
-
-                    items += `
-                                                                <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                                                                    <div class="contenedor-imagen">
-                                                                        <img src="${ruta}" class="imagen-carrusel">
-                                                                    </div>
-                                                                </div>
-                                                                `;
-
-                });
-            } else {
-
-                let ruta = `${BASE_URL}/imagenes/productos/default.jpg`;
-                items += `
-                                                            <div class="carousel-item active ">
-                                                                <div class="contenedor-imagen">
-                                                                    <img src="${ruta}" class="imagen-carrusel">
-                                                                </div>
-                                                            </div>
-                                                            `;
-                imagenes.push({ imagen: ruta });
             }
 
+            else {
+
+                let dataImagenes = $(this).attr('data-imagenes');
+
+                try {
+                    imagenes = JSON.parse(dataImagenes);
+                } catch (error) {
+                    imagenes = [];
+                }
+
+            }
+
+            if (!imagenes || imagenes.length === 0) {
+
+                imagenes = [
+                    {
+                        imagen: 'default.jpg'
+                    }
+                ];
+            }
+
+            const imagenActual = $(this).attr('src');
+            let indiceActual = 0;
+            imagenes.forEach(function (img, index) {
+
+                if (
+                    img.imagen &&
+                    imagenActual.includes(img.imagen)
+                ) {
+                    indiceActual = index;
+                }
+
+            });
+
+            const carouselId =
+                'carouselModalProducto_' + Date.now();
+
+            let items = '';
+
+            imagenes.forEach(function (img, index) {
+
+                const ruta = img.imagen
+                    ? `${BASE_URL}/imagenes/productos/${img.imagen}`
+                    : `${BASE_URL}/imagenes/productos/default.jpg`;
+
+                items += `
+                                                <div class="carousel-item ${index === indiceActual ? 'active' : ''}">
+                                                    <div class="modal-imagen-contenedor">
+                                                        <img
+                                                            src="${ruta}"
+                                                            class="modal-imagen-producto"
+                                                            alt="Imagen del producto"
+                                                        >
+                                                    </div>
+                                                </div>
+                                            `;
+            });
 
             Swal.fire({
                 html: `
-                                                            <div id="carouselProducto" class="carousel slide" data-bs-ride="false">
+                                                <div
+                                                    id="${carouselId}"
+                                                    class="carousel slide"
+                                                    data-bs-ride="false"
+                                                >
 
-                                                                <div class="carousel-inner">
-                                                                    ${items}
-                                                                </div>
+                                                    <div class="carousel-inner">
+                                                        ${items}
+                                                    </div>
 
-                                                                ${imagenes.length > 1 ? `
-                                                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProducto" data-bs-slide="prev">
-                                                                    <span class="btn-carrusel">
-                                                                        ❮
-                                                                    </span>
-                                                                </button>
+                                                    ${imagenes.length > 1
+                        ? `
+                                                        <button
+                                                            class="carousel-control-prev"
+                                                            type="button"
+                                                            data-bs-target="#${carouselId}"
+                                                            data-bs-slide="prev"
+                                                        >
+                                                            <span class="btn-carrusel">
+                                                                ❮
+                                                            </span>
+                                                        </button>
 
-                                                                <button class="carousel-control-next" type="button" data-bs-target="#carouselProducto" data-bs-slide="next">
-                                                                    <span class="btn-carrusel">
-                                                                        ❯
-                                                                    </span>
-                                                                </button>
-                                                                ` : ''}
+                                                        <button
+                                                            class="carousel-control-next"
+                                                            type="button"
+                                                            data-bs-target="#${carouselId}"
+                                                            data-bs-slide="next"
+                                                        >
+                                                            <span class="btn-carrusel">
+                                                                ❯
+                                                            </span>
+                                                        </button>
+                                                    `
+                        : ''
+                    }
 
-                                                            </div>
-                                                            `,
+                                            </div>
+                                        `,
+
                 width: '90%',
-                padding: 10,
+                padding: '10px',
                 showConfirmButton: false,
                 showCloseButton: true,
                 customClass: {
                     popup: 'swal-imagen-popup'
                 }
+
             });
 
         });
 
-        //pagos divididos:
 
         function agregarPago() {
             let html = `
-                                                            <div class="row pago-item mt-2">
+                                            <div class="row pago-item mt-2">
 
-                                                                <div class="col-md-8">
-                                                                    <select class="form-control form-control-sm metodo_pago">
-                                                                        <option value="EFECTIVO">EFECTIVO</option>
-                                                                        <option value="QR">QR</option>
-                                                                        <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                                                                    </select>
-                                                                </div>
+                                                <div class="col-md-8">
+                                                    <select class="form-control form-control-sm metodo_pago">
+                                                        <option value="EFECTIVO">EFECTIVO</option>
+                                                        <option value="QR">QR</option>
+                                                        <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                                                    </select>
+                                                </div>
 
-                                                                <div class="col-md-4">
-                                                                    <input type="number" class="form-control form-control-sm monto_pago" placeholder="Monto">
-                                                                </div>
-
-
-
-                                                            </div>`;
+                                                <div class="col-md-4">
+                                                    <input type="number" class="form-control form-control-sm monto_pago" placeholder="Monto">
+                                                </div>
+                                            </div>`;
 
             $('#lista_pagos').append(html);
         }
@@ -1148,39 +1117,11 @@
             cursor: zoom-in;
         }
 
-        #imagenGrande {
-            transition: transform 0.3s ease;
-            cursor: zoom-in;
-        }
-
-        #imagenGrande:hover {
-            transform: scale(1.8);
-        }
-
-        .swal-imagen-popup {
-            width: 50% !important;
-            max-width: 1200px !important;
-            height: 50vh !important;
-            padding: 10px !important;
-        }
-
-        .swal-imagen-popup .swal2-html-container {
-            margin: 0 !important;
-            padding: 0 !important;
-            height: calc(90vh - 40px);
-            overflow: hidden;
-        }
-
-        #carouselProducto {
-            height: 100%;
-        }
-
-        #carouselProducto .carousel-inner {
-            height: 100%;
-        }
-
-        #carouselProducto .carousel-item {
-            height: 100%;
+        .producto-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
         }
 
         .contenedor-imagen {
@@ -1197,28 +1138,188 @@
         }
 
         .btn-carrusel {
-            width: 60px;
-            height: 60px;
+            width: 40px !important;
+            height: 40px !important;
             border-radius: 50%;
             background: rgba(0, 0, 0, .75);
             color: #fff;
-            font-size: 42px;
+            font-size: 20px !important;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: .2s;
         }
 
         .btn-carrusel:hover {
             background: rgba(0, 0, 0, .95);
-            transform: scale(1.1);
         }
 
         #carouselProducto .carousel-control-prev,
         #carouselProducto .carousel-control-next {
             opacity: 1 !important;
             width: 8%;
+        }
+
+        .swal2-container {
+            z-index: 20000 !important;
+        }
+
+        .swal-imagen-popup {
+            width: 90vw !important;
+            max-width: 90vw !important;
+            height: 85vh !important;
+            max-height: 85vh !important;
+            padding: 15px !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+        }
+
+        .swal-imagen-popup .swal2-html-container {
+            width: 100% !important;
+            height: 100% !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+
+            max-height: none !important;
+
+            overflow: hidden !important;
+        }
+
+        .swal-imagen-popup .carousel {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .swal-imagen-popup .carousel-inner {
+            width: 100% !important;
+            height: 100% !important;
+
+            overflow: hidden !important;
+        }
+
+        .swal-imagen-popup .carousel-item {
+            width: 100% !important;
+            height: 100% !important;
+
+            overflow: hidden !important;
+        }
+
+        .modal-imagen-contenedor {
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+        }
+
+        .modal-imagen-producto {
+            display: block !important;
+            width: auto !important;
+            height: auto !important;
+            max-width: calc(90vw - 100px) !important;
+            max-height: calc(85vh - 60px) !important;
+            object-fit: contain !important;
+            margin: auto !important;
+        }
+
+        .swal-imagen-popup .carousel-control-prev,
+        .swal-imagen-popup .carousel-control-next {
+            width: 65px !important;
+
+            opacity: 1 !important;
+
+            z-index: 20 !important;
+        }
+
+        .swal-imagen-popup .carousel-control-prev {
+            left: 0 !important;
+        }
+
+        .swal-imagen-popup .carousel-control-next {
+            right: 0 !important;
+        }
+
+        .swal-imagen-popup .btn-carrusel {
+            width: 42px !important;
+            height: 42px !important;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, .75);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px !important;
+            font-weight: bold;
+        }
+
+        .swal-imagen-popup .btn-carrusel:hover {
+            background: rgba(0, 0, 0, .95);
+        }
+
+        .swal-imagen-popup .swal2-close {
+            position: absolute;
+
+            top: 5px;
+            right: 8px;
+
+            z-index: 30;
+
+            font-size: 30px;
+
+            color: #000;
+        }
+
+        .imagen-tabla-producto {
+            width: 60px;
+            height: 60px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+
+            background: #f8f9fa;
+
+            border-radius: 6px;
+        }
+
+        .imagen-tabla-producto .imagen-producto {
+            width: 50px;
+            height: 50px;
+
+            object-fit: contain;
+
+            border-radius: 6px;
+
+            cursor: zoom-in;
+        }
+
+        @media (max-width: 768px) {
+
+            .swal-imagen-popup {
+                width: 95vw !important;
+                max-width: 95vw !important;
+
+                height: 80vh !important;
+                max-height: 80vh !important;
+
+                padding: 8px !important;
+            }
+
+            .modal-imagen-producto {
+                max-width: calc(95vw - 70px) !important;
+                max-height: calc(80vh - 40px) !important;
+            }
+
+            .swal-imagen-popup .carousel-control-prev,
+            .swal-imagen-popup .carousel-control-next {
+                width: 45px !important;
+            }
         }
     </style>
 @endsection
