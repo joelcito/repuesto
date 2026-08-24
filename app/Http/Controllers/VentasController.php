@@ -93,7 +93,7 @@ class VentasController extends Controller
                 'caja_id' => 'required',
                 'metodo_pago' => 'required',
                 'productos' => 'required|array|min:1',
-                'pagos' => 'required|array|min:1'
+                'pagos' => 'nullable|array'
             ]);
 
             $usuario = Auth::user();
@@ -208,9 +208,7 @@ class VentasController extends Controller
             $venta->total = $total;
             $venta->save();
             $pagos = $request->pagos ?? [];
-            if (count($pagos) == 0) {
-                throw new \Exception("Debe registrar al menos un pago");
-            }
+
             $totalPagado = collect($pagos)->sum(function ($p) {
                 return $p['monto'] ?? 0;
             });

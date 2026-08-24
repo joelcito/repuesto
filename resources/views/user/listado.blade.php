@@ -98,9 +98,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="fv-row mb-7">
-                                <label class="required fw-semibold fs-6 mb-2">Email</label>
-                                <input type="email" class="form-control form-control-sm" id="email" name="email"
-                                    required>
+                                <label class="fw-semibold fs-6 mb-2">Email</label>
+                                <input type="email" class="form-control form-control-sm" id="email" name="email">
                             </div>
                         </div>
                         <div class="col-md-6">
