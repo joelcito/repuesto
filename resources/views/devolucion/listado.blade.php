@@ -29,10 +29,10 @@
                             <div class="row">
                                 <div class="col-md-4"> <label class="fw-semibold fs-6 mb-2"> Venta </label> <select
                                         class="form-select form-select-sm" name="venta_id" id="venta_id">
-                                        <option value=""> Seleccione </option> @foreach($ventas as $venta) <option
-                                            value="{{ $venta->id }}"> VENTA #{{ $venta->id }} |
-                                            {{ $venta->cliente->nombres ?? 'S/N' }} | Bs.
-                                            {{ number_format($venta->total, 2) }}
+                                        <option value=""> Seleccione </option> @foreach($ventas as $venta)
+                                            <option value="{{ $venta->id }}"> VENTA #{{ $venta->id }} |
+                                                {{ $venta->cliente->nombres ?? 'S/N' }} | Bs.
+                                                {{ number_format($venta->total, 2) }}
                                         </option> @endforeach
                                     </select> </div>
                                 <div class="col-md-4"> <label class="fw-semibold fs-6 mb-2"> Tipo </label> <select
@@ -240,15 +240,6 @@
 
                     $('#table_listado').html(resultado.data.listado);
                     iniciarTabla('#kt_table_devolucion');
-                    // if ($.fn.DataTable.isDataTable('#kt_table_devolucion')) {
-                    //     $('#kt_table_devolucion').DataTable().destroy();
-                    // }
-
-                    // $('#kt_table_devolucion').DataTable({
-                    //     responsive: true,
-                    //     destroy: true
-                    // });
-
                 }
             });
         }
@@ -290,50 +281,50 @@
                             item.precio_unitario - descuentoUnitario;
 
                         html += `
-                    <tr>
+                        <tr>
 
-                        <td>${item.producto.nombre}</td>
+                            <td>${item.producto.nombre}</td>
 
-                        <td class="text-center">
-                            ${item.cantidad}
-                        </td>
+                            <td class="text-center">
+                                ${item.cantidad}
+                            </td>
 
-                        <td class="text-center text-danger fw-bold">
-                            ${devuelto}
-                        </td>
+                            <td class="text-center text-danger fw-bold">
+                                ${devuelto}
+                            </td>
 
-                        <td class="text-center">
-                            Bs. ${parseFloat(item.precio_unitario).toFixed(2)}
-                        </td>
+                            <td class="text-center">
+                                Bs. ${parseFloat(item.precio_unitario).toFixed(2)}
+                            </td>
 
-                        <td class="text-center text-warning">
-                            Bs. ${parseFloat(descuentoUnitario).toFixed(2)}
-                        </td>
+                            <td class="text-center text-warning">
+                                Bs. ${parseFloat(descuentoUnitario).toFixed(2)}
+                            </td>
 
-                        <td class="text-center text-success fw-bold">
-                            Bs. ${parseFloat(precioFinal).toFixed(2)}
-                        </td>
+                            <td class="text-center text-success fw-bold">
+                                Bs. ${parseFloat(precioFinal).toFixed(2)}
+                            </td>
 
-                        <td>
+                            <td>
 
-                            <input
-                                type="number"
-                                min="0"
-                                max="${disponible}"
-                                value="0"
-                                class="form-control form-control-sm cantidad_devolucion"
-                                data-precio="${item.precio_unitario}"
-                                data-descuento="${item.descuento}"
-                                data-cantidad="${item.cantidad}"
-                                data-producto="${item.producto_id}">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="${disponible}"
+                                    value="0"
+                                    class="form-control form-control-sm cantidad_devolucion"
+                                    data-precio="${item.precio_unitario}"
+                                    data-descuento="${item.descuento}"
+                                    data-cantidad="${item.cantidad}"
+                                    data-producto="${item.producto_id}">
 
-                            <small class="text-danger">
-                                Disponible: ${disponible}
-                            </small>
+                                <small class="text-danger">
+                                    Disponible: ${disponible}
+                                </small>
 
-                        </td>
+                            </td>
 
-                    </tr>`;
+                        </tr>`;
                     });
 
                     $('#detalle_devolucion').html(html);
@@ -498,50 +489,50 @@
                             item.precio_unitario - descuentoUnitario;
 
                         html += `
-                            <tr>
+                                <tr>
 
-                                <td>${item.producto.nombre}</td>
+                                    <td>${item.producto.nombre}</td>
 
-                                <td class="text-center">
-                                    ${item.cantidad}
-                                </td>
+                                    <td class="text-center">
+                                        ${item.cantidad}
+                                    </td>
 
-                                <td class="text-center text-danger">
-                                    ${devuelto}
-                                </td>
+                                    <td class="text-center text-danger">
+                                        ${devuelto}
+                                    </td>
 
-                                <td class="text-center">
-                                    Bs. ${parseFloat(item.precio_unitario).toFixed(2)}
-                                </td>
+                                    <td class="text-center">
+                                        Bs. ${parseFloat(item.precio_unitario).toFixed(2)}
+                                    </td>
 
-                                <td class="text-center text-warning">
-                                    Bs. ${parseFloat(descuentoUnitario).toFixed(2)}
-                                </td>
+                                    <td class="text-center text-warning">
+                                        Bs. ${parseFloat(descuentoUnitario).toFixed(2)}
+                                    </td>
 
-                                <td class="text-center text-success fw-bold">
-                                    Bs. ${parseFloat(precioFinal).toFixed(2)}
-                                </td>
+                                    <td class="text-center text-success fw-bold">
+                                        Bs. ${parseFloat(precioFinal).toFixed(2)}
+                                    </td>
 
-                                <td>
+                                    <td>
 
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="${disponible}"
-                                        value="0"
-                                        class="form-control cantidad_devolucion"
-                                        data-precio="${item.precio_unitario}"
-                                        data-descuento="${item.descuento}"
-                                        data-cantidad="${item.cantidad}"
-                                        data-producto="${item.producto_id}">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="${disponible}"
+                                            value="0"
+                                            class="form-control cantidad_devolucion"
+                                            data-precio="${item.precio_unitario}"
+                                            data-descuento="${item.descuento}"
+                                            data-cantidad="${item.cantidad}"
+                                            data-producto="${item.producto_id}">
 
-                                    <small class="text-danger">
-                                        Disponible: ${disponible}
-                                    </small>
+                                        <small class="text-danger">
+                                            Disponible: ${disponible}
+                                        </small>
 
-                                </td>
+                                    </td>
 
-                            </tr>`;
+                                </tr>`;
                     });
 
                     $('#detalle_devolucion').html(html);

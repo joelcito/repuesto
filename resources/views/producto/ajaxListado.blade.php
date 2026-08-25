@@ -10,6 +10,7 @@
                 <th>Precio Venta</th>
                 <th>Imagen</th>
                 <th>Stock</th>
+                <th>Fecha Modif.</th>
                 <th>Estado</th>
                 <th>Actions</th>
             </tr>
@@ -41,6 +42,9 @@
                         <span class="badge {{ $producto->stock_actual > 0 ? 'bg-success' : 'bg-danger' }}">
                             {{ $producto->stock_actual ?? 0 }}
                         </span>
+                    </td>
+                    <td>
+                        {{ $producto->updated_at?->format('d/m/Y H:i') }}
                     </td>
                     <td>
                         @if($producto->estado)
