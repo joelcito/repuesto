@@ -94,11 +94,21 @@ class ReporteController extends Controller
             'cliente',
             'usuario',
             'pagos',
-            'detalles' => function ($q) {
+            'detalles' => function ($q) use ($request) {
+
                 $q->with([
                     'producto.marca',
                     'producto.unidad'
                 ]);
+
+                if ($request->tipo_producto !== 'TODOS') {
+                    $q->whereHas('producto', function ($producto) use ($request) {
+                        $producto->where(
+                            'tipo_producto',
+                            $request->tipo_producto
+                        );
+                    });
+                }
             }
         ])
             ->whereBetween('fecha', [
@@ -107,15 +117,27 @@ class ReporteController extends Controller
             ])
             ->get();
 
+        // Quitar ventas que no tienen detalles
+        // del tipo seleccionado
+        $ventas = $ventas->filter(function ($venta) {
+            return $venta->detalles->count() > 0;
+        });
+
         $ventas->each(function ($venta) {
+
             $venta->metodos_pago = $venta->pagos
                 ->pluck('metodo')
                 ->implode(', ');
+
+            // Total solamente de los productos filtrados
+            $venta->total_filtrado = $venta->detalles->sum('subtotal');
         });
+
         $pdf = Pdf::loadView(
             'reporte.pdf.ventas_pdf',
             compact('ventas')
         );
+
         return $pdf->stream('ventas.pdf');
     }
 

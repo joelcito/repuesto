@@ -63,20 +63,6 @@ class PagoController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        // $repuestos = (clone $baseQuery)
-        //     ->whereHas('venta.detalles.producto', function ($q) {
-        //         $q->where('tipo_producto', 'REPUESTO');
-        //     })
-        //     ->with([
-        //         'venta.detalles' => function ($q) {
-        //             $q->whereHas('producto', function ($p) {
-        //                 $p->where('tipo_producto', 'REPUESTO');
-        //             });
-        //             $q->with('producto');
-        //         }
-        //     ])
-        //     ->orderBy('id', 'desc')
-        //     ->get();
 
         $repuestos = (clone $baseQuery)
             ->where(function ($q) {
@@ -102,10 +88,7 @@ class PagoController extends Controller
             ->get();
 
 
-        // $lubricantes = (clone $baseQuery)
-        //     ->whereHas('venta.detalles.producto', function ($q) {
-        //         $q->where('tipo_producto', 'LUBRICANTE');
-        //     })
+
         $lubricantes = (clone $baseQuery)
             ->where(function ($q) {
 
@@ -169,28 +152,7 @@ class PagoController extends Controller
         return $data;
     }
 
-    // public function ajaxFormPagoDeuda(Request $request)
-    // {
-    //     if ($request->ajax()) {
-    //         $venta_id = $request->input('venta_id');
 
-    //         $venta = Venta::with(['cliente', 'sucursal'])->where('id', $venta_id)->first();
-    //         $pagos = pago::where('venta_id', $venta_id)
-    //             ->where('estado', 'INGRESO')
-    //             ->get();
-    //         $pagado = pago::where('venta_id', $venta_id)
-    //             ->where('estado', 'INGRESO')
-    //             ->sum('monto');
-
-    //         $valores = [
-    //             'formulario' => view('pago.ajaxFormPagoDeuda')->with(compact('venta', 'pagos', 'pagado'))->render()
-    //         ];
-    //         $data = Respuesta::success($valores, "Datos obtenidos correctamente");
-    //     } else {
-    //         $data = Respuesta::error(null, "Error al obtener los datos");
-    //     }
-    //     return $data;
-    // }
 
     public function ajaxFormPagoDeuda(Request $request)
     {
@@ -275,35 +237,6 @@ class PagoController extends Controller
         return $data;
     }
 
-    // public function guardarTipoIngresoSalida(Request $request)
-    // {
-    //     if ($request->ajax()) {
-    //         $usuario = Auth::user();
-    //         $monto = $request->input('monto');
-    //         $descripcion = $request->input('descripcion');
-    //         $tipo = $request->input('tipo');
-    //         $subcategoria_id = $request->input('subcategoria_id');
-    //         $sucursal = $usuario->sucursal;
-
-
-    //         $pago = new pago();
-    //         $pago->usuario_creador_id = $usuario->id;
-    //         $pago->sucursal_id = $sucursal->id;
-    //         $pago->monto = $monto;
-    //         $pago->fecha = date('Y-m-d H:i:s');
-    //         $pago->descripcion = $descripcion;
-    //         $pago->tipo_pago = 'EFECTIVO';
-    //         $pago->estado = $tipo;
-    //         $pago->sub_categoria_id = $subcategoria_id;
-    //         $pago->save();
-
-    //         $data = Respuesta::success(null, "Datos registrados correctamente");
-
-    //     } else {
-    //         $data = Respuesta::error(null, "Error al obtener los datos");
-    //     }
-    //     return $data;
-    // }
 
     public function guardarTipoIngresoSalida(Request $request)
     {
@@ -556,27 +489,6 @@ class PagoController extends Controller
         return $data;
     }
 
-    // public function comprobantePago(Request $request, $pago_id)
-    // {
-
-    //     $pago = Pago::with([
-    //         'usuario',
-    //         'sucursal',
-    //         'venta.pagos',
-    //         'categoria.parent'
-    //     ])->findOrFail($pago_id);
-
-    //     $html = View::make('pago.pdf.comprobantePago', compact(['pago']))->render();
-    //     $dompdf = new Dompdf();
-    //     $dompdf->setPaper(array(0, 0, 300.00, 504.00), 'landscape');//cambio orientacion de la hoja
-    //     $dompdf->loadHtml($html);
-    //     $dompdf->render();
-
-    //     return response($dompdf->output())
-    //         ->header('Content-Type', 'application/pdf')
-    //         ->header('Content-Disposition', 'inline; filename=Cotizacion.pdf');
-
-    // }
 
     public function comprobantePago(Request $request, $pago_id)
     {

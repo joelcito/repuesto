@@ -22,14 +22,23 @@
                         <form action="{{ route('reporte.ventas.pdf') }}" method="POST" target="_blank">
                             @csrf
                             <div class="row">
-                                <div class="col-md-5">
+                                <div class="col-md-4">
                                     <label>Fecha Inicio</label>
                                     <input type="date" name="fecha_inicio" class="form-control" required>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-4">
                                     <label>Fecha Fin</label>
                                     <input type="date" name="fecha_fin" class="form-control" required>
                                 </div>
+                                <div class="col-md-2">
+                                    <label>Tipo de producto</label>
+                                    <select name="tipo_producto" class="form-select">
+                                        <option value="TODOS">Todos</option>
+                                        <option value="REPUESTO">Repuestos</option>
+                                        <option value="LUBRICANTE">Lubricantes</option>
+                                    </select>
+                                </div>
+
                                 <div class="col-md-2 d-flex align-items-end">
                                     <button class="btn btn-danger w-100">
                                         PDF

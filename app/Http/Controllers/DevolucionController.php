@@ -115,7 +115,7 @@ class DevolucionController extends Controller
                 $descuentoUnitario =
                     ($ventaDetalle->descuento ?? 0)
                     / $ventaDetalle->cantidad;
-                //$subtotal = $item['cantidad'] * $ventaDetalle->precio_unitario;
+
                 $subtotal =
                     ($item['cantidad'] * $ventaDetalle->precio_unitario)
                     - ($descuentoUnitario * $item['cantidad']);
@@ -142,8 +142,6 @@ class DevolucionController extends Controller
                     ->where('producto_id', $item['producto_id'])
                     ->first();
                 $producto = Producto::findOrFail($item['producto_id']);
-                // $subtotal = $item['cantidad'] * $ventaDetalle->precio_unitario;
-
                 $descuentoUnitario =
                     ($ventaDetalle->descuento ?? 0)
                     / $ventaDetalle->cantidad;
@@ -155,7 +153,6 @@ class DevolucionController extends Controller
                     ($item['cantidad'] * $ventaDetalle->precio_unitario)
                     - $descuento;
 
-
                 DevolucionDetalle::create([
                     'devolucion_id' => $devolucion->id,
                     'producto_id' => $item['producto_id'],
@@ -166,13 +163,10 @@ class DevolucionController extends Controller
                     'usuario_creador_id' => $usuario->id
                 ]);
 
-
                 $ventaDetalle->cantidad_devuelta =
                     ($ventaDetalle->cantidad_devuelta ?? 0) + $item['cantidad'];
 
                 $ventaDetalle->save();
-
-
                 Movimiento::create([
                     'producto_id' => $producto->id,
                     'sucursal_id' => $venta->caja->sucursal_id,
@@ -185,46 +179,55 @@ class DevolucionController extends Controller
                     'estado' => 'INGRESO',
                     'usuario_creador_id' => $usuario->id
                 ]);
-
-
-                if ($request->tipo == 'DINERO') {
-
-                    MovimientoCaja::create([
-                        'caja_id' => $venta->caja_id,
-                        'venta_id' => $venta->id,
-                        'tipo' => 'SALIDA',
-                        'metodo_pago' => $venta->metodo_pago,
-                        'monto' => $subtotal,
-                        'descripcion' => 'DEVOLUCION #' . $devolucion->id,
-                        'fecha' => now(),
-                        'estado' => 'SALIDA',
-                        'usuario_creador_id' => $usuario->id
-                    ]);
-
-                    Pago::create([
-                        'usuario_creador_id' => $usuario->id,
-                        'venta_id' => $venta->id,
-                        'sucursal_id' => $venta->caja->sucursal_id,
-                        'monto' => $subtotal,
-                        'tipo_pago' => $venta->metodo_pago,
-                        'descripcion' => 'DEVOLUCION',
-                        'estado' => 'SALIDA'
-                    ]);
-
-                    $venta->caja->increment('total_egresos', $subtotal);
-                }
             }
 
+            if ($request->tipo == 'DINERO') {
+
+                MovimientoCaja::create([
+                    'caja_id' => $venta->caja_id,
+                    'venta_id' => $venta->id,
+                    'tipo' => 'SALIDA',
+                    'metodo_pago' => $venta->metodo_pago,
+                    'monto' => $devolucion->total,
+                    'descripcion' => 'DEVOLUCION #' . $devolucion->id,
+                    'fecha' => now(),
+                    'estado' => 'SALIDA',
+                    'usuario_creador_id' => $usuario->id
+                ]);
+
+                Pago::create([
+                    'usuario_creador_id' => $usuario->id,
+                    'venta_id' => $venta->id,
+                    'sucursal_id' => $venta->caja->sucursal_id,
+                    'monto' => $devolucion->total,
+                    'tipo_pago' => $venta->metodo_pago,
+                    'descripcion' => 'DEVOLUCION #' . $devolucion->id,
+                    'estado' => 'SALIDA'
+                ]);
+
+                $venta->caja->increment(
+                    'total_egresos',
+                    $devolucion->total
+                );
+            }
 
             $pendientes = VentaDetalle::where('venta_id', $venta->id)
                 ->whereRaw('cantidad > COALESCE(cantidad_devuelta,0)')
                 ->count();
+
+            $totalDevuelto = DevolucionDetalle::where('devolucion_id', $devolucion->id)
+                ->sum('subtotal');
+
+
+            $venta->total = max(0, $venta->total - $totalDevuelto);
 
             $venta->estado = $pendientes == 0
                 ? 'DEVUELTO'
                 : 'DEVOLUCION_PARCIAL';
 
             $venta->save();
+
+
 
             DB::commit();
 
@@ -274,14 +277,14 @@ class DevolucionController extends Controller
                     ->first();
 
                 if ($ventaDetalle) {
+
                     $ventaDetalle->cantidad_devuelta =
-                        $ventaDetalle->cantidad_devuelta
-                        - $movimiento->cantidad;
-                    if (
-                        $ventaDetalle->cantidad_devuelta < 0
-                    ) {
-                        $ventaDetalle->cantidad_devuelta = 0;
-                    }
+                        max(
+                            0,
+                            ($ventaDetalle->cantidad_devuelta ?? 0)
+                            - $movimiento->cantidad
+                        );
+
                     $ventaDetalle->save();
                 }
                 Movimiento::create([
@@ -327,17 +330,19 @@ class DevolucionController extends Controller
                     'estado' => 'INGRESO'
                 ]);
 
-                $caja = Caja::find($venta->caja_id);
-                $caja->total_egresos = $caja->total_egresos - $devolucion->total;
-                if ($caja->total_egresos < 0) {
-                    $caja->total_egresos = 0;
-                }
-                $caja->save();
+                $venta->caja->decrement(
+                    'total_egresos',
+                    min(
+                        $venta->caja->total_egresos,
+                        $devolucion->total
+                    )
+                );
             }
             $devolucion->estado = 'ANULADO';
             $devolucion->usuario_eliminador_id = $usuario->id;
             $devolucion->save();
-            $devolucion->delete();
+
+
             $detallesPendientes =
                 VentaDetalle::where(
                     'venta_id',
