@@ -198,6 +198,7 @@ class DevolucionController extends Controller
                 Pago::create([
                     'usuario_creador_id' => $usuario->id,
                     'venta_id' => $venta->id,
+                    'fecha' => now(),
                     'sucursal_id' => $venta->caja->sucursal_id,
                     'monto' => $devolucion->total,
                     'tipo_pago' => $venta->metodo_pago,

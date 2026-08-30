@@ -23,7 +23,7 @@
                 <form id="formularioUser">
                     <input type="hidden" name="id" id="id" value="0">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="fv-row mb-7">
                                 <label class="required fw-semibold fs-6 mb-2">Sucursal</label>
                                 <select class="form-control form-control-sm" id="sucursal_id" name="sucursal_id"
@@ -37,7 +37,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="fv-row mb-7">
                                 <label class="required fw-semibold fs-6 mb-2">Rol</label>
                                 <select class="form-control form-control-sm" id="rol_id" name="rol_id" required>
@@ -50,14 +50,15 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-4">
                             <div class="fv-row mb-7">
                                 <label class="required fw-semibold fs-6 mb-2">Nombre</label>
                                 <input type="text" class="form-control form-control-sm" id="nombre" name="nombre">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+
                         <div class="col-md-4">
                             <div class="fv-row mb-7">
                                 <label class="required fw-semibold fs-6 mb-2">Apellido paterno</label>
@@ -72,8 +73,7 @@
                                     name="ap_materno">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
+
                         <div class="col-md-4">
                             <div class="fv-row mb-7">
                                 <label class="required fw-semibold fs-6 mb-2">Cedula Identidad</label>
@@ -81,6 +81,9 @@
                                     maxlength="10">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+
                         <div class="col-md-4">
                             <div class="fv-row mb-7">
                                 <label class="required fw-semibold fs-6 mb-2">Celular</label>
@@ -94,21 +97,22 @@
                                 <input type="text" class="form-control form-control-sm" id="name" name="name">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="fv-row mb-7">
-                                <label class="fw-semibold fs-6 mb-2">Email</label>
-                                <input type="email" class="form-control form-control-sm" id="email" name="email">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="fv-row mb-7">
                                 <label class="required fw-semibold fs-6 mb-2">password</label>
                                 <input type="password" class="form-control form-control-sm" id="password"
                                     name="password">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+                        <!-- <div class="col-md-6">
+                            <div class="fv-row mb-7">
+                                <label class="fw-semibold fs-6 mb-2">Email</label>
+                                <input type="email" class="form-control form-control-sm" id="email" name="email">
+                            </div>
+                        </div> -->
+
                     </div>
                 </form>
             </div>
@@ -261,6 +265,7 @@
             $('#rol_id').val(user.rol_id)
             $('#sucursal_id').val(user.sucursal_id)
             $('#id').val(user.id)
+            $('#password').val('')
             $('#modalUsuario').modal('show')
         }
 

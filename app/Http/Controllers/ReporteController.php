@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Caja;
 use App\Models\Cliente;
 use App\Models\Movimiento;
+use App\Models\MovimientoCaja;
 use App\Models\Pago;
 use App\Models\Producto;
 use App\Models\Sucursal;
@@ -18,6 +19,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\UseUse;
 
+
 class ReporteController extends Controller
 {
     public function cajas(Request $request)
@@ -29,6 +31,7 @@ class ReporteController extends Controller
     public function historial(Request $request)
     {
         $clientes = User::where('rol_id', 3)->get();
+
         return view('reporte.historial_precios')->with(compact('clientes'));
     }
 
@@ -41,12 +44,16 @@ class ReporteController extends Controller
     public function inventarios(Request $request)
     {
         $clientes = User::where('rol_id', 3)->get();
-        return view('reporte.inventarios')->with(compact('clientes'));
+
+
+        return view('reporte.inventarios')
+            ->with(compact('clientes', 'sucursales'));
     }
 
     public function pagos(Request $request)
     {
         $clientes = User::where('rol_id', 3)->get();
+        $sucursales = Sucursal::where('estado', 1)->get();
         return view('reporte.pagos')->with(compact('clientes'));
     }
 
@@ -58,32 +65,52 @@ class ReporteController extends Controller
 
     public function ventas(Request $request)
     {
-        $clientes = User::where('rol_id', 3)->get();
-        return view('reporte.ventas')->with(compact('clientes'));
+        return view('reporte.ventas');
     }
 
     public function inventariosPdf(Request $request)
     {
-        $usuario = Auth::user();
-
         $productos = Producto::with([
             'categoria',
-            'proveedor',
-            'sucursal'
+            'proveedor'
         ])
             ->where('estado', 1)
+            ->when(
+                $request->tipo_producto !== 'TODOS',
+                function ($query) use ($request) {
+                    $query->where(
+                        'tipo_producto',
+                        $request->tipo_producto
+                    );
+                }
+            )
             ->get();
+
         foreach ($productos as $producto) {
-            $producto->stock_actual = $this->obtenerStock(
-                $producto->id,
-                $usuario->sucursal_id
+
+            $producto->stock_actual = max(
+                0,
+                $this->obtenerStock(
+                    $producto->id,
+                    $request->sucursal_id
+                )
             );
         }
 
+        $productos = $productos->filter(function ($producto) {
+            return $producto->stock_actual > 0;
+        });
+
+        $sucursal = Sucursal::findOrFail($request->sucursal_id);
+
         $pdf = Pdf::loadView(
             'reporte.pdf.inventarios_pdf',
-            compact('productos')
+            compact(
+                'productos',
+                'sucursal'
+            )
         );
+
         return $pdf->stream('inventarios.pdf');
     }
 
@@ -117,8 +144,6 @@ class ReporteController extends Controller
             ])
             ->get();
 
-        // Quitar ventas que no tienen detalles
-        // del tipo seleccionado
         $ventas = $ventas->filter(function ($venta) {
             return $venta->detalles->count() > 0;
         });
@@ -129,7 +154,6 @@ class ReporteController extends Controller
                 ->pluck('metodo')
                 ->implode(', ');
 
-            // Total solamente de los productos filtrados
             $venta->total_filtrado = $venta->detalles->sum('subtotal');
         });
 
@@ -172,6 +196,7 @@ class ReporteController extends Controller
         return $pdf->stream('tiquet.pdf');
     }
 
+
     public function cajasPdf(Request $request)
     {
         $cajas = Caja::with([
@@ -184,13 +209,90 @@ class ReporteController extends Controller
             ])
             ->get();
 
+        foreach ($cajas as $caja) {
+
+
+
+            $movimientos = MovimientoCaja::with([
+                'venta.detalles.producto'
+            ])
+                ->where('caja_id', $caja->id)
+                ->whereBetween('fecha', [
+                    $request->fecha_inicio,
+                    $request->fecha_fin
+                ])
+                ->get();
+
+            $ingresos = 0;
+            $egresos = 0;
+
+            foreach ($movimientos as $movimiento) {
+
+
+
+                if ($request->tipo_producto === 'TODOS') {
+
+                    if ($movimiento->tipo === 'INGRESO') {
+                        $ingresos += $movimiento->monto;
+                    }
+
+                    if ($movimiento->tipo === 'EGRESO') {
+                        $egresos += $movimiento->monto;
+                    }
+
+                    continue;
+                }
+
+
+                if (!$movimiento->venta) {
+                    continue;
+                }
+
+                $montoTipo = 0;
+
+                foreach ($movimiento->venta->detalles as $detalle) {
+
+                    if (
+                        optional($detalle->producto)->tipo_producto
+                        === $request->tipo_producto
+                    ) {
+                        $montoTipo += $detalle->subtotal;
+                    }
+                }
+
+
+
+                if (
+                    $movimiento->tipo === 'INGRESO' &&
+                    $montoTipo > 0
+                ) {
+                    $ingresos += $montoTipo;
+                }
+
+
+
+                if ($movimiento->tipo === 'EGRESO') {
+                    $egresos += $montoTipo;
+                }
+            }
+
+            $caja->ingresos_filtrados = $ingresos;
+            $caja->egresos_filtrados = $egresos;
+
+
+            $caja->saldo_filtrado =
+                $caja->monto_apertura
+                + $ingresos
+                - $egresos;
+        }
+
         $pdf = Pdf::loadView(
             'reporte.pdf.cajas_pdf',
             compact('cajas')
         );
+
         return $pdf->stream('cajas.pdf');
     }
-
 
     public function utilidadesPdf(Request $request)
     {
@@ -206,12 +308,28 @@ class ReporteController extends Controller
                 ]);
 
             })
+            ->when(
+                $request->tipo_producto !== 'TODOS',
+                function ($query) use ($request) {
+
+                    $query->whereHas('producto', function ($producto) use ($request) {
+
+                        $producto->where(
+                            'tipo_producto',
+                            $request->tipo_producto
+                        );
+
+                    });
+
+                }
+            )
             ->get();
 
         $pdf = Pdf::loadView(
             'reporte.pdf.utilidades_pdf',
             compact('detalles')
         );
+
         return $pdf->stream('utilidades.pdf');
     }
 
@@ -225,6 +343,21 @@ class ReporteController extends Controller
                 $request->fecha_inicio,
                 $request->fecha_fin
             ])
+            ->when(
+                $request->tipo_producto !== 'TODOS',
+                function ($query) use ($request) {
+
+                    $query->whereHas('producto', function ($producto) use ($request) {
+
+                        $producto->where(
+                            'tipo_producto',
+                            $request->tipo_producto
+                        );
+
+                    });
+
+                }
+            )
             ->orderBy('fecha')
             ->get();
 
@@ -232,6 +365,7 @@ class ReporteController extends Controller
             'reporte.pdf.ingreso_salida_pdf',
             compact('movimientos')
         );
+
         return $pdf->stream('ingresos_salidas.pdf');
     }
 
@@ -243,12 +377,28 @@ class ReporteController extends Controller
                 $request->fecha_inicio,
                 $request->fecha_fin
             ])
+            ->when(
+                $request->tipo_producto !== 'TODOS',
+                function ($query) use ($request) {
+
+                    $query->whereHas('producto', function ($producto) use ($request) {
+
+                        $producto->where(
+                            'tipo_producto',
+                            $request->tipo_producto
+                        );
+
+                    });
+
+                }
+            )
             ->get();
 
         $pdf = Pdf::loadView(
             'reporte.pdf.historial_precios_pdf',
             compact('movimientos')
         );
+
         return $pdf->stream('historial_precios.pdf');
     }
 
@@ -265,6 +415,24 @@ class ReporteController extends Controller
                 $request->fecha_inicio,
                 $request->fecha_fin
             ])
+            ->when(
+                $request->tipo_producto !== 'TODOS',
+                function ($query) use ($request) {
+
+                    $query->whereHas(
+                        'venta.detalles.producto',
+                        function ($producto) use ($request) {
+
+                            $producto->where(
+                                'tipo_producto',
+                                $request->tipo_producto
+                            );
+
+                        }
+                    );
+
+                }
+            )
             ->get();
 
         $pdf = Pdf::loadView(

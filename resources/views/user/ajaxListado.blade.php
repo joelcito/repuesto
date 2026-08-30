@@ -10,7 +10,6 @@
                 <th>C.I.</th>
                 <th>Celular</th>
                 <th>Nombre Usuario</th>
-                <th>Email</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -27,7 +26,6 @@
                     <td>{{ $user->cedula }}</td>
                     <td>{{ $user->celular }}</td>
                     <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
                     <td>
                         <button class="btn btn-icon btn-sm btn-warning btn-circle" title="Editar user"
                             onclick="editarUser({{ json_encode($user) }})"><i class="fa fa-edit"></i></button>

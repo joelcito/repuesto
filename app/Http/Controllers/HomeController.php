@@ -22,24 +22,20 @@ class HomeController extends Controller
         // $this->middleware('auth');
     }
 
-    private function obtenerStock($productoId, $sucursalId = null)
+    private function obtenerStock($productoId)
     {
-        $query = Movimiento::where('producto_id', $productoId);
-
-        if ($sucursalId) {
-            $query->where('sucursal_id', $sucursalId);
-        }
-
-        return $query->selectRaw("
-        COALESCE(SUM(
-            CASE
-                WHEN tipo = 'INGRESO' THEN cantidad
-                WHEN tipo = 'VENTA' THEN -cantidad
-                WHEN tipo = 'DEVOLUCION' THEN cantidad
-                ELSE 0
-            END
-        ), 0) as stock
-    ")->value('stock');
+        return Movimiento::where('producto_id', $productoId)
+            ->selectRaw("
+            COALESCE(SUM(
+                CASE
+                    WHEN tipo = 'INGRESO' THEN cantidad
+                    WHEN tipo = 'VENTA' THEN -cantidad
+                    WHEN tipo = 'DEVOLUCION' THEN cantidad
+                    ELSE 0
+                END
+            ), 0) as stock
+        ")
+            ->value('stock');
     }
 
     public function index()
@@ -67,21 +63,22 @@ class HomeController extends Controller
             ->join('ventas', 'ventas.id', '=', 'venta_detalle.venta_id')
             ->whereDate('ventas.created_at', now())
             ->selectRaw('
-                COALESCE(
-                    SUM(
-                        venta_detalle.subtotal
-                        -
-                        (
-                            venta_detalle.precio_compra *
-                            (
-                                venta_detalle.cantidad
-                                - COALESCE(venta_detalle.cantidad_devuelta, 0)
-                            )
-                        )
-                    ),
-                    0
-                ) as utilidad
-            ')
+        COALESCE(
+            SUM(
+                (
+                    venta_detalle.precio_unitario
+                    -
+                    venta_detalle.precio_compra
+                )
+                *
+                (
+                    venta_detalle.cantidad
+                    - COALESCE(venta_detalle.cantidad_devuelta, 0)
+                )
+            ),
+            0
+        ) as utilidad
+    ')
             ->value('utilidad');
 
         $stockBajo = Producto::whereColumn(
@@ -113,9 +110,24 @@ class HomeController extends Controller
         // ->take(10)
         // ->values();
 
-        $productos = Producto::orderBy('stock_minimo', 'asc')
+        $productos = Producto::get()
+            ->map(function ($producto) {
+
+                $stock = $this->obtenerStock($producto->id);
+
+                $producto->stock_actual_calculado = max(0, $stock);
+
+                return $producto;
+
+            })
+            ->filter(function ($producto) {
+
+                return $producto->stock_actual_calculado <= $producto->stock_minimo;
+
+            })
+            ->sortBy('stock_actual_calculado')
             ->take(10)
-            ->get();
+            ->values();
 
 
         $ultimasVentas = Venta::with('cliente')

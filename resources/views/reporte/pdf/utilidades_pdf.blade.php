@@ -69,17 +69,20 @@
         <tbody>
             @foreach($detalles as $index => $detalle)
                     @php
-                    $utilidadUnitaria =
-                        $detalle->precio_unitario -
-                        $detalle->descuento -
-                        $detalle->precio_compra;
+                        $cantidadDevuelta = $detalle->cantidad_devuelta ?? 0;
 
-                    $utilidad =
-                        $utilidadUnitaria *
-                        $detalle->cantidad;
+                        $cantidadReal = $detalle->cantidad - $cantidadDevuelta;
 
-                    $totalUtilidad += $utilidad;
-                @endphp
+                        $utilidadUnitaria =
+                            $detalle->precio_unitario -
+                            $detalle->descuento -
+                            $detalle->precio_compra;
+
+                        $utilidad =
+                            $utilidadUnitaria * $cantidadReal;
+
+                        $totalUtilidad += $utilidad;
+                    @endphp
                     <tr>
                         <td>
                             {{ $index + 1 }}

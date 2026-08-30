@@ -114,7 +114,7 @@
                                 <!--begin::Input group=-->
                                 <div class="fv-row mb-8">
                                     <!--begin::Email-->
-                                    <input type="text" placeholder="Correo" name="email" autocomplete="off"
+                                    <input type="text" placeholder="Usuario" name="name" autocomplete="off"
                                         class="form-control bg-transparent" />
                                     <!--end::Email-->
                                 </div>

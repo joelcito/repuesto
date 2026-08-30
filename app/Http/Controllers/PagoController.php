@@ -44,8 +44,24 @@ class PagoController extends Controller
         $fecha_ini = $request->input('fecha_ini');
         $fecha_fin = $request->input('fecha_fin');
         $usuario_id = $request->input('usuario_busqueda_id');
+
+
         $baseQuery = Pago::query()
-            ->with(['venta.detalles.producto', 'movimientoCaja']); // IMPORTANTE
+            ->with(['venta.detalles.producto', 'movimientoCaja'])
+            ->where(function ($q) {
+                $q->whereNull('venta_id')
+                    ->orWhereHas('venta', function ($venta) {
+                        $venta->whereRaw('
+                    ventas.total > (
+                        SELECT COALESCE(SUM(devoluciones.total), 0)
+                        FROM devoluciones
+                        WHERE devoluciones.venta_id = ventas.id
+                        AND devoluciones.estado != "ANULADO"
+                    )
+                ');
+                    });
+            });
+
 
         if ($sucursal_id) {
             $baseQuery->where('sucursal_id', $sucursal_id);
@@ -63,6 +79,16 @@ class PagoController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
+        \Log::info('TODOS PAGOS', $todos->map(function ($pago) {
+            return [
+                'id' => $pago->id,
+                'venta_id' => $pago->venta_id,
+                'monto' => $pago->monto,
+                'descripcion' => $pago->descripcion,
+                'estado' => $pago->estado,
+                'fecha' => $pago->fecha,
+            ];
+        })->toArray());
 
         $repuestos = (clone $baseQuery)
             ->where(function ($q) {

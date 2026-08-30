@@ -85,6 +85,7 @@
                             <thead>
                                 <tr class="fw-bold text-muted">
                                     <th class="ps-5">Producto</th>
+                                    <th class="text-center">Stock actual</th>
                                     <th class="text-center pe-5">Mínimo</th>
                                 </tr>
                             </thead>
@@ -98,6 +99,12 @@
                                             </span>
                                         </td>
 
+                                        <td class="text-center">
+                                            <span class="badge badge-light-danger fs-7">
+                                                {{ $producto->stock_actual_calculado }}
+                                            </span>
+                                        </td>
+
                                         <td class="text-center pe-5">
                                             <span class="badge badge-light-warning fs-7">
                                                 {{ $producto->stock_minimo }}
@@ -106,8 +113,8 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="2" class="text-center py-10 text-muted">
-                                            No hay productos registrados
+                                        <td colspan="3" class="text-center py-10 text-muted">
+                                            No hay productos con stock mínimo
                                         </td>
                                     </tr>
                                 @endforelse
@@ -237,7 +244,7 @@
             <div class="card h-100">
                 <div class="card-header">
                     <h3 class="card-title">
-                        Productos con stock bajo
+                        Productos con stock minimo
                     </h3>
                 </div>
 
@@ -247,6 +254,7 @@
                             <thead>
                                 <tr class="fw-bold text-muted">
                                     <th class="ps-5">Producto</th>
+                                    <th class="text-center">Stock actual</th>
                                     <th class="text-center pe-5">Mínimo</th>
                                 </tr>
                             </thead>
@@ -259,6 +267,13 @@
                                                 {{ $producto->nombre }}
                                             </span>
                                         </td>
+
+                                        <td class="text-center">
+                                            <span class="badge badge-light-danger fs-7">
+                                                {{ $producto->stock_actual_calculado }}
+                                            </span>
+                                        </td>
+
                                         <td class="text-center pe-5">
                                             <span class="badge badge-light-warning fs-7">
                                                 {{ $producto->stock_minimo }}
@@ -268,7 +283,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="3" class="text-center py-10 text-muted">
-                                            No hay productos registrados
+                                            No hay productos con stock mínimo
                                         </td>
                                     </tr>
                                 @endforelse
@@ -302,7 +317,7 @@
                 @foreach($ventasMensuales ?? [] as $venta)
                     ['{{ $venta->mes }}', {{ $venta->total }}],
                 @endforeach
-                                                                    ]);
+                                                                            ]);
 
             var options = {
                 title: 'Ventas Mensuales',

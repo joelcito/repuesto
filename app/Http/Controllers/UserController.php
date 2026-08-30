@@ -35,6 +35,7 @@ class UserController extends Controller
 
     public function guardarUser(Request $request)
     {
+
         if ($request->ajax()) {
             $user_id = $request->input('id');
             $sucursal_id = $request->input('sucursal_id');
@@ -52,9 +53,13 @@ class UserController extends Controller
             if ($user_id == '0') {
                 $user = new User();
                 $user->usuario_creador_id = $usuario->id;
+                $user->password = Hash::make($request->input('password'));
             } else {
                 $user = User::find($user_id);
                 $user->usuario_modificador_id = $usuario->id;
+                if ($request->filled('password')) {
+                    $user->password = Hash::make($request->input('password'));
+                }
             }
 
             $user->rol_id = $rol_id;
@@ -66,7 +71,7 @@ class UserController extends Controller
             $user->celular = $celular;
             $user->name = $name;
             $user->email = $email;
-            $user->password = $password;
+
             $user->save();
 
             $data = Respuesta::success(null, "Datos Obtenidos correctamente");

@@ -25,6 +25,7 @@
                 $totalVentas = 0;
                 $totalOtrosIngresos = 0;
             @endphp
+
             @forelse ($pagos as $pago)
                 <tr class="{{ $pago->estado == 'INGRESO' ? 'bg-light-success' : 'bg-light-danger' }}">
                     <td>{{ $pago?->sucursal?->nombre }}</td>
@@ -88,13 +89,17 @@
                         if ($pago->tipo_pago === 'TRANSFERENCIA') {
                             $totalIngresoTransferencia += $pago->monto;
                         }
-                        if ($pago->venta_id != null) {
-                            $totalVentas += $pago->monto;
-                        }
+
 
                         if ($pago->venta_id == null) {
                             $totalOtrosIngresos += $pago->monto;
                         }
+
+                        if ($pago->venta_id != null) {
+                            $totalVentas += $pago->monto;
+                        }
+
+
                     }
 
                     if ($pago->estado === 'SALIDA') {
@@ -115,6 +120,13 @@
                         if ($pago->tipo_pago === 'TRANSFERENCIA') {
                             $totalSalidaTransferencia += $montoSalida;
                         }
+
+                        if ($pago->venta_id != null && str_starts_with($pago->descripcion ?? '', 'DEVOLUCION #')) {
+                            $totalVentas -= $montoSalida;
+                        }
+
+
+
                     }
                 @endphp
             @empty

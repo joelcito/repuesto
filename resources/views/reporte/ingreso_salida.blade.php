@@ -20,23 +20,50 @@
                     <div class="card-body">
 
                         <form action="{{ route('reporte.ingreso_salida.pdf') }}" method="POST" target="_blank">
+
                             @csrf
+
                             <div class="row">
-                                <div class="col-md-5">
-                                    <label>Fecha Inicio</label>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Fecha Inicio</label>
                                     <input type="date" name="fecha_inicio" class="form-control" required>
                                 </div>
 
-                                <div class="col-md-5">
-                                    <label>Fecha Fin</label>
+                                <div class="col-md-4">
+                                    <label class="form-label">Fecha Fin</label>
                                     <input type="date" name="fecha_fin" class="form-control" required>
                                 </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label">Tipo de producto</label>
+
+                                    <select name="tipo_producto" class="form-select">
+
+                                        <option value="TODOS">
+                                            Todos
+                                        </option>
+
+                                        <option value="REPUESTO">
+                                            Repuestos
+                                        </option>
+
+                                        <option value="LUBRICANTE">
+                                            Lubricantes
+                                        </option>
+
+                                    </select>
+                                </div>
+
                                 <div class="col-md-2 d-flex align-items-end">
-                                    <button class="btn btn-danger w-100">
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        <i class="fa fa-file-pdf"></i>
                                         PDF
                                     </button>
                                 </div>
+
                             </div>
+
                         </form>
                     </div>
                 </div>

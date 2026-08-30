@@ -61,20 +61,18 @@
         </thead>
         <tbody>
             @foreach($cajas as $caja)
-                    <tr>
-                        <td>{{ $caja->usuario->name ?? '' }}</td>
-                        <td>{{ $caja->monto_apertura }}</td>
-                        <td>{{ $caja->monto_cierre }}</td>
-                        <td>{{ $caja->total_ingresos }}</td>
-                        <td>{{ $caja->total_egresos }}</td>
-                        <td>
-                            {{
-                $caja->monto_apertura +
-                $caja->total_ingresos -
-                $caja->total_egresos
-                                }}
-                        </td>
-                    </tr>
+                <tr>
+                    <td>{{ $caja->usuario->name ?? '' }}</td>
+                    <td>{{ $caja->monto_apertura }}</td>
+                    <td>{{ $caja->monto_cierre }}</td>
+                    <td>{{ number_format($caja->ingresos_filtrados, 2) }}</td>
+
+                    <td>{{ number_format($caja->egresos_filtrados, 2) }}</td>
+
+                    <td>
+                        {{ number_format($caja->saldo_filtrado, 2) }}
+                    </td>
+                </tr>
             @endforeach
         </tbody>
     </table>
