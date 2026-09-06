@@ -298,75 +298,98 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
                     </button>
                 </div>
-
-                <div class="modal-body">
-                    <div class="row g-4">
-                        <div class="col-md-4 text-center">
-                            <img id="info_imagen_producto" src="{{ asset('imagenes/productos/default.jpg') }}"
-                                class="img-fluid rounded" style="max-height:250px; object-fit:contain;" alt="Producto">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="fw-bold text-muted">
-                                        Producto
-                                    </label>
-                                    <div id="info_nombre" class="form-control bg-light">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="fw-bold text-muted">
-                                        Código
-                                    </label>
-                                    <div id="info_codigo" class="form-control bg-light">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="fw-bold text-muted">
-                                        Nro. de Parte
-                                    </label>
-                                    <div id="info_numero_parte" class="form-control bg-light">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="fw-bold text-muted">
-                                        Marca
-                                    </label>
-                                    <div id="info_marca" class="form-control bg-light">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="fw-bold text-muted">
-                                        Vehículo
-                                    </label>
-                                    <div id="info_vehiculo" class="form-control bg-light">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="fw-bold text-muted">
-                                        Ubicación
-                                    </label>
-                                    <div id="info_ubicacion" class="form-control bg-light">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="fw-bold text-muted">
-                                        Medida
-                                    </label>
-                                    <div id="info_medida" class="form-control bg-light">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="fw-bold text-muted">
-                                        Última modificación
-                                    </label>
-                                    <div id="info_ultima_modificacion" class="form-control bg-light">
-                                    </div>
-                                </div>
+                    <div class="modal-body">
+                        <div class="row g-4">
+                            
+                            <div class="col-md-4 text-center d-flex align-items-center justify-content-center">
+                                <img id="info_imagen_producto"
+                                    src="{{ asset('imagenes/productos/default.jpg') }}"
+                                    class="img-fluid rounded"
+                                    style="max-height: 280px; max-width: 100%; object-fit: contain;"
+                                    alt="Producto">
                             </div>
+                           
+                            <div class="col-md-8">
+
+                                <div class="mb-2">
+                                    <label class="fw-bold text-muted small">Código</label>
+                                    <div id="info_codigo" class="form-control form-control-sm bg-light"></div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="fw-bold text-muted small">Nombre</label>
+                                    <div id="info_nombre" class="form-control form-control-sm bg-light"></div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <label class="fw-bold text-muted small">Descripción</label>
+                                    <div id="info_descripcion" class="form-control form-control-sm bg-light"></div>
+                                </div>
+                            
+                                <div class="mb-2">
+                                    <label class="fw-bold text-muted small">Vehículos Compatibles</label>
+                                    <div id="info_vehiculo" class="form-control form-control-sm bg-light"></div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="fw-bold text-muted small">Categoria</label>
+                                    <div id="info_categoria" class="form-control form-control-sm bg-light"></div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="fw-bold text-muted small">Marca</label>
+                                    <div id="info_marca" class="form-control form-control-sm bg-light"></div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="fw-bold text-muted small">Unidad</label>
+                                    <div id="info_unidad" class="form-control form-control-sm bg-light"></div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="fw-bold text-muted small">Sucursal</label>
+                                    <div id="info_sucursal" class="form-control form-control-sm bg-light"></div>
+                                </div>
+
+                                <div class="mb-2"> 
+                                    <label class="fw-bold text-muted small">Precio de compra</label>
+                                     <div id="info_precio_compra" class="form-control form-control-sm bg-light"></div> 
+                                </div> 
+                                 <div class="mb-2">
+                                    <label class="fw-bold text-muted small">Precio de venta</label>
+                                    <div id="info_precio_venta" class="form-control form-control-sm bg-light"> </div> 
+                                </div> 
+                                 <div class="mb-2">    
+                                    <label class="fw-bold text-muted small">Precio mayor</label> 
+                                    <div id="info_precio_mayor" class="form-control form-control-sm bg-light"></div>
+                                 </div>
+                                              
+                                 <div class="mb-2"> 
+                                    <label class="fw-bold text-muted small">Proveedor</label> 
+                                     <div id="info_proveedor" class="form-control form-control-sm bg-light"></div> 
+                                </div> 
+                                <div class="mb-2"> 
+                                    <label class="fw-bold text-muted small">Observaciones</label> 
+                                            
+                                <div id="info_observaciones" class="form-control form-control-sm bg-light">
+
+                                </div> 
+                            </div>
+                                            
+                                <div class="mb-2"> 
+                                    <label class="fw-bold text-muted small">Medida</label> 
+                                             
+                                <div id="info_medida" class="form-control form-control-sm bg-light"></div>
+                                            
+                            </div>
+
+                                
+                            </div>
+
                         </div>
                     </div>
-                </div>
+
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Cerrar
@@ -1021,6 +1044,7 @@
         $(document).on('click', '.btn-mas-informacion', function (e) {
             e.stopPropagation();
             let producto = $(this).data('producto');
+            console.log(producto);
             $('#info_nombre').text(
                 producto.nombre || '-'
             );
@@ -1042,6 +1066,43 @@
             $('#info_medida').text(
                 producto.medidas || '-'
             );
+
+            $('#info_descripcion').text(
+                producto.descripcion || '-'
+            );
+
+            $('#info_categoria').text(
+                producto.categoria?.nombre || '-'
+            );
+
+            $('#info_unidad').text(
+                producto.unidad?.nombre || '-'
+            );
+
+             $('#info_sucursal').text(
+                producto.sucursal?.nombre || '-'
+            );
+
+             $('#info_precio_compra').text(
+                producto.precio_compra || '-'
+            );
+
+             $('#info_precio_venta').text(
+                producto.precio_venta || '-'
+            );
+
+            $('#info_precio_mayor').text(
+                producto.precio_mayor || '-'
+            );
+            
+            $('#info_proveedor').text(
+                producto.proveedor?.nombre_completo || '-'
+            );
+            
+            $('#info_observaciones').text(
+                producto.observaciones || '-'
+            );
+            
 
             let fechaModificacion = '-';
             if (producto.updated_at) {

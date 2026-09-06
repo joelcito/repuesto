@@ -59,7 +59,7 @@
     <!--begin::Root-->
     <div class="d-flex flex-column flex-root" id="kt_app_root">
         <!--begin::Page bg image-->
-        <style>
+        <!-- <style>
             body {
                 background-image: url('{{ asset('assets/media/auth/bg6.jpg') }}');
             }
@@ -67,7 +67,7 @@
             [data-bs-theme="dark"] body {
                 background-image: url('{{ asset('assets/media/auth/bg6-dark.jpg') }}');
             }
-        </style>
+        </style> -->
         <!--end::Page bg image-->
         <!--begin::Authentication - Sign-in -->
         <div class="d-flex flex-column flex-column-fluid flex-lg-row">
@@ -114,7 +114,7 @@
                                 <!--begin::Input group=-->
                                 <div class="fv-row mb-8">
                                     <!--begin::Email-->
-                                    <input type="text" placeholder="Usuario" name="name" autocomplete="off"
+                                    <input type="text" placeholder="Usuario" name="login" autocomplete="off"
                                         class="form-control bg-transparent" />
                                     <!--end::Email-->
                                 </div>

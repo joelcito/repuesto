@@ -563,7 +563,7 @@ class VentasController extends Controller
     {
         $buscar = trim($request->buscar);
         $usuario = Auth::user();
-        $productoExacto = Producto::with('marca', 'imagenes')
+        $productoExacto = Producto::with([ 'marca', 'categoria', 'sucursal', 'proveedor', 'unidad', 'imagenes' ])
             ->where('estado', 1)
             ->where('codigo_barras', $buscar)
             ->first();
@@ -576,7 +576,14 @@ class VentasController extends Controller
 
             return response()->json([$productoExacto]);
         }
-        $productos = Producto::with('marca', 'imagenes')
+        $productos = Producto::with([
+                    'marca',
+                    'categoria',
+                    'sucursal',
+                    'proveedor',
+                    'unidad',
+                    'imagenes'
+                ])
             ->where('estado', 1)
             ->where(function ($query) use ($buscar) {
                 $query->where('nombre', 'LIKE', "%{$buscar}%")
