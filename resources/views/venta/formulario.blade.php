@@ -569,33 +569,33 @@
                     : `${BASE_URL}/imagenes/productos/default.jpg`;
 
                 let img = `
-                                                                                                        <div class="imagen-tabla-producto">
-                                                                                                            <img
-                                                                                                                src="${imagen}"
-                                                                                                                class="imagen-producto"
-                                                                                                                data-imagenes='${JSON.stringify(item.imagen)}'
-                                                                                                                alt="Producto"
-                                                                                                            >
-                                                                                                        </div>
-                                                                                                    `;
+                        <div class="imagen-tabla-producto">
+                            <img
+                                src="${imagen}"
+                                class="imagen-producto"
+                                data-imagenes='${JSON.stringify(item.imagen)}'
+                                alt="Producto"
+                            >
+                        </div>
+                    `;
 
                 let botonEliminar =
                     `<button
-                                                                                                    class="btn btn-danger btn-sm"
-                                                                                                    onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
-                                                                                                    X
-                                                                                                </button>`;
+                        class="btn btn-danger btn-sm"
+                        onclick="eliminarProducto(${item.producto_id}, '${item.tipo_precio}')">
+                        X
+                    </button>`;
 
                 let inputCantidad = `
-                                                                                            <input
-                                                                                                type="number"
-                                                                                                class="form-control form-control-sm cantidad-carrito"
-                                                                                                data-index="${index}"
-                                                                                                value="${item.cantidad}"
-                                                                                                min="1"
-                                                                                                step="1"
-                                                                                                style="width: 80px; margin: auto; text-align: center;">
-                                                                                        `;
+                <input
+                    type="number"
+                    class="form-control form-control-sm cantidad-carrito"
+                    data-index="${index}"
+                    value="${item.cantidad}"
+                    min="1"
+                    step="1"
+                    style="width: 80px; margin: auto; text-align: center;">
+            `;
 
 
                 tabla.row.add([
@@ -641,7 +641,7 @@
 
 
         function calcularTotal() {
-            console.log('calculartotal', productosVenta);
+          
             let total = 0;
             productosVenta.forEach(function (item) {
                 total += parseFloat(item.subtotal);
@@ -717,127 +717,173 @@
             $('#cambio_visual').text(cambio.toFixed(2));
         }
 
-        function guardarVenta() {
+        
+        function guardarVenta(confirmarCuenta = false) {
 
-            let pagos = [];
-            if (!$('#formulario_venta_general')[0].checkValidity()
-            ) {
-                $('#formulario_venta_general')[0].reportValidity();
-                return;
-            }
+                    let pagos = [];
 
-            let totalVenta = parseFloat($('#total_general').text()) || 0;
-
-            $('.pago-item').each(function () {
-                let metodo = $(this).find('.metodo_pago').val();
-                let monto = parseFloat($(this).find('.monto_pago').val()) || 0;
-
-                if (monto > 0) {
-                    pagos.push({
-                        metodo: metodo,
-                        monto: monto
-                    });
-                }
-            });
-            // if (totalVenta > 0 && pagos.length == 0) {
-            //     Swal.fire({
-            //         icon: 'warning',
-            //         title: 'Debe agregar al menos un pago'
-            //     });
-            //     return;
-            // }
-
-            let totalPagado = 0;
-            pagos.forEach(p => {
-                let monto = parseFloat(p.monto) || 0;
-
-                totalPagado += monto;
-            });
-
-            if (totalPagado < 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Monto inválido'
-                });
-                return;
-            }
-
-            let realizoPago =
-                $('#realizo_pago_recibo').is(':checked');
-
-            let montoPagado = 0;
-            if (realizoPago) {
-                montoPagado =
-                    parseFloat($('#monto_pagado_recibo').val()) || 0;
-            }
-            let boton = $("#boton_enviar_recibo");
-            let icono = boton.find("i");
-            boton.attr("disabled", true);
-            icono.show();
-
-            let metodoPago = realizoPago
-                ? $('#tipo_pago_pagado_recibo').val()
-                : 'SIN_PAGO';
-
-            let datos = {
-                cliente_id: $('#cliente_seleccionado').val(),
-                caja_id: $('#caja_id').val(),
-                fecha: $('#fecha_recepcion_cliente').val(),
-                metodo_pago: metodoPago,
-                monto_pagado: montoPagado,
-                cambio: $('#cambio_pagado_recibo').val(),
-                observacion: $('#observacion').val(),
-                realizo_pago: realizoPago,
-                productos: productosVenta,
-                pagos: pagos
-            };
-
-            $.ajax({
-                url: "{{ route('venta.guardarVenta') }}",
-                method: "POST",
-                data: datos,
-                success: function (resultado) {
-                    boton.attr("disabled", false);
-                    icono.hide();
-                    if (resultado.estado) {
-                        limpiarFormularioVenta();
-                        Swal.fire({
-                            icon: 'success',
-                            title: resultado.mensaje,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        const ancho = 400;
-                        const alto = 600;
-
-                        const left = window.screenX + (window.outerWidth - ancho) / 2;
-                        const top = window.screenY + (window.outerHeight - alto) / 2;
-
-                        window.open(
-                            "{{ url('venta/tiquet') }}/" + resultado.venta_id,
-                            '_blank',
-                            `width=${ancho},height=${alto},left=${left},top=${top},scrollbars=yes,resizable=yes`
-                        );
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: resultado.mensaje
-                        });
+                    if (!$('#formulario_venta_general')[0].checkValidity()) {
+                        $('#formulario_venta_general')[0].reportValidity();
+                        return;
                     }
-                },
-                error: function (xhr) {
-                    boton.attr("disabled", false);
-                    icono.hide();
-                    console.log(xhr.responseText);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Ocurrió un error al guardar'
+
+                    let totalVenta = parseFloat($('#total_general').text()) || 0;
+
+                    $('.pago-item').each(function () {
+                        let metodo = $(this).find('.metodo_pago').val();
+                        let monto = parseFloat($(this).find('.monto_pago').val()) || 0;
+
+                        if (monto > 0) {
+                            pagos.push({
+                                metodo: metodo,
+                                monto: monto
+                            });
+                        }
                     });
-                    console.log(xhr.responseText);
+
+                    let totalPagado = 0;
+
+                    pagos.forEach(p => {
+                        let monto = parseFloat(p.monto) || 0;
+                        totalPagado += monto;
+                    });
+
+                  
+
+                    if (totalPagado < totalVenta && !confirmarCuenta) {
+
+                        let saldo = totalVenta - totalPagado;
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Monto menor al total',
+                            html: `
+                                El total de la venta es <b>Bs. ${totalVenta.toFixed(2)}</b><br>
+                                El monto pagado es <b>Bs. ${totalPagado.toFixed(2)}</b><br>
+                                Saldo pendiente: <b>Bs. ${saldo.toFixed(2)}</b><br><br>
+                                ¿Desea guardar la venta y registrar el saldo como
+                                <b>cuenta por cobrar</b>?
+                            `,
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, guardar',
+                            cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+
+                            if (result.isConfirmed) {
+                                // AQUÍ volvemos a ejecutar guardarVenta
+                                // pero necesitamos evitar que vuelva a mostrar el SweetAlert
+                                guardarVenta(true);
+                            }
+
+                        });
+
+                        return;
+                    }
+
+                    if (totalPagado < 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Monto inválido'
+                        });
+                        return;
+                    }
+
+                    let realizoPago =
+                        $('#realizo_pago_recibo').is(':checked');
+
+                    let montoPagado = 0;
+
+                    if (realizoPago) {
+                        montoPagado =
+                            parseFloat($('#monto_pagado_recibo').val()) || 0;
+                    }
+
+                    let boton = $("#boton_enviar_recibo");
+                    let icono = boton.find("i");
+
+                    boton.attr("disabled", true);
+                    icono.show();
+
+                    let metodoPago = realizoPago
+                        ? $('#tipo_pago_pagado_recibo').val()
+                        : 'SIN_PAGO';
+
+                    let datos = {
+                        cliente_id: $('#cliente_seleccionado').val(),
+                        caja_id: $('#caja_id').val(),
+                        fecha: $('#fecha_recepcion_cliente').val(),
+                        metodo_pago: metodoPago,
+                        monto_pagado: montoPagado,
+                        cambio: $('#cambio_pagado_recibo').val(),
+                        observacion: $('#observacion').val(),
+                        realizo_pago: realizoPago,
+                        productos: productosVenta,
+                        pagos: pagos
+                    };
+
+                    $.ajax({
+                        url: "{{ route('venta.guardarVenta') }}",
+                        method: "POST",
+                        data: datos,
+
+                        success: function (resultado) {
+
+                            boton.attr("disabled", false);
+                            icono.hide();
+
+                            if (resultado.estado) {
+
+                                limpiarFormularioVenta();
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: resultado.mensaje,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+
+                                const ancho = 400;
+                                const alto = 600;
+
+                                const left =
+                                    window.screenX +
+                                    (window.outerWidth - ancho) / 2;
+
+                                const top =
+                                    window.screenY +
+                                    (window.outerHeight - alto) / 2;
+
+                                window.open(
+                                    "{{ url('venta/tiquet') }}/" + resultado.venta_id,
+                                    '_blank',
+                                    `width=${ancho},height=${alto},left=${left},top=${top},scrollbars=yes,resizable=yes`
+                                );
+
+                            } else {
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: resultado.mensaje
+                                });
+                            }
+                        },
+
+                        error: function (xhr) {
+
+                            boton.attr("disabled", false);
+                            icono.hide();
+
+                            console.log(xhr.responseText);
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Ocurrió un error al guardar'
+                            });
+                        }
+                    });
                 }
-            });
-        }
+
 
         $('#buscar_producto').keyup(function () {
             let buscar = $(this).val();
@@ -1044,7 +1090,7 @@
         $(document).on('click', '.btn-mas-informacion', function (e) {
             e.stopPropagation();
             let producto = $(this).data('producto');
-            console.log(producto);
+           
             $('#info_nombre').text(
                 producto.nombre || '-'
             );

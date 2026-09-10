@@ -39,7 +39,19 @@
                                         class="form-select form-select-sm" name="tipo" id="tipo">
                                         <option value="DINERO"> DEVOLUCIÓN DINERO </option>
                                         <option value="PRODUCTO"> DEVOLUCIÓN PRODUCTO </option>
-                                    </select> </div>
+                                    </select> 
+                                </div>
+
+                                <div class="col-md-4" id="contenedorMetodoPago">
+                                    <label class="fw-semibold fs-6 mb-2"> Método de pago </label>
+                                    <select class="form-select form-select-sm" name="metodo_pago" id="metodo_pago">
+                                        <option value="">Seleccione</option>
+                                        <option value="EFECTIVO">EFECTIVO</option>
+                                        <option value="QR">QR</option>
+                                        <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                                    </select>
+                                </div>
+
                                 <div class="col-md-4"> <label class="fw-semibold fs-6 mb-2"> Monto </label> <input
                                         type="number" step="0.01" class="form-control form-control-sm" name="monto"
                                         id="monto" readonly value="0"> </div>
@@ -247,7 +259,11 @@
         function modalNuevaDevolucion() {
             $('#formularioDevolucion')[0].reset();
             $('#monto').val(0);
-            $('#detalle_devolucion').html(` <tr> <td colspan="5" class="text-center text-muted py-5"> Seleccione una venta </td> </tr> `);
+            $('#detalle_devolucion').html(` <tr> <td colspan="7" class="text-center text-muted py-5"> Seleccione una venta </td> </tr> `);
+
+            $('#contenedorMetodoPago').show();
+            $('#metodo_pago').prop('required', true);
+
             $('#modalDevolucion').modal('show');
         }
 
@@ -360,17 +376,32 @@
         $(document).on('keyup change', '.cantidad_devolucion', function () { calcularMonto(); });
 
         function guardarDevolucion() {
-            let productos = []; $('.cantidad_devolucion').each(function () {
-                let cantidad = parseFloat($(this).val()) || 0; if (cantidad > 0) {
-                    productos.push({ producto_id: $(this).data('producto'), cantidad: cantidad });
+                let productos = []; $('.cantidad_devolucion').each(function () {
+                    let cantidad = parseFloat($(this).val()) || 0; if (cantidad > 0) {
+                        productos.push({ producto_id: $(this).data('producto'), cantidad: cantidad });
+                    }
+                }); if (productos.length == 0) {
+                    Swal.fire({ icon: 'warning', title: 'Debe seleccionar al menos un producto' });
+                    return;
+                } 
+
+                if ($('#tipo').val() === 'DINERO' && !$('#metodo_pago').val()) {
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Seleccione el método de pago'
+                    });
+
+                    return;
                 }
-            }); if (productos.length == 0) {
-                Swal.fire({ icon: 'warning', title: 'Debe seleccionar al menos un producto' });
-                return;
-            } let datos = {
-                venta_id: $('#venta_id').val(), tipo: $('#tipo').val(),
-                motivo: $('#motivo').val(), productos: productos
-            }; $.ajax({
+                
+                let datos = {
+                    venta_id: $('#venta_id').val(),
+                    tipo: $('#tipo').val(),
+                    metodo_pago: $('#metodo_pago').val(),
+                    motivo: $('#motivo').val(),
+                    productos: productos
+                }; $.ajax({
                 url: "{{ route('devolucion.guardarDevolucion') }}",
                 method: "POST", data: datos, success: function (resultado) {
                     if (resultado.estado) {
@@ -570,5 +601,22 @@
             });
 
         }
+
+       $('#tipo').change(function () {
+
+    if ($(this).val() === 'DINERO') {
+
+        $('#contenedorMetodoPago').show();
+        $('#metodo_pago').prop('required', true);
+
+    } else {
+
+        $('#contenedorMetodoPago').hide();
+        $('#metodo_pago').val('');
+        $('#metodo_pago').prop('required', false);
+
+    }
+
+});
     </script>
 @endsection

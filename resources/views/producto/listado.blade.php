@@ -719,8 +719,7 @@
                 },
                 error: function (xhr) {
 
-                    console.log('Error verificando código:', xhr.status);
-                    console.log(xhr.responseText);
+                   
 
                     Swal.fire({
                         icon: "error",

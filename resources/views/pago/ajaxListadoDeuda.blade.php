@@ -46,7 +46,7 @@
                     </td>
                     <td>
                         <span class="text-danger">
-                            {{ number_format(($venta->total - $venta->descuento_adicional) - $venta->pagos->sum('monto'), 2) }}
+                            {{ number_format(max(0, ($venta->total - ($venta->descuento_adicional ?? 0)) - $venta->pagos->sum('monto')), 2) }}
                         </span>
                     </td>
                     <td>
