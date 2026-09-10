@@ -79,55 +79,69 @@
                 </tr>
                 @php
 
-                    if ($pago->estado === 'INGRESO') {
-                        if ($pago->tipo_pago === 'EFECTIVO') {
-                            $totalIngresoEfectivo += $pago->monto;
-                        }
-                        if ($pago->tipo_pago === 'QR') {
-                            $totalIngresoQR += $pago->monto;
-                        }
-                        if ($pago->tipo_pago === 'TRANSFERENCIA') {
-                            $totalIngresoTransferencia += $pago->monto;
-                        }
+                     if ($pago->estado === 'INGRESO') {
+
+        if ($pago->tipo_pago === 'EFECTIVO') {
+            $totalIngresoEfectivo += $pago->monto;
+        }
+
+        if ($pago->tipo_pago === 'QR') {
+            $totalIngresoQR += $pago->monto;
+        }
+
+        if ($pago->tipo_pago === 'TRANSFERENCIA') {
+            $totalIngresoTransferencia += $pago->monto;
+        }
+
+        if ($pago->venta_id == null) {
+            $totalOtrosIngresos += $pago->monto;
+        }
+
+        // SOLO UNA VENTA REAL
+        if (
+            $pago->venta_id != null &&
+            str_starts_with($pago->descripcion ?? '', 'PAGO VENTA')
+        ) {
+            $totalVentas += $pago->monto;
+        }
+    }
 
 
-                        if ($pago->venta_id == null) {
-                            $totalOtrosIngresos += $pago->monto;
-                        }
+    if ($pago->estado === 'SALIDA') {
 
-                        if ($pago->venta_id != null) {
-                            $totalVentas += $pago->monto;
-                        }
+        $montoSalida = $pago->movimientoCaja
+            ? $pago->movimientoCaja->monto
+            : $pago->monto;
 
+        if ($pago->tipo_pago === 'EFECTIVO') {
+            $totalSalidaEfectivo += $montoSalida;
+        }
 
-                    }
+        if ($pago->tipo_pago === 'QR') {
+            $totalSalidaQR += $montoSalida;
+        }
 
-                    if ($pago->estado === 'SALIDA') {
+        if ($pago->tipo_pago === 'TRANSFERENCIA') {
+            $totalSalidaTransferencia += $montoSalida;
+        }
 
-                        $montoSalida = $pago->movimientoCaja
-                            ? $pago->movimientoCaja->monto
-                            : $pago->monto;
+        // DEVOLUCION RESTA DE LAS VENTAS
+        if (
+            $pago->venta_id != null &&
+            str_starts_with($pago->descripcion ?? '', 'DEVOLUCION #')
+        ) {
+            $totalVentas -= $montoSalida;
+        }
 
-
-                        if ($pago->tipo_pago === 'EFECTIVO') {
-                            $totalSalidaEfectivo += $montoSalida;
-                        }
-
-                        if ($pago->tipo_pago === 'QR') {
-                            $totalSalidaQR += $montoSalida;
-                        }
-
-                        if ($pago->tipo_pago === 'TRANSFERENCIA') {
-                            $totalSalidaTransferencia += $montoSalida;
-                        }
-
-                        if ($pago->venta_id != null && str_starts_with($pago->descripcion ?? '', 'DEVOLUCION #')) {
-                            $totalVentas -= $montoSalida;
-                        }
-
+        if (
+            $pago->venta_id != null &&
+            str_starts_with($pago->descripcion ?? '', 'ANULACION DEVOLUCION')
+        ) {
+            $totalVentas += $pago->monto;
+        }
 
 
-                    }
+    }
                 @endphp
             @empty
                 <h4 class="text-danger">No hay datos</h4>

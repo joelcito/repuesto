@@ -25,9 +25,9 @@ class Devolucion extends Model
         'tipo',
         'total',
         'motivo',
+        'metodo_pago',
 
-        'estado',
-        'usuario_creador_id'
+        'estado'
     ];
 
 

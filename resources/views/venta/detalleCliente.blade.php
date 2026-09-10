@@ -203,7 +203,7 @@
         }
 
         function editarEstadoOrdenTrabajo(orden, estado) {
-            console.log(orden);
+           
 
             $('#numero_orden_trabajo_text').text(orden)
             $('#estado_orden_trabajo').val(estado)

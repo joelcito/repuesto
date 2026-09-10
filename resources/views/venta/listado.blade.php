@@ -103,12 +103,12 @@
             }
         })
         $(document).ready(function () {
-            console.log('dddd');
+           
             ajaxListado();
         });
 
         function ajaxListado() {
-            console.log('ENTRO AJAX');
+            
             Swal.fire({
                 title: 'Generando Listado...',
                 text: 'Por favor espera mientras generamos el listado.',

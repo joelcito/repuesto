@@ -591,8 +591,7 @@
                 }
             });
 
-            console.log($('#imagenes')[0].files);
-            console.log($('#imagenes')[0].files.length);
+          
             $.ajax({
                 url: "{{ route('producto.guardarProducto') }}",
                 method: "POST",

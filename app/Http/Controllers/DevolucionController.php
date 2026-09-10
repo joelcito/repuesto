@@ -82,7 +82,8 @@ class DevolucionController extends Controller
                 'venta_id' => 'required',
                 'productos' => 'required|array|min:1',
                 'tipo' => 'required',
-                'motivo' => 'required'
+                'motivo' => 'required',
+                'metodo_pago' => 'required_if:tipo,DINERO'
             ]);
 
             $usuario = Auth::user();
@@ -129,6 +130,9 @@ class DevolucionController extends Controller
                 'caja_id' => $venta->caja_id,
                 'usuario_cliente_id' => $venta->usuario_cliente_id,
                 'tipo' => $request->tipo,
+                'metodo_pago' => $request->tipo == 'DINERO'
+                    ? $request->metodo_pago
+                    : null,
                 'motivo' => $request->motivo,
                 'total' => $totalGeneral,
                 'estado' => 'INGRESO',
@@ -187,7 +191,7 @@ class DevolucionController extends Controller
                     'caja_id' => $venta->caja_id,
                     'venta_id' => $venta->id,
                     'tipo' => 'SALIDA',
-                    'metodo_pago' => $venta->metodo_pago,
+                    'metodo_pago' => $request->metodo_pago,
                     'monto' => $devolucion->total,
                     'descripcion' => 'DEVOLUCION #' . $devolucion->id,
                     'fecha' => now(),
@@ -201,9 +205,10 @@ class DevolucionController extends Controller
                     'fecha' => now(),
                     'sucursal_id' => $venta->caja->sucursal_id,
                     'monto' => $devolucion->total,
-                    'tipo_pago' => $venta->metodo_pago,
+                    'tipo_pago' => $request->metodo_pago,
                     'descripcion' => 'DEVOLUCION #' . $devolucion->id,
-                    'estado' => 'SALIDA'
+                    'estado' => 'SALIDA',
+                    'caja_id' => $venta->caja_id
                 ]);
 
                 $venta->caja->increment(
@@ -216,11 +221,9 @@ class DevolucionController extends Controller
                 ->whereRaw('cantidad > COALESCE(cantidad_devuelta,0)')
                 ->count();
 
-            $totalDevuelto = DevolucionDetalle::where('devolucion_id', $devolucion->id)
-                ->sum('subtotal');
-
-
-            $venta->total = max(0, $venta->total - $totalDevuelto);
+            // $totalDevuelto = DevolucionDetalle::where('devolucion_id', $devolucion->id)
+            //     ->sum('subtotal');
+            // $venta->total = max(0, $venta->total - $totalDevuelto);
 
             $venta->estado = $pendientes == 0
                 ? 'DEVUELTO'
@@ -308,7 +311,7 @@ class DevolucionController extends Controller
                     'caja_id' => $venta->caja_id,
                     'venta_id' => $venta->id,
                     'tipo' => 'INGRESO',
-                    'metodo_pago' => $venta->metodo_pago,
+                    'metodo_pago' => $devolucion->metodo_pago,
                     'monto' => $devolucion->total,
                     'descripcion' =>
                         'ANULACION DEVOLUCION #' .
@@ -323,11 +326,12 @@ class DevolucionController extends Controller
                     'venta_id' => $venta->id,
                     'sucursal_id' => $venta->caja->sucursal_id,
                     'monto' => $devolucion->total,
+                     'caja_id' => $venta->caja_id,
                     'cambio' => 0,
                     'fecha' => now(),
                     'descripcion' =>
                         'ANULACION DEVOLUCION',
-                    'tipo_pago' => $venta->metodo_pago,
+                    'tipo_pago' => $devolucion->metodo_pago,
                     'estado' => 'INGRESO'
                 ]);
 
@@ -344,21 +348,36 @@ class DevolucionController extends Controller
             $devolucion->save();
 
 
-            $detallesPendientes =
-                VentaDetalle::where(
-                    'venta_id',
-                    $venta->id
-                )
-                    ->whereRaw(
-                        'cantidad > COALESCE(cantidad_devuelta,0)'
-                    )
-                    ->count();
-            if ($detallesPendientes == 0) {
+            // $detallesPendientes =
+            //     VentaDetalle::where(
+            //         'venta_id',
+            //         $venta->id
+            //     )
+            //         ->whereRaw(
+            //             'cantidad > COALESCE(cantidad_devuelta,0)'
+            //         )
+            //         ->count();
+            // if ($detallesPendientes == 0) {
+            //     $venta->estado = 'DEVUELTO';
+            // } else {
+            //     $venta->estado =
+            //         'DEVOLUCION_PARCIAL';
+            // }
+
+            $totalDevueltoVenta = VentaDetalle::where('venta_id', $venta->id)
+                ->sum('cantidad_devuelta');
+
+            $totalVendidoVenta = VentaDetalle::where('venta_id', $venta->id)
+                ->sum('cantidad');
+
+            if ($totalDevueltoVenta <= 0) {
+                $venta->estado = 'SALIDA';
+            } elseif ($totalDevueltoVenta >= $totalVendidoVenta) {
                 $venta->estado = 'DEVUELTO';
             } else {
-                $venta->estado =
-                    'DEVOLUCION_PARCIAL';
+                $venta->estado = 'DEVOLUCION_PARCIAL';
             }
+
             $venta->save();
             DB::commit();
             return response()->json([
