@@ -99,7 +99,14 @@
                         </div>
                         <div class="col-md-4">
                             <div class="fv-row mb-7">
-                                <label class="required fw-semibold fs-6 mb-2">password</label>
+                                <label class="fw-semibold fs-6 mb-2">Email</label>
+                                <input type="email" class="form-control form-control-sm" id="email"
+                                    name="email">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Password</label>
                                 <input type="password" class="form-control form-control-sm" id="password"
                                     name="password">
                             </div>
