@@ -320,5 +320,80 @@ class ProductoController extends Controller
         ]);
     }
 
+    public function visualizarHistorialIngreso(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $producto_id = $request->input('producto');
+
+            $movimientos = Movimiento::where('producto_id', $producto_id)
+                ->where('tipo', 'INGRESO')
+                ->orderBy('id', 'DESC')
+                ->get();
+
+            $producto = Producto::find($producto_id);
+
+            /*
+        |--------------------------------------------------------------------------
+        | Datos para gráfica
+        |--------------------------------------------------------------------------
+        | Para la gráfica los ordenamos del más antiguo al más reciente.
+        */
+            $movimientosGrafica = $movimientos
+                ->sortBy('id')
+                ->values();
+
+            $grafica = $movimientosGrafica->map(function ($movimiento) {
+
+                return [
+                    'id' => $movimiento->id,
+
+                    'fecha' => $movimiento->fecha
+                        ? \Carbon\Carbon::parse($movimiento->fecha)->format('d/m/Y H:i')
+                        : '',
+
+                    'cantidad' => (float) ($movimiento->cantidad ?? 0),
+
+                    'precio_compra' => (float) ($movimiento->precio_compra ?? 0),
+
+                    'precio_venta' => (float) ($movimiento->precio_venta ?? 0),
+
+                    'precio_mayor' => (float) ($movimiento->precio_mayor ?? 0),
+                ];
+            });
+
+            $valores = [
+
+                'listado' => view(
+                    'producto.visualizarHistorialIngreso'
+                )
+                    ->with(
+                        compact(
+                            'movimientos',
+                            'producto'
+                        )
+                    )
+                    ->render(),
+
+                'grafica' => $grafica,
+
+                'producto' => $producto->nombre ?? ''
+            ];
+
+            $data = Respuesta::success(
+                $valores,
+                "Producto generado con éxito"
+            );
+        } else {
+
+            $data = Respuesta::error(
+                null,
+                "Error al obtener los datos"
+            );
+        }
+
+        return $data;
+    }
+
 
 }

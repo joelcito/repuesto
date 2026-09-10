@@ -28,6 +28,7 @@ class Movimiento extends Model
         'precio_compra',
         'precio_venta',
         'compra_ingreso',
+        'precio_mayor',
 
         'motivo',
 

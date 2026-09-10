@@ -54,6 +54,7 @@
                         @endif
                     </td>
                     <td>
+                        <button class="btn btn-sm btn-primary btn-icon btn-circle" title="Ver historial de ingresos" onclick="visualizarHistorialIngreso({{ $producto->id }})"><i class="fa fa-eye"></i></button>
                         <button class="btn btn-icon btn-sm btn-dark btn-circle" title="Imprimir Código de Barras"
                             onclick="mostrarCodigoBarras({{ $producto->id }})"><i class="fa fa-barcode"></i></button>
                         <button class="btn btn-icon btn-sm btn-info btn-circle" title="Ver Stock"

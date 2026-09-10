@@ -30,9 +30,9 @@ return new class extends Migration {
 
             $table->integer('cantidad')->default(0);
 
-
             $table->decimal('precio_compra', 10, 2)->nullable();
             $table->decimal('precio_venta', 10, 2)->nullable();
+            $table->decimal('precio_mayor', 10, 2)->nullable();
 
             $table->string('motivo')->nullable();
 

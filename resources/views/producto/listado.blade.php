@@ -280,15 +280,20 @@
                             <label class="form-label fw-bold">
                                 Precio Compra
                             </label>
-                            <input type="number" class="form-control form-control-sm" id="precio_compra_ingreso"
-                                name="precio_compra" min="0.01" step="0.01">
+                            <input type="number" class="form-control form-control-sm" id="precio_compra_ingreso" name="precio_compra" min="0.01" step="0.01">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">
                                 Precio Venta
                             </label>
-                            <input type="number" class="form-control form-control-sm" id="precio_venta_ingreso"
-                                name="precio_venta" min="0.01" step="0.01">
+                            <input type="number" class="form-control form-control-sm" id="precio_venta_ingreso" name="precio_venta" min="0.01" step="0.01">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">
+                                Precio por Mayor
+                            </label>
+                            <input type="number" class="form-control form-control-sm" id="precio_pormayor_ingreso" name="precio_pormayor" min="0.01"
+                                step="0.01">
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -463,6 +468,45 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalVerHistorialPago" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header" id="kt_modal_add_user_header">
+                <h3 class="fw-bold">
+                    HISTORIAL DE INGRESOS
+                </h3>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body scroll-y">
+
+                <!-- GRÁFICA -->
+                <div class="card mb-5">
+                    <div class="card-body">
+
+                        <h5 class="fw-bold mb-4">
+                            Evolución de ingresos y precios
+                        </h5>
+
+                        <div style="height: 350px;">
+                            <canvas id="graficaHistorialIngreso"></canvas>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TABLA -->
+                <div id="tabla_historial_ingreso"></div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <div class="d-flex flex-column flex-column-fluid">
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxlg">
@@ -538,6 +582,8 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+
+        let graficaHistorialIngreso = null;
 
         $(document).ready(function () {
             ajaxListado();
@@ -860,6 +906,7 @@
                         $('#idProd').val(productoId);
                         $('#precio_compra_ingreso').val(prod.precio_compra || 0);
                         $('#precio_venta_ingreso').val(prod.precio_venta || 0);
+                        $('#precio_pormayor_ingreso').val(prod.precio_mayor || 0);
                         $('#cantidad_ingreso').val('');
                         $('#descripcion_ingreso').val('');
                     }, 200);
@@ -1504,6 +1551,209 @@
                 ventana.close();
 
             }, 500);
+
+        }
+
+        function visualizarHistorialIngreso(pro){
+            $.ajax({
+                url: "{{ route('producto.visualizarHistorialIngreso') }}",
+                method: "POST",
+                data: {producto: pro},
+                success: function (res) {
+                    console.log(res);
+                    if (res.estado) {
+                        $('#tabla_historial_ingreso').html(res.data.listado);
+                        $('#modalVerHistorialPago').modal('show')
+                        // GENERAR GRÁFICA
+                        generarGraficaHistorialIngreso(
+                        res.data.grafica
+                        );
+                    }
+                }
+            });
+        }
+
+        function generarGraficaHistorialIngreso(datos) {
+
+            const labels = datos.map(function(item) {
+                return item.fecha;
+            });
+
+            const cantidades = datos.map(function(item) {
+                return item.cantidad;
+            });
+
+            const preciosCompra = datos.map(function(item) {
+                return item.precio_compra;
+            });
+
+            const preciosVenta = datos.map(function(item) {
+                return item.precio_venta;
+            });
+
+            const preciosMayor = datos.map(function(item) {
+                return item.precio_mayor;
+            });
+
+
+            const canvas = document.getElementById(
+                'graficaHistorialIngreso'
+            );
+
+            const ctx = canvas.getContext('2d');
+
+
+            // IMPORTANTE:
+            // destruir gráfica anterior antes de crear otra
+            if (graficaHistorialIngreso !== null) {
+
+                graficaHistorialIngreso.destroy();
+
+            }
+
+
+            graficaHistorialIngreso = new Chart(ctx, {
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+                            type: 'bar',
+                            label: 'Cantidad ingresada',
+                            data: cantidades,
+                            yAxisID: 'yCantidad'
+                        },
+
+                        {
+                            type: 'line',
+                            label: 'Precio Compra',
+                            data: preciosCompra,
+                            tension: 0.3,
+                            yAxisID: 'yPrecio'
+                        },
+
+                        {
+                            type: 'line',
+                            label: 'Precio Venta',
+                            data: preciosVenta,
+                            tension: 0.3,
+                            yAxisID: 'yPrecio'
+                        },
+
+                        {
+                            type: 'line',
+                            label: 'Precio por Mayor',
+                            data: preciosMayor,
+                            tension: 0.3,
+                            yAxisID: 'yPrecio'
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+
+                    plugins: {
+
+                        legend: {
+                            position: 'top'
+                        },
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label: function(context) {
+
+                                    let label =
+                                        context.dataset.label || '';
+
+                                    let valor =
+                                        context.parsed.y;
+
+                                    if (
+                                        context.dataset.label ===
+                                        'Cantidad ingresada'
+                                    ) {
+
+                                        return label + ': ' + valor;
+
+                                    }
+
+                                    return label + ': Bs ' +
+                                        parseFloat(valor).toFixed(2);
+
+                                }
+
+                            }
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        yCantidad: {
+
+                            type: 'linear',
+
+                            position: 'left',
+
+                            beginAtZero: true,
+
+                            title: {
+                                display: true,
+                                text: 'Cantidad'
+                            }
+
+                        },
+
+                        yPrecio: {
+
+                            type: 'linear',
+
+                            position: 'right',
+
+                            beginAtZero: true,
+
+                            grid: {
+                                drawOnChartArea: false
+                            },
+
+                            title: {
+                                display: true,
+                                text: 'Precio Bs'
+                            }
+
+                        },
+
+                        x: {
+
+                            title: {
+                                display: true,
+                                text: 'Fecha de ingreso'
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            });
 
         }
     </script>

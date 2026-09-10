@@ -39,50 +39,49 @@ class MovimientoController extends Controller
     public function guardarIngreso(Request $request)
     {
         if ($request->ajax()) {
-            $producto_id = $request->idProd;
-            $sucursal_id = $request->idSuc;
 
-            $ultimo = Movimiento::where('tipo', 'INGRESO')
-                ->max('compra_ingreso');
+            // dd($request->all());
 
+            $producto_id    = $request->idProd;
+            $sucursal_id    = $request->idSuc;
+            $ultimo         = Movimiento::where('tipo', 'INGRESO')->max('compra_ingreso');
             $compra_ingreso = $ultimo ? $ultimo + 1 : 1;
 
             $request->validate([
-                'idProd' => 'required',
-                'idSuc' => 'required',
-                'cantidad' => 'required|numeric|min:1',
-                'precio_compra' => 'required|numeric|min:0',
-                'precio_venta' => 'required|numeric|min:0',
-
+                'idProd'          => 'required',
+                'idSuc'           => 'required',
+                'cantidad'        => 'required|numeric|min:1',
+                'precio_compra'   => 'required|numeric|min:0',
+                'precio_venta'    => 'required|numeric|min:0',
+                'precio_pormayor' => 'required|numeric|min:0',
             ]);
 
             $usuario = Auth::user();
 
             Movimiento::create([
                 'usuario_creador_id' => $usuario->id,
-                'producto_id' => $producto_id,
-                'sucursal_id' => $sucursal_id,
-                'tipo' => 'INGRESO',
-                'cantidad' => $request->cantidad,
-                'precio_compra' => $request->precio_compra,
-                'precio_venta' => $request->precio_venta,
-                'compra_ingreso' => $compra_ingreso,
-                'fecha' => now(),
-                'descripcion' => $request->descripcion,
-                'estado' => 'INGRESO'
+                'producto_id'        => $producto_id,
+                'sucursal_id'        => $sucursal_id,
+                'tipo'               => 'INGRESO',
+                'cantidad'           => $request->cantidad,
+                'precio_compra'      => $request->precio_compra,
+                'precio_venta'       => $request->precio_venta,
+                'compra_ingreso'     => $compra_ingreso,
+                'precio_mayor'       => $request->precio_pormayor,
+                'fecha'              => now(),
+                'descripcion'        => $request->descripcion,
+                'estado'             => 'INGRESO'
             ]);
 
-            if ($request->precio_compra || $request->precio_venta) {
-                $producto = Producto::find($producto_id);
+            if ($request->precio_compra || $request->precio_venta || $request->precio_pormayor) {
+                $producto                = Producto::find($producto_id);
                 $producto->precio_compra = $request->precio_compra;
-                $producto->precio_venta = $request->precio_venta;
+                $producto->precio_venta  = $request->precio_venta;
+                $producto->precio_mayor  = $request->precio_pormayor;
                 $producto->save();
             }
 
-            return Respuesta::success(
-                null,
-                "Ingreso registrado correctamente"
-            );
+            return Respuesta::success(null,"Ingreso registrado correctamente");
         }
 
         return Respuesta::error(null, "Error");

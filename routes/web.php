@@ -105,6 +105,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}', [ProductoController::class, 'obtenerProducto']);
         Route::post('/generarCodigoBarra', [ProductoController::class, 'generarCodigoBarra']);
         Route::post('/verificar-codigo-barras', [ProductoController::class, 'verificarCodigoBarras'])->name('producto.verificarCodigoBarras');
+        Route::post('/visualizarHistorialIngreso', [ProductoController::class, 'visualizarHistorialIngreso'])->name('producto.visualizarHistorialIngreso');
 
     });
 
