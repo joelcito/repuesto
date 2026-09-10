@@ -42,13 +42,13 @@ class ReporteController extends Controller
     }
 
     public function inventarios(Request $request)
-    {
-        $clientes = User::where('rol_id', 3)->get();
+{
+    $clientes = User::where('rol_id', 3)->get();
+    $sucursales = Sucursal::all();
 
-
-        return view('reporte.inventarios')
-            ->with(compact('clientes', 'sucursales'));
-    }
+    return view('reporte.inventarios')
+        ->with(compact('clientes', 'sucursales'));
+}
 
     public function pagos(Request $request)
     {
