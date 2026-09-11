@@ -107,6 +107,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/verificar-codigo-barras', [ProductoController::class, 'verificarCodigoBarras'])->name('producto.verificarCodigoBarras');
         Route::post('/visualizarHistorialIngreso', [ProductoController::class, 'visualizarHistorialIngreso'])->name('producto.visualizarHistorialIngreso');
 
+        Route::post('/verificar-codigo-interno', [ProductoController::class, 'verificarCodigoInterno'])->name('producto.verificarCodigoInterno');
+
     });
 
     Route::prefix('/categoria')->group(function () {

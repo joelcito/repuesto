@@ -42,11 +42,22 @@
                                     <div id="mensaje_codigo_barras" class="invalid-feedback" style="display:none;">
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Código</label>
-                                    <input type="text" class="form-control form-control-sm" name="codigo_interno"
+
+                                    <input type="text"
+                                        class="form-control form-control-sm"
+                                        name="codigo_interno"
                                         id="codigo_interno">
+
+                                    <div id="mensaje_codigo_interno"
+                                        class="invalid-feedback"
+                                        style="display:none;">
+                                    </div>
                                 </div>
+
+
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Nombre</label>
                                     <input type="text" class="form-control form-control-sm" name="nombre" id="nombre">
@@ -601,22 +612,88 @@
 
 
 
-        function ajaxListado() {
-            $.ajax({
-                url: "{{ route('producto.ajaxListado') }}",
-                method: "POST",
-                data: {
-                    buscar: $('#buscar').val(),
-                    estado: $('#f_estado').val(),
-                    stock: $('#f_stock').val(),
-                    categoria: $('#f_categoria').val(),
-                    marca: $('#f_marca').val(),
-                },
-                success: function (res) {
-                    $('#table_listado').html(res.data.listado);
-                }
-            });
+       let ajaxListadoActual = null;
+let timerBusqueda = null;
+
+function ajaxListado() {
+
+    // Cancelar petición anterior si todavía está ejecutándose
+    if (ajaxListadoActual) {
+        ajaxListadoActual.abort();
+    }
+
+    const request = $.ajax({
+        url: "{{ route('producto.ajaxListado') }}",
+        method: "POST",
+        data: {
+            buscar: $('#buscar').val(),
+            estado: $('#f_estado').val(),
+            stock: $('#f_stock').val(),
+            categoria: $('#f_categoria').val(),
+            marca: $('#f_marca').val(),
+        },
+
+        success: function (res) {
+
+            if (res.estado) {
+
+                $('#table_listado').html(res.data.listado);
+
+                // Inicializar DataTables SOLO después de cargar la tabla
+                inicializarTablaProductos();
+            }
+        },
+
+        error: function (xhr, status) {
+
+            if (status !== 'abort') {
+                console.error(xhr.responseText);
+            }
         }
+    });
+
+    ajaxListadoActual = request;
+
+    request.always(function () {
+        if (ajaxListadoActual === request) {
+            ajaxListadoActual = null;
+        }
+    });
+}
+
+
+function inicializarTablaProductos() {
+
+    const tabla = $('#kt_table_producto');
+
+    if (!tabla.length) {
+        return;
+    }
+
+    tabla.DataTable({
+        lengthMenu: [10, 25, 50, 100],
+
+        dom: '<"dt-head row"<"col-md-6"l><"col-md-6"f>><"clear">t<"dt-footer row"<"col-md-5"i><"col-md-7"p>>',
+
+        language: {
+            paginate: {
+                first: 'Primero',
+                last: 'Último',
+                next: 'Siguiente',
+                previous: 'Anterior'
+            },
+
+            search: 'Buscar:',
+            lengthMenu: 'Mostrar _MENU_ registros por página',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+            emptyTable: 'No hay datos disponibles'
+        },
+
+        order: [],
+
+        responsive: true
+    });
+}
         function modalNuevoProducto() {
             $('#formularioProducto')[0].reset();
             $('#id').val(0);
@@ -1298,6 +1375,9 @@
         let codigoBarrasValido = true;
         let timerCodigoBarras = null;
 
+        let codigoInternoValido = true;
+        let timerCodigoInterno = null;
+
 
         $(document).on('input', '#codigo_barras', function () {
 
@@ -1305,15 +1385,10 @@
             const codigo = $(this).val().trim();
             const id = $('#id').val() || 0;
 
-
             clearTimeout(timerCodigoBarras);
 
-
             if (codigo === '') {
-
-
                 codigoBarrasValido = false;
-
 
                 $('#codigo_barras')
                     .removeClass('is-valid is-invalid');
@@ -1342,12 +1417,8 @@
 
                     success: function (res) {
 
-
                         if (res.existe) {
-
-
                             codigoBarrasValido = false;
-
 
                             $('#codigo_barras')
                                 .removeClass('is-valid')
@@ -1361,9 +1432,7 @@
 
                         } else {
 
-
                             codigoBarrasValido = true;
-
 
                             $('#codigo_barras')
                                 .removeClass('is-invalid')
@@ -1387,40 +1456,105 @@
             }, 400);
         });
 
+            $(document).on('input', '#codigo_interno', function () {
 
-        function cargarProductos() {
-            $.ajax({
-                url: "{{ route('producto.ajaxListado') }}",
-                method: "POST",
-                data: {
-                    buscar: $('#buscar').val(),
-                    categoria: $('#f_categoria').val(),
-                    marca: $('#f_marca').val(),
-                    estado: $('#f_estado').val(),
-                    stock: $('#f_stock').val(),
-                },
-                success: function (res) {
-                    if (res.estado) {
-                        $('#table_listado').html(res.data.listado);
-                    }
+                const codigo = $(this).val().trim();
+                const id = $('#id').val() || 0;
+
+                clearTimeout(timerCodigoInterno);
+
+                if (codigo === '') {
+
+                    codigoInternoValido = true;
+
+                    $('#codigo_interno')
+                        .removeClass('is-valid is-invalid');
+
+                    $('#mensaje_codigo_interno')
+                        .hide()
+                        .text('');
+
+                    return;
                 }
+
+                timerCodigoInterno = setTimeout(function () {
+
+                    $.ajax({
+                        url: "{{ route('producto.verificarCodigoInterno') }}",
+                        method: "POST",
+                        data: {
+                            codigo_interno: codigo,
+                            id: id
+                        },
+
+                        success: function (res) {
+
+                            if (res.existe) {
+
+                                codigoInternoValido = false;
+
+                                $('#codigo_interno')
+                                    .removeClass('is-valid')
+                                    .addClass('is-invalid');
+
+                                $('#mensaje_codigo_interno')
+                                    .text('Este código ya se encuentra registrado actualmente.')
+                                    .show();
+
+                            } else {
+
+                                codigoInternoValido = true;
+
+                                $('#codigo_interno')
+                                    .removeClass('is-invalid')
+                                    .addClass('is-valid');
+
+                                $('#mensaje_codigo_interno')
+                                    .hide()
+                                    .text('');
+                            }
+                        },
+
+                        error: function (xhr) {
+
+                            console.log(xhr.responseText);
+
+                            codigoInternoValido = false;
+                        }
+
+                    });
+
+                }, 400);
             });
-        }
 
-        $(document).on('input', '#buscar', function () {
-            ajaxListado();
-        });
 
-        $(document).on('change', '#f_estado, #f_stock , #f_categoria, #f_marca', function () {
-            ajaxListado();
-        });
 
-        function limpiarFiltros() {
-            $('#buscar').val('');
-            $('#f_estado').val('');
-            $('#f_stock').val('');
-            ajaxListado();
-        }
+
+            $(document).on('input', '#buscar', function () {
+
+                clearTimeout(timerBusqueda);
+
+                timerBusqueda = setTimeout(function () {
+                    ajaxListado();
+                }, 300);
+
+            });
+
+            $(document).on('change', '#f_estado, #f_stock, #f_categoria, #f_marca', function () {
+                ajaxListado();
+            });
+
+
+                    function limpiarFiltros() {
+
+                $('#buscar').val('');
+                $('#f_estado').val('');
+                $('#f_stock').val('');
+                $('#f_categoria').val('');
+                $('#f_marca').val('');
+
+                ajaxListado();
+            }
 
         function mostrarCodigoBarras(idProducto) {
 

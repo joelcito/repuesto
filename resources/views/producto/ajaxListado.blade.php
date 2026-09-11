@@ -76,7 +76,7 @@
         </tbody>
     </table>
 </div>
-
+{{-- 
 <script>
     $(document).ready(function () {
         $('#kt_table_producto').DataTable({
@@ -100,4 +100,4 @@
 
 
     });
-</script>
+</script> --}}

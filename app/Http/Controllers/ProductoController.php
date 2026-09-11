@@ -41,6 +41,8 @@ class ProductoController extends Controller
         ));
     }
 
+    
+
     public function ajaxListado(Request $request)
     {
         $query = Producto::with([
@@ -394,6 +396,18 @@ class ProductoController extends Controller
 
         return $data;
     }
+
+
+    public function verificarCodigoInterno(Request $request)
+{
+    $existe = Producto::where('codigo_interno', $request->codigo_interno)
+        ->where('id', '!=', $request->id)
+        ->exists();
+
+    return response()->json([
+        'existe' => $existe
+    ]);
+}
 
 
 }

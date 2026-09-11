@@ -312,6 +312,11 @@
                             <div class="col-md-8">
 
                                 <div class="mb-2">
+                                    <label class="fw-bold text-muted small">Fecha y hora de la ultima modificaciòn</label>
+                                    <div id="info_ultima_modificacion" class="form-control form-control-sm bg-light"></div>
+                                </div>
+
+                                <div class="mb-2">
                                     <label class="fw-bold text-muted small">Código</label>
                                     <div id="info_codigo" class="form-control form-control-sm bg-light"></div>
                                 </div>
@@ -587,15 +592,30 @@
                     </button>`;
 
                 let inputCantidad = `
-                <input
-                    type="number"
-                    class="form-control form-control-sm cantidad-carrito"
-                    data-index="${index}"
-                    value="${item.cantidad}"
-                    min="1"
-                    step="1"
-                    style="width: 80px; margin: auto; text-align: center;">
-            `;
+                <div class="d-flex align-items-center justify-content-center gap-1">
+
+                        <button type="button"
+                            class="btn btn-sm btn-light-danger"
+                            onclick="cambiarCantidad(${index}, -1)">
+                            <i class="fa fa-minus"></i>
+                        </button>
+
+                        <input
+                            type="text"
+                            class="form-control form-control-sm cantidad-carrito text-center fw-bold"
+                            data-index="${index}"
+                            value="${item.cantidad}"
+                            readonly
+                            style="width: 55px;">
+
+                        <button type="button"
+                            class="btn btn-sm btn-light-success"
+                            onclick="cambiarCantidad(${index}, 1)">
+                            <i class="fa fa-plus"></i>
+                        </button>
+
+                    </div>
+                `;
 
 
                 tabla.row.add([
@@ -638,6 +658,40 @@
             recargarTabla();
             calcularTotal();
         });
+
+
+        function cambiarCantidad(index, cambio) {
+
+                if (!productosVenta[index]) {
+                    return;
+                }
+
+                let cantidadActual = parseFloat(productosVenta[index].cantidad) || 1;
+
+                let nuevaCantidad = cantidadActual + cambio;
+
+                // No permitir cantidades menores a 1
+                if (nuevaCantidad < 1) {
+                    return;
+                }
+
+                productosVenta[index].cantidad = nuevaCantidad;
+
+                let precio = parseFloat(productosVenta[index].precio) || 0;
+                let descuento = parseFloat(productosVenta[index].descuento) || 0;
+
+                let precioConDescuento = precio - descuento;
+
+                if (precioConDescuento < 0) {
+                    precioConDescuento = 0;
+                }
+
+                productosVenta[index].subtotal =
+                    nuevaCantidad * precioConDescuento;
+
+                recargarTabla();
+                calcularTotal();
+            }
 
 
         function calcularTotal() {
