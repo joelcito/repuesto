@@ -104,7 +104,18 @@
                 <td>{{ $pago->descripcion }}</td>
                 <td>{{ $pago->tipo_pago }}</td>
                 <td>{{ number_format($pago->monto, 2) }}</td>
-                <td>{{ number_format($pago->venta?->descuento ?? 0, 2) }}</td>
+                <td>
+                    @if($pago->estado === 'SALIDA' && str_starts_with($pago->descripcion ?? '', 'DEVOLUCION #'))
+                        @php
+                            $devolucionId = (int) str_replace('DEVOLUCION #', '', $pago->descripcion);
+                            $descuentoDevolucion = \App\Models\DevolucionDetalle::where('devolucion_id', $devolucionId)
+                                ->sum('descuento');
+                        @endphp
+                        {{ number_format($descuentoDevolucion, 2) }}
+                    @else
+                        {{ number_format($pago->venta?->descuento ?? 0, 2) }}
+                    @endif
+                </td>
                 <td>
                     @if($pago->venta)
 

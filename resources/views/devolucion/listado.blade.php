@@ -291,7 +291,7 @@
                         let disponible = item.cantidad - devuelto;
 
                         let descuentoUnitario =
-                            (item.descuento ?? 0) / item.cantidad;
+                             parseFloat(item.descuento) || 0;
 
                         let precioFinal =
                             item.precio_unitario - descuentoUnitario;
@@ -351,27 +351,29 @@
 
         });
 
-        function calcularMonto() {
-            let total = 0;
-            $('.cantidad_devolucion').each(function () {
-                let cantidad = parseFloat($(this).val()) || 0;
-                let precio = parseFloat($(this).data('precio')) || 0;
-                //total += cantidad * precio;
-                let descuento =
-                    parseFloat($(this).data('descuento')) || 0;
+       function calcularMonto() {
+    let total = 0;
 
-                let cantidadVendida =
-                    parseFloat($(this).data('cantidad')) || 1;
+    $('.cantidad_devolucion').each(function () {
 
-                let descuentoUnitario = descuento / cantidadVendida;
+        let cantidad =
+            parseFloat($(this).val()) || 0;
 
-                let subtotal =
-                    cantidad * (precio - descuentoUnitario);
+        let precio =
+            parseFloat($(this).data('precio')) || 0;
 
-                total += subtotal;
-            });
-            $('#monto').val(total.toFixed(2));
-        }
+        // El descuento YA ES UNITARIO
+        let descuentoUnitario =
+            parseFloat($(this).data('descuento')) || 0;
+
+        let subtotal =
+            cantidad * (precio - descuentoUnitario);
+
+        total += subtotal;
+    });
+
+    $('#monto').val(total.toFixed(2));
+}
 
         $(document).on('keyup change', '.cantidad_devolucion', function () { calcularMonto(); });
 
@@ -513,8 +515,7 @@
                         let devuelto = item.cantidad_devuelta ?? 0;
                         let disponible = item.cantidad - devuelto;
 
-                        let descuentoUnitario =
-                            (item.descuento ?? 0) / item.cantidad;
+                       let descuentoUnitario =  parseFloat(item.descuento) || 0;
 
                         let precioFinal =
                             item.precio_unitario - descuentoUnitario;

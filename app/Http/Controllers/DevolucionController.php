@@ -14,7 +14,7 @@ use App\Models\User;
 use App\Models\Venta;
 use App\Models\VentaDetalle;
 use App\Utils\Respuesta;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -113,9 +113,7 @@ class DevolucionController extends Controller
                 }
 
 
-                $descuentoUnitario =
-                    ($ventaDetalle->descuento ?? 0)
-                    / $ventaDetalle->cantidad;
+                $descuentoUnitario = $ventaDetalle->descuento ?? 0;
 
                 $subtotal =
                     ($item['cantidad'] * $ventaDetalle->precio_unitario)
@@ -146,9 +144,7 @@ class DevolucionController extends Controller
                     ->where('producto_id', $item['producto_id'])
                     ->first();
                 $producto = Producto::findOrFail($item['producto_id']);
-                $descuentoUnitario =
-                    ($ventaDetalle->descuento ?? 0)
-                    / $ventaDetalle->cantidad;
+                $descuentoUnitario = $ventaDetalle->descuento ?? 0;
 
                 $descuento =
                     $descuentoUnitario * $item['cantidad'];
